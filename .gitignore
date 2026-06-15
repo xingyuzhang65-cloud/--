@@ -1,0 +1,4 @@
+edge-profile/
+edge-profile-check/
+*.log
+ui-check*.png

@@ -1,0 +1,141 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>循环柜预警</title>
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <div class="layout">
+      <nav class="sidebar" aria-label="主导航">
+        <button class="tab-button active" data-tab="warning" type="button">
+          <span class="tab-icon" aria-hidden="true">⚠</span>
+          循环柜预警
+        </button>
+        <button class="tab-button" data-tab="stats" type="button">
+          <span class="tab-icon" aria-hidden="true">📊</span>
+          数据统计
+        </button>
+        <button class="tab-button" data-tab="settings" type="button">
+          <span class="tab-icon" aria-hidden="true">⚙</span>
+          系统设置
+        </button>
+      </nav>
+
+      <main class="page-shell" id="tab-warning">
+        <section class="search-panel" aria-label="搜索筛选">
+          <div class="search-row">
+            <label class="field field-wide">
+              <span>关键词</span>
+              <input id="keywordInput" type="search" placeholder="预报单号、柜号、系统柜号" autocomplete="off" />
+            </label>
+            <label class="field">
+              <span>客户名称</span>
+              <input id="customerInput" type="text" placeholder="如 TTTX" autocomplete="off" />
+            </label>
+            <label class="field">
+              <span>业务员</span>
+              <input id="salespersonInput" type="text" placeholder="如 jessie" autocomplete="off" />
+            </label>
+            <label class="field">
+              <span>类型</span>
+              <select id="orderTypeSelect">
+                <option value="">全部类型</option>
+              </select>
+            </label>
+            <label class="field">
+              <span>状态</span>
+              <select id="statusSelect">
+                <option value="">全部状态</option>
+              </select>
+            </label>
+            <label class="field">
+              <span>集装箱类型</span>
+              <select id="typeSelect">
+                <option value="">全部类型</option>
+              </select>
+            </label>
+            <label class="field">
+              <span>仓库</span>
+              <select id="warehouseSelect">
+                <option value="">全部仓库</option>
+              </select>
+            </label>
+            <label class="field">
+              <span>提柜地点</span>
+              <select id="pickupSelect">
+                <option value="">全部地点</option>
+              </select>
+            </label>
+            <div class="actions" aria-label="搜索操作">
+              <button id="searchButton" class="btn primary" type="button">搜索</button>
+              <button id="resetButton" class="btn" type="button">重置</button>
+            </div>
+          </div>
+        </section>
+
+        <section class="table-section" aria-label="循环柜预警列表">
+          <div class="table-toolbar">
+            <div class="summary">
+              <strong>循环柜预警</strong>
+              <span id="resultSummary">共 0 条</span>
+            </div>
+            <div class="selection-info" id="selectionInfo">已选 0 条</div>
+          </div>
+
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th class="col-index">#</th>
+                  <th class="col-check">
+                    <input id="selectAll" type="checkbox" aria-label="全选" />
+                  </th>
+                  <th>客户名称</th>
+                  <th>
+                    <button class="sort-button" type="button" data-sort="bookingNo">
+                      预报单号 <span class="sort-mark" aria-hidden="true"></span>
+                    </button>
+                  </th>
+                  <th>提柜地点</th>
+                  <th>仓库</th>
+                  <th>码头</th>
+                  <th>火车站</th>
+                  <th>库点数量</th>
+                  <th>中转仓</th>
+                  <th>集装箱类型</th>
+                  <th>柜号</th>
+                  <th>系统柜号</th>
+                  <th>业务员</th>
+                  <th>类型</th>
+                  <th>状态</th>
+                </tr>
+              </thead>
+              <tbody id="tableBody"></tbody>
+            </table>
+            <div id="emptyState" class="empty-state" hidden>暂无匹配数据</div>
+          </div>
+        </section>
+      </main>
+
+      <main class="page-shell" id="tab-stats" hidden>
+        <div class="placeholder-tab">
+          <div class="placeholder-icon">📊</div>
+          <h2>数据统计</h2>
+          <p>此功能正在开发中…</p>
+        </div>
+      </main>
+
+      <main class="page-shell" id="tab-settings" hidden>
+        <div class="placeholder-tab">
+          <div class="placeholder-icon">⚙</div>
+          <h2>系统设置</h2>
+          <p>此功能正在开发中…</p>
+        </div>
+      </main>
+    </div>
+
+    <script src="script.js"></script>
+  </body>
+</html>
