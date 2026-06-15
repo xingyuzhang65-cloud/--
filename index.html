@@ -9,21 +9,43 @@
   <body>
     <div class="layout">
       <nav class="sidebar" aria-label="主导航">
-        <button class="tab-button active" data-tab="warning" type="button">
-          <span class="tab-icon" aria-hidden="true">⚠</span>
-          循环柜预警
-        </button>
-        <button class="tab-button" data-tab="stats" type="button">
-          <span class="tab-icon" aria-hidden="true">📊</span>
-          数据统计
-        </button>
-        <button class="tab-button" data-tab="settings" type="button">
-          <span class="tab-icon" aria-hidden="true">⚙</span>
-          系统设置
+        <div class="menu-group-title">循环柜预报</div>
+        <button class="tab-button active" data-tab="overview" type="button">
+          <span class="tab-icon" aria-hidden="true">▦</span>
+          循环柜总览
         </button>
       </nav>
 
-      <main class="page-shell" id="tab-warning">
+      <main class="page-shell" id="tab-overview">
+        <section class="overview-panel" aria-label="循环柜总览">
+          <div class="overview-header">
+            <div>
+              <h1>循环柜总览</h1>
+              <p>按客户和仓库聚合最新预报时间与柜量，点击单元格可下钻到明细。</p>
+            </div>
+            <div class="overview-meta" id="overviewMeta">共 0 个客户</div>
+          </div>
+
+          <div class="overview-search">
+            <label class="field" style="max-width: 260px;">
+              <span>客户简称</span>
+              <select id="overviewCustomerSearch">
+                <option value="">全部客户</option>
+              </select>
+            </label>
+          </div>
+
+          <div class="matrix-wrap">
+            <table class="matrix-table" id="overviewMatrix">
+              <thead id="overviewHead"></thead>
+              <tbody id="overviewBody"></tbody>
+            </table>
+            <div id="overviewEmptyState" class="empty-state" hidden>暂无总览数据</div>
+          </div>
+        </section>
+      </main>
+
+      <main class="page-shell" id="tab-details" hidden>
         <section class="search-panel" aria-label="搜索筛选">
           <div class="search-row">
             <label class="field field-wide">
@@ -39,16 +61,26 @@
               <input id="salespersonInput" type="text" placeholder="如 jessie" autocomplete="off" />
             </label>
             <label class="field">
-              <span>类型</span>
+              <span>字段类型</span>
               <select id="orderTypeSelect">
-                <option value="">全部类型</option>
+                <option value="">全部字段类型</option>
               </select>
             </label>
             <label class="field">
-              <span>状态</span>
+              <span>运单状态</span>
               <select id="statusSelect">
-                <option value="">全部状态</option>
+                <option value="">全部运单状态</option>
               </select>
+            </label>
+            <label class="field">
+              <span>预警状态</span>
+              <select id="warningStatusSelect">
+                <option value="">全部预警状态</option>
+              </select>
+            </label>
+            <label class="field">
+              <span>创建时间</span>
+              <input id="createdAtInput" type="text" placeholder="如 2026-06-14" autocomplete="off" />
             </label>
             <label class="field">
               <span>集装箱类型</span>
@@ -75,13 +107,29 @@
           </div>
         </section>
 
-        <section class="table-section" aria-label="循环柜预警列表">
+        <section class="table-section" aria-label="预报明细列表">
           <div class="table-toolbar">
-            <div class="summary">
-              <strong>循环柜预警</strong>
-              <span id="resultSummary">共 0 条</span>
+            <div class="table-primary-actions">
+              <button id="backButton" class="btn back-btn" type="button">← 返回总览</button>
+              <button id="exportButton" class="btn" type="button">导出</button>
+              <div class="summary">
+                <strong>预报明细列表</strong>
+                <span id="resultSummary">共 0 条</span>
+              </div>
             </div>
-            <div class="selection-info" id="selectionInfo">已选 0 条</div>
+            <div class="table-actions">
+              <div class="selection-info" id="selectionInfo">已选 0 条</div>
+            </div>
+          </div>
+
+          <div class="warehouse-tabs" aria-label="仓库筛选">
+            <button class="warehouse-tab active" type="button" data-warehouse="">全部</button>
+            <button class="warehouse-tab" type="button" data-warehouse="洛杉矶仓">洛杉矶仓</button>
+            <button class="warehouse-tab" type="button" data-warehouse="芝加哥仓">芝加哥仓</button>
+            <button class="warehouse-tab" type="button" data-warehouse="新泽西仓">新泽西仓</button>
+            <button class="warehouse-tab" type="button" data-warehouse="萨凡纳仓">萨凡纳仓</button>
+            <button class="warehouse-tab" type="button" data-warehouse="休斯顿仓">休斯顿仓</button>
+            <button class="warehouse-tab" type="button" data-warehouse="奥克兰仓">奥克兰仓</button>
           </div>
 
           <div class="table-wrap">
@@ -108,8 +156,13 @@
                   <th>柜号</th>
                   <th>系统柜号</th>
                   <th>业务员</th>
-                  <th>类型</th>
-                  <th>状态</th>
+                  <th>字段类型</th>
+                  <th>运单状态</th>
+                  <th>
+                    <button class="sort-button" type="button" data-sort="createdAt">
+                      创建时间 <span class="sort-mark" aria-hidden="true"></span>
+                    </button>
+                  </th>
                 </tr>
               </thead>
               <tbody id="tableBody"></tbody>
@@ -119,21 +172,6 @@
         </section>
       </main>
 
-      <main class="page-shell" id="tab-stats" hidden>
-        <div class="placeholder-tab">
-          <div class="placeholder-icon">📊</div>
-          <h2>数据统计</h2>
-          <p>此功能正在开发中…</p>
-        </div>
-      </main>
-
-      <main class="page-shell" id="tab-settings" hidden>
-        <div class="placeholder-tab">
-          <div class="placeholder-icon">⚙</div>
-          <h2>系统设置</h2>
-          <p>此功能正在开发中…</p>
-        </div>
-      </main>
     </div>
 
     <script src="script.js"></script>
