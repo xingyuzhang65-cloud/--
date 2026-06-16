@@ -3,49 +3,140 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>循环柜预警</title>
+    <title>循环柜断档预警</title>
     <link rel="stylesheet" href="styles.css" />
   </head>
   <body>
     <div class="layout">
       <nav class="sidebar" aria-label="主导航">
-        <div class="menu-group-title">循环柜预报</div>
+        <div class="menu-group-title">循环柜预警</div>
         <button class="tab-button active" data-tab="overview" type="button">
           <span class="tab-icon" aria-hidden="true">▦</span>
-          循环柜总览
+          预警看板
         </button>
       </nav>
 
       <main class="page-shell" id="tab-overview">
-        <section class="overview-panel" aria-label="循环柜总览">
-          <div class="overview-header">
+        <section class="board-panel" aria-label="循环柜断档预警看板">
+          <div class="board-header">
             <div>
-              <h1>循环柜总览</h1>
-              <p>按客户和仓库聚合最新预报时间与柜量，点击单元格可下钻到明细。</p>
+              <h1>循环柜断档预警看板</h1>
+              <p id="monitorWindowText">监控周期加载中</p>
             </div>
-            <div class="overview-meta" id="overviewMeta">共 0 个客户</div>
+            <div class="header-tools">
+              <label class="field compact-field">
+                <span>当前视角</span>
+                <select id="roleSelect"></select>
+              </label>
+              <div class="run-meta" id="runMeta">周三 24:00 自动检测</div>
+            </div>
           </div>
 
-          <div class="overview-search">
-            <label class="field" style="max-width: 260px;">
+          <div class="board-filters">
+            <label class="field field-filter">
               <span>客户简称</span>
               <select id="overviewCustomerSearch">
-                <option value="">全部客户</option>
+                <option value=""></option>
               </select>
             </label>
+            <label class="field field-filter">
+              <span>业务员</span>
+              <select id="overviewSalespersonSearch">
+                <option value=""></option>
+              </select>
+            </label>
+            <label class="field field-range">
+              <span>最新预报时间</span>
+              <div class="range-box" id="latestTimeBox">
+                <input class="range-display" id="latestTimeDisplay" type="text" placeholder="全部" readonly autocomplete="off" />
+                <button class="range-clear" id="latestTimeClear" type="button" title="清除">✕</button>
+                <div class="range-drop" hidden>
+                  <div class="range-drop-row">
+                    <input id="latestTimeFrom" type="datetime-local" />
+                    <span>—</span>
+                    <input id="latestTimeTo" type="datetime-local" />
+                  </div>
+                </div>
+              </div>
+            </label>
+            <label class="field field-range">
+              <span>预警时间</span>
+              <div class="range-box" id="warningTimeBox">
+                <input class="range-display" id="warningTimeDisplay" type="text" placeholder="全部" readonly autocomplete="off" />
+                <button class="range-clear" id="warningTimeClear" type="button" title="清除">✕</button>
+                <div class="range-drop" hidden>
+                  <div class="range-drop-row">
+                    <input id="warningTimeFrom" type="datetime-local" />
+                    <span>—</span>
+                    <input id="warningTimeTo" type="datetime-local" />
+                  </div>
+                </div>
+              </div>
+            </label>
+            <button id="boardSearchButton" class="btn primary" type="button">搜索</button>
+            <button id="resetBoardButton" class="btn" type="button">重置</button>
           </div>
 
-          <div class="matrix-wrap">
-            <table class="matrix-table" id="overviewMatrix">
-              <thead id="overviewHead"></thead>
-              <tbody id="overviewBody"></tbody>
+          <div class="status-tabs" id="statusTabs" aria-label="预警状态筛选">
+            <button class="status-tab active" type="button" data-status="pending">
+              待处理 <strong id="countPending">0</strong>
+            </button>
+            <button class="status-tab" type="button" data-status="processed">
+              已完成 <strong id="countProcessed">0</strong>
+            </button>
+            <button class="status-tab" type="button" data-status="overdue">
+              超时未处理 <strong id="countOverdue">0</strong>
+            </button>
+            <button class="status-tab" type="button" data-status="all">
+              全部 <strong id="countAll">0</strong>
+            </button>
+          </div>
+
+          <div class="board-list-toolbar" id="boardListToolbar">
+            <div class="toolbar-actions">
+              <button class="btn tiny" id="boardListExportBtn" type="button">导出</button>
+              <button class="btn tiny primary" id="boardListBatchBtn" type="button" disabled>批量完成</button>
+              <button class="btn tiny" id="boardListViewLogBtn" type="button">查看日志</button>
+            </div>
+            <span class="toolbar-selection-info" id="boardListSelectionInfo">已选 0 条</span>
+          </div>
+
+          <div class="alert-table-wrap">
+            <table class="alert-table">
+              <thead>
+                <tr>
+                  <th class="col-check"><input id="boardSelectAll" type="checkbox" aria-label="全选" /></th>
+                  <th>客户简称</th>
+                  <th>业务员</th>
+                  <th>最新预报时间</th>
+                  <th>洛杉矶仓</th>
+                  <th>芝加哥仓</th>
+                  <th>新泽西仓</th>
+                  <th>萨凡纳仓</th>
+                  <th>休斯顿仓</th>
+                  <th>奥克兰仓</th>
+                  <th>预警时间</th>
+                </tr>
+              </thead>
+              <tbody id="alertBody"></tbody>
             </table>
-            <div id="overviewEmptyState" class="empty-state" hidden>暂无总览数据</div>
+            <div id="overviewEmptyState" class="empty-state" hidden>暂无匹配预警记录</div>
           </div>
         </section>
       </main>
 
       <main class="page-shell" id="tab-details" hidden>
+        <div class="details-top-bar">
+          <button id="backButton" class="btn back-btn" type="button">← 返回预警看板</button>
+          <strong class="details-title">预报明细列表</strong>
+          <span id="resultSummary">共 0 条</span>
+          <div class="details-top-actions">
+            <span class="selection-info" id="selectionInfo">已选 0 条</span>
+            <button id="exportSelectedButton" class="btn tiny" type="button" hidden>导出选中</button>
+            <button id="clearSelectionButton" class="btn tiny" type="button" hidden>取消选择</button>
+          </div>
+        </div>
+
         <section class="search-panel" aria-label="搜索筛选">
           <div class="search-row">
             <label class="field field-wide">
@@ -70,12 +161,6 @@
               <span>运单状态</span>
               <select id="statusSelect">
                 <option value="">全部运单状态</option>
-              </select>
-            </label>
-            <label class="field">
-              <span>预警状态</span>
-              <select id="warningStatusSelect">
-                <option value="">全部预警状态</option>
               </select>
             </label>
             <label class="field">
@@ -108,20 +193,6 @@
         </section>
 
         <section class="table-section" aria-label="预报明细列表">
-          <div class="table-toolbar">
-            <div class="table-primary-actions">
-              <button id="backButton" class="btn back-btn" type="button">← 返回总览</button>
-              <button id="exportButton" class="btn" type="button">导出</button>
-              <div class="summary">
-                <strong>预报明细列表</strong>
-                <span id="resultSummary">共 0 条</span>
-              </div>
-            </div>
-            <div class="table-actions">
-              <div class="selection-info" id="selectionInfo">已选 0 条</div>
-            </div>
-          </div>
-
           <div class="warehouse-tabs" aria-label="仓库筛选">
             <button class="warehouse-tab active" type="button" data-warehouse="">全部</button>
             <button class="warehouse-tab" type="button" data-warehouse="洛杉矶仓">洛杉矶仓</button>
@@ -130,6 +201,12 @@
             <button class="warehouse-tab" type="button" data-warehouse="萨凡纳仓">萨凡纳仓</button>
             <button class="warehouse-tab" type="button" data-warehouse="休斯顿仓">休斯顿仓</button>
             <button class="warehouse-tab" type="button" data-warehouse="奥克兰仓">奥克兰仓</button>
+          </div>
+
+          <div class="board-list-toolbar" id="detailsListToolbar">
+            <div class="toolbar-actions">
+              <button class="btn tiny" id="exportButton" type="button">导出</button>
+            </div>
           </div>
 
           <div class="table-wrap">
@@ -155,6 +232,9 @@
                   <th>集装箱类型</th>
                   <th>柜号</th>
                   <th>系统柜号</th>
+                  <th>预报总箱数</th>
+                  <th>总体积</th>
+                  <th>重量</th>
                   <th>业务员</th>
                   <th>字段类型</th>
                   <th>运单状态</th>
@@ -171,7 +251,36 @@
           </div>
         </section>
       </main>
+    </div>
 
+    <div class="modal-overlay" id="logModal" hidden>
+      <div class="modal-panel">
+        <div class="modal-header">
+          <h2>操作日志</h2>
+          <button class="modal-close-btn" id="logModalClose" type="button" aria-label="关闭">✕</button>
+        </div>
+        <div class="modal-filters">
+          <label class="field">
+            <span>客户简称</span>
+            <select id="logCustomerFilter"><option value="">全部</option></select>
+          </label>
+        </div>
+        <div class="modal-table-wrap">
+          <table class="log-table">
+            <thead>
+              <tr>
+                <th>时间</th>
+                <th>客户简称</th>
+                <th>原状态</th>
+                <th>新状态</th>
+                <th>操作人</th>
+              </tr>
+            </thead>
+            <tbody id="logTableBody"></tbody>
+          </table>
+          <div class="empty-state" id="logEmptyState" hidden>暂无操作日志</div>
+        </div>
+      </div>
     </div>
 
     <script src="script.js"></script>
