@@ -512,13 +512,13 @@ tbody tr:hover {
 
 .search-row {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
   gap: 10px 14px;
   align-items: center;
 }
 
 .field-wide {
-  grid-column: span 3;
+  grid-column: span 1;
 }
 
 .field-wide input {
@@ -527,8 +527,8 @@ tbody tr:hover {
 
 .search-row .field input,
 .search-row .field select {
-  height: 38px;
-  padding: 0 12px;
+  height: 32px;
+  padding: 0 9px;
 }
 
 .actions {
@@ -539,9 +539,8 @@ tbody tr:hover {
 }
 
 .actions .btn {
-  height: 38px;
+  height: 32px;
   min-width: 80px;
-  font-size: 13px;
 }
 
 .table-section {
