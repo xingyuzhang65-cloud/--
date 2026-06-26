@@ -3,24 +3,114 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>循环柜断档预警</title>
-    <link rel="stylesheet" href="styles.css" />
+    <title>循环柜预警</title>
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
+    <meta http-equiv="Pragma" content="no-cache" />
+    <meta http-equiv="Expires" content="0" />
+    <link rel="stylesheet" href="styles.css?v=20260626" />
+    <style>
+      .alert-table th:nth-child(13), .alert-table td:nth-child(13) { position: sticky; right: 0; z-index: 5; width: 148px; background: #fff; box-shadow: -8px 0 12px rgba(31,45,64,0.08); }
+      .alert-table th:nth-child(13) { z-index: 6; background: var(--header-bg); }
+      .alert-table th:nth-child(12), .alert-table td:nth-child(12) { width: 80px; background: #fff; }
+      .alert-table th:nth-child(11), .alert-table td:nth-child(11) { width: 160px; background: #fff; }
+      .board-content-text { color: #1d3b5c; font-size: 12px; cursor: default; }
+      .board-content-empty { color: #bcc5d0; }
+      .operator-text { color: #3a556d; font-size: 12px; font-weight: 600; }
+      .alert-table { min-width: 1740px; }
+    </style>
   </head>
   <body>
     <div class="layout">
       <nav class="sidebar" aria-label="主导航">
-        <div class="menu-group-title">循环柜预警</div>
-        <button class="tab-button active" data-tab="overview" type="button">
-          <span class="tab-icon" aria-hidden="true">▦</span>
-          预警看板
-        </button>
+        <div class="brand">
+          <span class="brand-mark">MW</span>
+          <span class="brand-name">美仓海外仓系统</span>
+        </div>
+
+        <div class="nav-menu">
+          <button class="menu-button" type="button">
+            <span class="menu-icon" aria-hidden="true">▣</span>
+            <span>货件管理</span>
+            <span class="menu-caret" aria-hidden="true">⌄</span>
+          </button>
+          <button class="menu-button muted" type="button">
+            <span class="menu-icon" aria-hidden="true">☷</span>
+            <span>出运计划</span>
+            <span class="menu-caret" aria-hidden="true">⌄</span>
+          </button>
+          <button class="menu-button active-parent" type="button" aria-expanded="true">
+            <span class="menu-icon" aria-hidden="true">▣</span>
+            <span>入库管理</span>
+            <span class="menu-caret" aria-hidden="true">⌃</span>
+          </button>
+          <div class="submenu open">
+            <button class="submenu-button" type="button">
+              <span class="submenu-icon" aria-hidden="true">▧</span>
+              <span>预报单</span>
+            </button>
+            <button class="submenu-button" type="button">
+              <span class="submenu-icon" aria-hidden="true">▧</span>
+              <span>运单管理</span>
+            </button>
+            <button class="tab-button active" data-tab="overview" type="button">
+              <span class="tab-icon" aria-hidden="true">▦</span>
+              <span>循环柜预警</span>
+            </button>
+          </div>
+          <button class="menu-button" type="button">
+            <span class="menu-icon" aria-hidden="true">♙</span>
+            <span>库内管理</span>
+            <span class="menu-caret" aria-hidden="true">⌄</span>
+          </button>
+          <button class="menu-button" type="button">
+            <span class="menu-icon" aria-hidden="true">♙</span>
+            <span>出库管理</span>
+            <span class="menu-caret" aria-hidden="true">⌄</span>
+          </button>
+          <button class="menu-button" type="button">
+            <span class="menu-icon" aria-hidden="true">⌂</span>
+            <span>仓库管理</span>
+            <span class="menu-caret" aria-hidden="true">⌄</span>
+          </button>
+          <button class="menu-button" type="button">
+            <span class="menu-icon" aria-hidden="true">♙</span>
+            <span>数据报表</span>
+            <span class="menu-caret" aria-hidden="true">⌄</span>
+          </button>
+          <button class="menu-button" type="button">
+            <span class="menu-icon" aria-hidden="true">▤</span>
+            <span>单据管理</span>
+            <span class="menu-caret" aria-hidden="true">⌄</span>
+          </button>
+          <button class="menu-button" type="button">
+            <span class="menu-icon" aria-hidden="true">▣</span>
+            <span>财务管理</span>
+            <span class="menu-caret" aria-hidden="true">⌄</span>
+          </button>
+          <button class="menu-button" type="button">
+            <span class="menu-icon" aria-hidden="true">⚙</span>
+            <span>系统设置</span>
+            <span class="menu-caret" aria-hidden="true">⌄</span>
+          </button>
+          <button class="menu-button" type="button">
+            <span class="menu-icon" aria-hidden="true">?</span>
+            <span>询价报价管理</span>
+            <span class="menu-caret" aria-hidden="true">⌄</span>
+          </button>
+          <button class="menu-button" type="button">
+            <span class="menu-icon" aria-hidden="true">♙</span>
+            <span>报价询价</span>
+            <span class="menu-caret" aria-hidden="true">⌄</span>
+          </button>
+        </div>
+        <button class="sidebar-collapse" type="button" aria-label="收起侧栏">‹</button>
       </nav>
 
       <main class="page-shell" id="tab-overview">
-        <section class="board-panel" aria-label="循环柜断档预警看板">
+        <section class="board-panel" aria-label="循环柜预警">
           <div class="board-header">
             <div>
-              <h1>循环柜断档预警看板</h1>
+              <h1>循环柜预警</h1>
               <p id="monitorWindowText">监控周期加载中</p>
             </div>
             <div class="header-tools">
@@ -42,6 +132,12 @@
             <label class="field field-filter">
               <span>业务员</span>
               <select id="overviewSalespersonSearch">
+                <option value=""></option>
+              </select>
+            </label>
+            <label class="field field-filter">
+              <span>操作人</span>
+              <select id="overviewOperatorSearch">
                 <option value=""></option>
               </select>
             </label>
@@ -84,9 +180,6 @@
             <button class="status-tab" type="button" data-status="processed">
               已完成 <strong id="countProcessed">0</strong>
             </button>
-            <button class="status-tab" type="button" data-status="overdue">
-              超时未处理 <strong id="countOverdue">0</strong>
-            </button>
             <button class="status-tab" type="button" data-status="all">
               全部 <strong id="countAll">0</strong>
             </button>
@@ -96,6 +189,7 @@
             <div class="toolbar-actions">
               <button class="btn tiny" id="boardListExportBtn" type="button">导出</button>
               <button class="btn tiny primary" id="boardListBatchBtn" type="button" disabled>批量完成</button>
+              <button class="btn tiny" id="boardListBatchRemarkBtn" type="button" disabled>批量备注</button>
               <button class="btn tiny" id="boardListViewLogBtn" type="button">查看日志</button>
             </div>
             <span class="toolbar-selection-info" id="boardListSelectionInfo">已选 0 条</span>
@@ -115,6 +209,8 @@
                   <th>萨凡纳仓</th>
                   <th>休斯顿仓</th>
                   <th>奥克兰仓</th>
+                  <th>处理内容</th>
+                  <th>操作人</th>
                   <th>预警时间</th>
                 </tr>
               </thead>
@@ -125,9 +221,9 @@
         </section>
       </main>
 
-      <main class="page-shell" id="tab-details" hidden>
+      <main class="page-shell details-drawer" id="tab-details" hidden>
         <div class="details-top-bar">
-          <button id="backButton" class="btn back-btn" type="button">← 返回预警看板</button>
+          <button id="backButton" class="drawer-close-btn" type="button" aria-label="关闭">×</button>
           <strong class="details-title">预报明细列表</strong>
           <span id="resultSummary">共 0 条</span>
           <div class="details-top-actions">
@@ -139,10 +235,6 @@
 
         <section class="search-panel" aria-label="搜索筛选">
           <div class="search-row">
-            <label class="field field-wide">
-              <span>关键词</span>
-              <input id="keywordInput" type="search" placeholder="预报单号、柜号、系统柜号" autocomplete="off" />
-            </label>
             <label class="field">
               <span>客户名称</span>
               <input id="customerInput" type="text" placeholder="如 TTTX" autocomplete="off" />
@@ -168,21 +260,9 @@
               <input id="createdAtInput" type="text" placeholder="如 2026-06-14" autocomplete="off" />
             </label>
             <label class="field">
-              <span>集装箱类型</span>
-              <select id="typeSelect">
-                <option value="">全部类型</option>
-              </select>
-            </label>
-            <label class="field">
               <span>仓库</span>
               <select id="warehouseSelect">
                 <option value="">全部仓库</option>
-              </select>
-            </label>
-            <label class="field">
-              <span>提柜地点</span>
-              <select id="pickupSelect">
-                <option value="">全部地点</option>
               </select>
             </label>
             <div class="actions" aria-label="搜索操作">
@@ -201,12 +281,7 @@
             <button class="warehouse-tab" type="button" data-warehouse="萨凡纳仓">萨凡纳仓</button>
             <button class="warehouse-tab" type="button" data-warehouse="休斯顿仓">休斯顿仓</button>
             <button class="warehouse-tab" type="button" data-warehouse="奥克兰仓">奥克兰仓</button>
-          </div>
-
-          <div class="board-list-toolbar" id="detailsListToolbar">
-            <div class="toolbar-actions">
-              <button class="btn tiny" id="exportButton" type="button">导出</button>
-            </div>
+            <button class="btn tiny" id="exportButton" type="button">导出</button>
           </div>
 
           <div class="table-wrap">
@@ -250,6 +325,15 @@
             <div id="emptyState" class="empty-state" hidden>暂无匹配数据</div>
           </div>
         </section>
+
+        <section class="progress-section" aria-label="问题进度">
+          <div class="progress-header">
+            <h2>问题进度 <span id="progressCustomerName"></span></h2>
+            <button id="progressUpdateBtn" class="btn tiny primary" type="button">更新进度</button>
+          </div>
+          <div class="progress-list" id="progressList"></div>
+          <div class="empty-state progress-empty" id="progressEmpty" hidden>暂无问题进度</div>
+        </section>
       </main>
     </div>
 
@@ -283,6 +367,45 @@
       </div>
     </div>
 
+    <div class="modal-overlay" id="progressModal" hidden>
+      <div class="modal-panel progress-modal-panel">
+        <div class="modal-header">
+          <h2>更新进度 <span id="progressModalCustomerName"></span></h2>
+          <button class="modal-close-btn" id="progressModalClose" type="button" aria-label="关闭">✕</button>
+        </div>
+        <div class="progress-modal-body">
+          <div class="progress-form-row">
+            <label class="progress-form-label">
+              处理进度描述
+              <span class="progress-required">*</span>
+            </label>
+            <div class="progress-form-control">
+              <textarea id="progressInput" rows="5" placeholder="请输入本次跟进处理的具体内容…"></textarea>
+            </div>
+          </div>
+          <div class="progress-form-row">
+            <label class="progress-form-label">文件附件</label>
+            <div class="progress-form-control">
+              <div class="progress-file-row">
+                <label class="attachment-picker">
+                  <input id="progressAttachment" type="file" multiple />
+                  <span>📎 选择文件</span>
+                </label>
+                <span class="attachment-name" id="progressAttachmentName">未选择任何文件</span>
+              </div>
+              <div class="progress-edit-attachments" id="progressEditAttachments" hidden></div>
+              <p class="progress-form-hint">支持上传图片、PDF 等格式，单文件不超过 10MB</p>
+            </div>
+          </div>
+          <div class="progress-modal-actions">
+            <button class="btn" id="progressCancelBtn" type="button">取消</button>
+            <button class="btn primary" id="progressConfirmBtn" type="button">确认</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div id="toast" class="toast" hidden></div>
     <script src="script.js"></script>
   </body>
 </html>

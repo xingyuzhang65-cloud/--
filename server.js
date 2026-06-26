@@ -31,7 +31,13 @@ const server = http.createServer((req, res) => {
       return;
     }
 
-    res.writeHead(200, { "Content-Type": types[path.extname(filePath)] || "application/octet-stream" });
+    const ext = path.extname(filePath);
+    res.writeHead(200, {
+      "Content-Type": types[ext] || "application/octet-stream",
+      "Cache-Control": "no-cache, no-store, must-revalidate",
+      "Pragma": "no-cache",
+      "Expires": "0"
+    });
     res.end(data);
   });
 });
