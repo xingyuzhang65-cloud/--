@@ -406,6 +406,12 @@
     </div>
 
     <div id="toast" class="toast" hidden></div>
-    <script src="script.js"></script>
+    <script src="script.js?v=20260626"></script>
+    <script>
+      window.addEventListener('error', function(e) {
+        document.querySelector('#alertBody') && (document.querySelector('#alertBody').innerHTML = '<tr><td colspan="13" style="color:red;padding:20px;text-align:center;">JS 错误: ' + e.message + ' (行 ' + e.lineno + ':' + e.colno + ')</td></tr>');
+        document.querySelector('#monitorWindowText') && (document.querySelector('#monitorWindowText').textContent = '脚本加载异常');
+      });
+    </script>
   </body>
 </html>

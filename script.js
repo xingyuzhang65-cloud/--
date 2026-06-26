@@ -1622,4 +1622,9 @@ function init() {
   applyIncomingFilter();
 }
 
-init();
+try {
+  init();
+} catch (e) {
+  document.getElementById('monitorWindowText') && (document.getElementById('monitorWindowText').textContent = '初始化失败: ' + e.message);
+  document.getElementById('alertBody') && (document.getElementById('alertBody').innerHTML = '<tr><td colspan="13" style="color:red;padding:20px;text-align:center;">初始化错误: ' + e.message + '</td></tr>');
+}
