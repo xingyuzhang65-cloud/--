@@ -97,6 +97,7 @@ const state = {
     orderType: "",
     status: "",
     createdAt: "",
+    carrierCode: "",
     type: "",
     warehouse: "",
     pickup: ""
@@ -120,33 +121,100 @@ const state = {
   editingProgressId: "",
   editingDeletedAttachments: [],
   isBatchProgress: false,
-  activeRemarkId: ""
+  activeRemarkId: "",
+  visibleDetailFields: [],
+  fieldSettingsDraft: []
 };
 
 const generatedWarnings = buildWarningRecords();
 const warningStore = loadWarningStore();
 
-const exportColumns = [
-  { title: "序号", getValue: (_row, index) => index + 1 },
-  { title: "客户名称", key: "customer" },
-  { title: "预报单号", key: "bookingNo" },
-  { title: "提柜地点", key: "pickup" },
-  { title: "仓库", key: "warehouse" },
-  { title: "码头", key: "dock" },
-  { title: "火车站", key: "rail" },
-  { title: "库点数量", key: "quantity" },
-  { title: "中转仓", key: "transit" },
-  { title: "集装箱类型", key: "type" },
-  { title: "柜号", key: "containerNo" },
-  { title: "系统柜号", key: "systemNo" },
-  { title: "预报总箱数", key: "totalBoxes" },
-  { title: "总体积", key: "volume" },
-  { title: "重量", key: "weight" },
-  { title: "业务员", key: "salesperson" },
-  { title: "字段类型", key: "orderType" },
-  { title: "运单状态", key: "status" },
-  { title: "创建时间", key: "createdAt" }
+const carrierCodeByPrefix = {
+  CCLU: "HEDE",
+  TCNU: "HEDE",
+  MSNU: "HEDE",
+  DFSU: "HEDE",
+  OOCU: "HEDE",
+  CSNU: "HEDE",
+  FFAU: "CMA",
+  TGBU: "CMA",
+  GOSU: "HEDE",
+  TCLU: "HEDE",
+  CXRU: "HEDE",
+  HLCU: "HEDE",
+  ONEU: "CMA",
+  SEKU: "HEDE",
+  CSLU: "HEDE",
+  CAAU: "CMA",
+  SMCU: "HEDE",
+  BMOU: "HEDE",
+  TTNU: "HEDE",
+  CGMU: "CMA",
+  HLXU: "HEDE",
+  MSCU: "HEDE",
+  OOLU: "CMA",
+  FSCU: "HEDE",
+  FCIU: "CMA",
+  NYKU: "HEDE"
+};
+
+function getCarrierCode(row) {
+  if (row.carrierCode) {
+    return row.carrierCode;
+  }
+
+  const prefix = String(row.containerNo || "").slice(0, 4).toUpperCase();
+  return carrierCodeByPrefix[prefix] || "HEDE";
+}
+
+const detailFieldDefaults = [
+  { id: "customer", title: "客户名称", width: 100, getText: (row) => row.customer },
+  { id: "bookingNo", title: "预报单号", width: 180, sortable: true, getText: (row) => row.bookingNo, render: (row) => linkCell(row.bookingNo) },
+  { id: "pickup", title: "提柜地点", width: 100, getText: (row) => row.pickup },
+  { id: "warehouse", title: "仓库", width: 100, getText: (row) => row.warehouse },
+  { id: "carrierCode", title: "船司代码", width: 76, className: "carrier-code-cell", getText: (row) => getCarrierCode(row), sortValue: (row) => getCarrierCode(row) },
+  { id: "dock", title: "码头", width: 90, getText: (row) => row.dock },
+  { id: "rail", title: "火车站", width: 90, getText: (row) => row.rail },
+  { id: "quantity", title: "库点数量", width: 76, getText: (row) => row.quantity },
+  { id: "transit", title: "中转仓", width: 90, getText: (row) => row.transit },
+  { id: "type", title: "集装箱类型", width: 90, getText: (row) => row.type },
+  { id: "containerNo", title: "柜号", width: 94, className: "asset-cell", getText: (row) => row.containerNo, render: (row) => linkCell(row.containerNo) },
+  { id: "systemNo", title: "系统柜号", width: 125, className: "asset-cell", getText: (row) => row.systemNo },
+  { id: "totalBoxes", title: "预报总箱数", width: 92, getText: (row) => row.totalBoxes },
+  { id: "volume", title: "总体积", width: 92, getText: (row) => row.volume },
+  { id: "weight", title: "重量", width: 92, getText: (row) => row.weight },
+  { id: "salesperson", title: "业务员", width: 140, getText: (row) => row.salesperson },
+  { id: "orderType", title: "字段类型", width: 92, getText: (row) => row.orderType },
+  { id: "status", title: "运单状态", width: 92, getText: (row) => row.status, render: (row) => `<span class="status-badge">${escapeHtml(row.status)}</span>` },
+  { id: "createdAt", title: "创建时间", width: 150, sortable: true, getText: (row) => row.createdAt }
 ];
+
+const detailFieldMap = new Map(detailFieldDefaults.map((field) => [field.id, field]));
+
+function getVisibleDetailFields() {
+  return state.visibleDetailFields
+    .filter((fieldState) => fieldState.visible)
+    .map((fieldState) => detailFieldMap.get(fieldState.id))
+    .filter(Boolean);
+}
+
+function getDetailFieldValue(field, row) {
+  if (field.getText) {
+    return field.getText(row);
+  }
+
+  return row[field.id];
+}
+
+function getExportColumns() {
+  return [
+    { title: "序号", getValue: (_row, index) => index + 1 },
+    ...getVisibleDetailFields().map((field) => ({
+      title: field.title,
+      getValue: (row) => getDetailFieldValue(field, row)
+    }))
+  ];
+}
 
 const els = {
   roleSelect: document.querySelector("#roleSelect"),
@@ -178,21 +246,29 @@ const els = {
   orderTypeSelect: document.querySelector("#orderTypeSelect"),
   statusSelect: document.querySelector("#statusSelect"),
   createdAtInput: document.querySelector("#createdAtInput"),
-  warehouseSelect: document.querySelector("#warehouseSelect"),
+  carrierCodeInput: document.querySelector("#carrierCodeInput"),
   searchButton: document.querySelector("#searchButton"),
   resetButton: document.querySelector("#resetButton"),
   backButton: document.querySelector("#backButton"),
   exportButton: document.querySelector("#exportButton"),
+  fieldSettingsButton: document.querySelector("#fieldSettingsButton"),
+  fieldSettingsMask: document.querySelector("#fieldSettingsMask"),
+  fieldSettingsDrawer: document.querySelector("#fieldSettingsDrawer"),
+  fieldSettingsClose: document.querySelector("#fieldSettingsClose"),
+  fieldSettingsCancel: document.querySelector("#fieldSettingsCancel"),
+  fieldSettingsApply: document.querySelector("#fieldSettingsApply"),
+  fieldSettingsBody: document.querySelector("#fieldSettingsBody"),
   exportSelectedButton: document.querySelector("#exportSelectedButton"),
   clearSelectionButton: document.querySelector("#clearSelectionButton"),
   boardSelectAll: document.querySelector("#boardSelectAll"),
+  detailsTable: document.querySelector("#detailsTable"),
+  detailsTableHead: document.querySelector("#detailsTableHead"),
   tableBody: document.querySelector("#tableBody"),
   resultSummary: document.querySelector("#resultSummary"),
   selectionInfo: document.querySelector("#selectionInfo"),
   selectAll: document.querySelector("#selectAll"),
   emptyState: document.querySelector("#emptyState"),
   warehouseTabs: document.querySelectorAll(".warehouse-tab"),
-  sortButtons: document.querySelectorAll(".sort-button"),
   tabButtons: document.querySelectorAll(".tab-button"),
   boardListToolbar: document.querySelector("#boardListToolbar"),
   boardListSelectionInfo: document.querySelector("#boardListSelectionInfo"),
@@ -1075,6 +1151,7 @@ function exportSelectedCSV() {
   const selectedRows = getFilteredRows().filter((row) => state.selected.has(row.containerNo));
   if (!selectedRows.length) { return; }
 
+  const exportColumns = getExportColumns();
   const header = exportColumns.map((column) => csvCell(column.title)).join(",");
   const body = selectedRows.map((row, index) => {
     return exportColumns
@@ -1112,11 +1189,12 @@ function readFilters() {
   state.filters.orderType = els.orderTypeSelect.value;
   state.filters.status = els.statusSelect.value;
   state.filters.createdAt = els.createdAtInput.value.trim().toLowerCase();
-  state.filters.warehouse = state.activeWarehouseTab || els.warehouseSelect.value;
+  state.filters.carrierCode = els.carrierCodeInput.value.trim().toLowerCase();
+  state.filters.warehouse = state.activeWarehouseTab;
 }
 
 function getFilteredRows() {
-  const { customer, salesperson, orderType, status, createdAt, warehouse } = state.filters;
+  const { customer, salesperson, orderType, status, createdAt, carrierCode, warehouse } = state.filters;
   const role = getRole();
 
   return rows
@@ -1127,16 +1205,20 @@ function getFilteredRows() {
       const orderTypeMatch = !orderType || row.orderType === orderType;
       const statusMatch = !status || row.status === status;
       const createdAtMatch = !createdAt || row.createdAt.toLowerCase().includes(createdAt);
+      const carrierCodeMatch = !carrierCode || getCarrierCode(row).toLowerCase().includes(carrierCode);
       const warehouseMatch = !warehouse || row.warehouse === warehouse;
 
-      return customerMatch && salespersonMatch && orderTypeMatch && statusMatch && createdAtMatch && warehouseMatch;
+      return customerMatch && salespersonMatch && orderTypeMatch && statusMatch && createdAtMatch && carrierCodeMatch && warehouseMatch;
     })
     .sort((a, b) => {
       if (!state.sortKey || !state.sortDirection) {
         return parseDateTime(b.createdAt) - parseDateTime(a.createdAt);
       }
 
-      const result = String(a[state.sortKey]).localeCompare(String(b[state.sortKey]), "zh-Hans-CN");
+      const sortField = detailFieldMap.get(state.sortKey);
+      const aValue = sortField?.sortValue ? sortField.sortValue(a) : a[state.sortKey];
+      const bValue = sortField?.sortValue ? sortField.sortValue(b) : b[state.sortKey];
+      const result = String(aValue ?? "").localeCompare(String(bValue ?? ""), "zh-Hans-CN");
       return state.sortDirection === "asc" ? result : -result;
     });
 }
@@ -1153,6 +1235,40 @@ function escapeHtml(value) {
     .replaceAll(">", "&gt;")
     .replaceAll('"', "&quot;")
     .replaceAll("'", "&#039;");
+}
+
+function renderDetailsHeader() {
+  const visibleFields = getVisibleDetailFields();
+  els.detailsTableHead.innerHTML = `
+    <th class="col-index">#</th>
+    <th class="col-check">
+      <input id="selectAll" type="checkbox" aria-label="全选" />
+    </th>
+    ${visibleFields.map((field) => {
+      const isSorted = state.sortKey === field.id;
+      const sortClasses = ["sort-button"];
+      if (isSorted && state.sortDirection === "asc") {
+        sortClasses.push("asc");
+      }
+      if (isSorted && state.sortDirection === "desc") {
+        sortClasses.push("desc");
+      }
+
+      const content = field.sortable
+        ? `<button class="${sortClasses.join(" ")}" type="button" data-sort="${escapeHtml(field.id)}">${escapeHtml(field.title)} <span class="sort-mark" aria-hidden="true"></span></button>`
+        : escapeHtml(field.title);
+      return `<th style="width:${field.width}px">${content}</th>`;
+    }).join("")}
+  `;
+  els.selectAll = document.querySelector("#selectAll");
+}
+
+function renderDetailsCell(field, row) {
+  const rawValue = getDetailFieldValue(field, row);
+  const content = field.render ? field.render(row) : escapeHtml(rawValue ?? "");
+  const title = escapeHtml(rawValue ?? "");
+  const className = field.className ? ` class="${field.className}"` : "";
+  return `<td${className} style="width:${field.width}px" title="${title}">${content}</td>`;
 }
 
 function formatFileSize(bytes) {
@@ -1176,6 +1292,9 @@ function showToast(message, type) {
 
 function renderTable() {
   const visibleRows = getFilteredRows();
+  const visibleFields = getVisibleDetailFields();
+  renderDetailsHeader();
+  updateDetailsTableWidth(visibleFields);
   els.tableBody.innerHTML = visibleRows
     .map((row, index) => {
       const selected = state.selected.has(row.containerNo);
@@ -1183,24 +1302,7 @@ function renderTable() {
         <tr class="${selected ? "is-selected" : ""}">
           <td>${index + 1}</td>
           <td><input class="row-check" type="checkbox" data-id="${escapeHtml(row.containerNo)}" ${selected ? "checked" : ""} aria-label="选择第 ${index + 1} 行" /></td>
-          <td title="${escapeHtml(row.customer)}">${escapeHtml(row.customer)}</td>
-          <td>${linkCell(row.bookingNo)}</td>
-          <td title="${escapeHtml(row.pickup)}">${escapeHtml(row.pickup)}</td>
-          <td title="${escapeHtml(row.warehouse)}">${escapeHtml(row.warehouse)}</td>
-          <td title="${escapeHtml(row.dock)}">${escapeHtml(row.dock)}</td>
-          <td title="${escapeHtml(row.rail)}">${escapeHtml(row.rail)}</td>
-          <td>${row.quantity}</td>
-          <td title="${escapeHtml(row.transit)}">${escapeHtml(row.transit)}</td>
-          <td>${escapeHtml(row.type)}</td>
-          <td class="asset-cell">${linkCell(row.containerNo)}</td>
-          <td class="asset-cell" title="${escapeHtml(row.systemNo)}">${escapeHtml(row.systemNo)}</td>
-          <td>${row.totalBoxes}</td>
-          <td>${row.volume}</td>
-          <td>${row.weight}</td>
-          <td title="${escapeHtml(row.salesperson)}">${escapeHtml(row.salesperson)}</td>
-          <td title="${escapeHtml(row.orderType)}">${escapeHtml(row.orderType)}</td>
-          <td><span class="status-badge">${escapeHtml(row.status)}</span></td>
-          <td title="${escapeHtml(row.createdAt)}">${escapeHtml(row.createdAt)}</td>
+          ${visibleFields.map((field) => renderDetailsCell(field, row)).join("")}
         </tr>
       `;
     })
@@ -1213,6 +1315,12 @@ function renderTable() {
   updateDetailsBatchUI();
 }
 
+function updateDetailsTableWidth(visibleFields) {
+  const baseWidth = 94;
+  const fieldsWidth = visibleFields.reduce((sum, field) => sum + field.width, 0);
+  els.detailsTable.style.width = `${Math.max(760, baseWidth + fieldsWidth)}px`;
+}
+
 function updateSelectAll(visibleRows) {
   const visibleIds = visibleRows.map((row) => row.containerNo);
   const checkedCount = visibleIds.filter((id) => state.selected.has(id)).length;
@@ -1222,6 +1330,76 @@ function updateSelectAll(visibleRows) {
 
 function applySearch() {
   readFilters();
+  renderTable();
+}
+
+function resetDetailFieldState() {
+  state.visibleDetailFields = detailFieldDefaults.map((field) => ({
+    id: field.id,
+    visible: true
+  }));
+}
+
+function openFieldSettings() {
+  state.fieldSettingsDraft = state.visibleDetailFields.map((field) => ({ ...field }));
+  renderFieldSettings();
+  els.fieldSettingsMask.hidden = false;
+  els.fieldSettingsDrawer.hidden = false;
+}
+
+function closeFieldSettings() {
+  els.fieldSettingsMask.hidden = true;
+  els.fieldSettingsDrawer.hidden = true;
+}
+
+function renderFieldSettings() {
+  els.fieldSettingsBody.innerHTML = state.fieldSettingsDraft
+    .map((fieldState, index) => {
+      const field = detailFieldMap.get(fieldState.id);
+      if (!field) {
+        return "";
+      }
+
+      return `
+        <tr data-id="${escapeHtml(field.id)}">
+          <td>${index + 1}</td>
+          <td>${escapeHtml(field.title)}</td>
+          <td>
+            <input class="field-visible-check" type="checkbox" ${fieldState.visible ? "checked" : ""} aria-label="显示 ${escapeHtml(field.title)}" />
+          </td>
+          <td>
+            <div class="field-order-actions">
+              <button class="field-order-btn" type="button" data-action="up" ${index === 0 ? "disabled" : ""} aria-label="上移 ${escapeHtml(field.title)}">▲</button>
+              <button class="field-order-btn" type="button" data-action="down" ${index === state.fieldSettingsDraft.length - 1 ? "disabled" : ""} aria-label="下移 ${escapeHtml(field.title)}">▼</button>
+            </div>
+          </td>
+        </tr>
+      `;
+    })
+    .join("");
+}
+
+function moveFieldSetting(id, direction) {
+  const currentIndex = state.fieldSettingsDraft.findIndex((field) => field.id === id);
+  const nextIndex = direction === "up" ? currentIndex - 1 : currentIndex + 1;
+  if (currentIndex < 0 || nextIndex < 0 || nextIndex >= state.fieldSettingsDraft.length) {
+    return;
+  }
+
+  const nextDraft = state.fieldSettingsDraft.slice();
+  const [item] = nextDraft.splice(currentIndex, 1);
+  nextDraft.splice(nextIndex, 0, item);
+  state.fieldSettingsDraft = nextDraft;
+  renderFieldSettings();
+}
+
+function applyFieldSettings() {
+  state.visibleDetailFields = state.fieldSettingsDraft.map((field) => ({ ...field }));
+  if (state.sortKey && !state.visibleDetailFields.some((field) => field.id === state.sortKey && field.visible)) {
+    state.sortKey = "";
+    state.sortDirection = "";
+  }
+  closeFieldSettings();
   renderTable();
 }
 
@@ -1247,6 +1425,7 @@ function getExportFileName() {
 function exportRows() {
   readFilters();
   const visibleRows = getFilteredRows();
+  const exportColumns = getExportColumns();
   const header = exportColumns.map((column) => csvCell(column.title)).join(",");
   const body = visibleRows.map((row, index) => {
     return exportColumns
@@ -1274,7 +1453,7 @@ function resetSearch() {
   els.orderTypeSelect.value = "";
   els.statusSelect.value = "";
   els.createdAtInput.value = "";
-  els.warehouseSelect.value = "";
+  els.carrierCodeInput.value = "";
   state.selected.clear();
   setActiveWarehouseTab("");
   applySearch();
@@ -1282,7 +1461,6 @@ function resetSearch() {
 
 function setActiveWarehouseTab(warehouse) {
   state.activeWarehouseTab = warehouse;
-  els.warehouseSelect.value = warehouse;
   els.warehouseTabs.forEach((tab) => {
     tab.classList.toggle("active", tab.dataset.warehouse === warehouse);
   });
@@ -1422,6 +1600,33 @@ function bindEvents() {
   els.searchButton.addEventListener("click", applySearch);
   els.resetButton.addEventListener("click", resetSearch);
   els.exportButton.addEventListener("click", exportRows);
+  els.fieldSettingsButton.addEventListener("click", openFieldSettings);
+  els.fieldSettingsClose.addEventListener("click", closeFieldSettings);
+  els.fieldSettingsCancel.addEventListener("click", closeFieldSettings);
+  els.fieldSettingsMask.addEventListener("click", closeFieldSettings);
+  els.fieldSettingsApply.addEventListener("click", applyFieldSettings);
+
+  els.fieldSettingsBody.addEventListener("change", (event) => {
+    if (!event.target.matches(".field-visible-check")) {
+      return;
+    }
+
+    const row = event.target.closest("tr");
+    const fieldState = state.fieldSettingsDraft.find((field) => field.id === row.dataset.id);
+    if (fieldState) {
+      fieldState.visible = event.target.checked;
+    }
+  });
+
+  els.fieldSettingsBody.addEventListener("click", (event) => {
+    const button = event.target.closest(".field-order-btn");
+    if (!button) {
+      return;
+    }
+
+    const row = button.closest("tr");
+    moveFieldSetting(row.dataset.id, button.dataset.action);
+  });
 
   if (els.exportSelectedButton) {
     els.exportSelectedButton.addEventListener("click", exportSelectedCSV);
@@ -1493,7 +1698,7 @@ function bindEvents() {
     });
   }
 
-  [els.customerInput, els.salespersonInput, els.createdAtInput].forEach((input) => {
+  [els.customerInput, els.salespersonInput, els.createdAtInput, els.carrierCodeInput].forEach((input) => {
     input.addEventListener("keydown", (event) => {
       if (event.key === "Enter") {
         applySearch();
@@ -1527,12 +1732,23 @@ function bindEvents() {
     });
   });
 
-  els.warehouseSelect.addEventListener("change", () => {
-    setActiveWarehouseTab(els.warehouseSelect.value);
-    applySearch();
+  els.detailsTableHead.addEventListener("click", (event) => {
+    const button = event.target.closest(".sort-button");
+    if (!button) {
+      return;
+    }
+
+    const nextSortKey = button.dataset.sort;
+    state.sortDirection = state.sortKey === nextSortKey && state.sortDirection === "desc" ? "asc" : "desc";
+    state.sortKey = nextSortKey;
+    renderTable();
   });
 
-  els.selectAll.addEventListener("change", () => {
+  els.detailsTableHead.addEventListener("change", (event) => {
+    if (!event.target.matches("#selectAll")) {
+      return;
+    }
+
     getFilteredRows().forEach((row) => {
       if (els.selectAll.checked) {
         state.selected.add(row.containerNo);
@@ -1542,22 +1758,6 @@ function bindEvents() {
     });
 
     renderTable();
-  });
-
-  els.sortButtons.forEach((button) => {
-    button.addEventListener("click", () => {
-      const nextSortKey = button.dataset.sort;
-      state.sortDirection = state.sortKey === nextSortKey && state.sortDirection === "desc" ? "asc" : "desc";
-      state.sortKey = nextSortKey;
-
-      els.sortButtons.forEach((sortButton) => {
-        const isActive = sortButton.dataset.sort === state.sortKey;
-        sortButton.classList.toggle("asc", isActive && state.sortDirection === "asc");
-        sortButton.classList.toggle("desc", isActive && state.sortDirection === "desc");
-      });
-
-      renderTable();
-    });
   });
 
   // ── Board list toolbar ──
@@ -1605,6 +1805,7 @@ function bindEvents() {
 }
 
 function init() {
+  resetDetailFieldState();
   els.monitorWindowText.textContent = `检测区间：${auditWindow.weekStart.slice(0, 10)} 周一 00:00 至 ${auditWindow.riskEnd.slice(0, 10)} 周三 23:59`;
   els.runMeta.textContent = `触发时间 ${auditWindow.triggeredAt.slice(0, 16)}`;
   renderRoleOptions();
@@ -1615,7 +1816,6 @@ function init() {
   }
   fillSelect(els.orderTypeSelect, uniqueValues("orderType"));
   fillSelect(els.statusSelect, statusOptions);
-  fillSelect(els.warehouseSelect, warehouseOptions);
   bindEvents();
   renderBoard();
   applySearch();

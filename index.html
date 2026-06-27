@@ -260,10 +260,8 @@
               <input id="createdAtInput" type="text" placeholder="如 2026-06-14" autocomplete="off" />
             </label>
             <label class="field">
-              <span>仓库</span>
-              <select id="warehouseSelect">
-                <option value="">全部仓库</option>
-              </select>
+              <span>船司代码</span>
+              <input id="carrierCodeInput" type="text" placeholder="如 HEDE" autocomplete="off" />
             </label>
             <div class="actions" aria-label="搜索操作">
               <button id="searchButton" class="btn primary" type="button">搜索</button>
@@ -282,43 +280,13 @@
             <button class="warehouse-tab" type="button" data-warehouse="休斯顿仓">休斯顿仓</button>
             <button class="warehouse-tab" type="button" data-warehouse="奥克兰仓">奥克兰仓</button>
             <button class="btn tiny" id="exportButton" type="button">导出</button>
+            <button class="icon-btn field-settings-button" id="fieldSettingsButton" type="button" aria-label="自定义列表字段" title="自定义列表字段">⚙</button>
           </div>
 
           <div class="table-wrap">
-            <table>
+            <table id="detailsTable">
               <thead>
-                <tr>
-                  <th class="col-index">#</th>
-                  <th class="col-check">
-                    <input id="selectAll" type="checkbox" aria-label="全选" />
-                  </th>
-                  <th>客户名称</th>
-                  <th>
-                    <button class="sort-button" type="button" data-sort="bookingNo">
-                      预报单号 <span class="sort-mark" aria-hidden="true"></span>
-                    </button>
-                  </th>
-                  <th>提柜地点</th>
-                  <th>仓库</th>
-                  <th>码头</th>
-                  <th>火车站</th>
-                  <th>库点数量</th>
-                  <th>中转仓</th>
-                  <th>集装箱类型</th>
-                  <th>柜号</th>
-                  <th>系统柜号</th>
-                  <th>预报总箱数</th>
-                  <th>总体积</th>
-                  <th>重量</th>
-                  <th>业务员</th>
-                  <th>字段类型</th>
-                  <th>运单状态</th>
-                  <th>
-                    <button class="sort-button" type="button" data-sort="createdAt">
-                      创建时间 <span class="sort-mark" aria-hidden="true"></span>
-                    </button>
-                  </th>
-                </tr>
+                <tr id="detailsTableHead"></tr>
               </thead>
               <tbody id="tableBody"></tbody>
             </table>
@@ -336,6 +304,31 @@
         </section>
       </main>
     </div>
+
+    <div class="field-settings-mask" id="fieldSettingsMask" hidden></div>
+    <aside class="field-settings-drawer" id="fieldSettingsDrawer" hidden aria-label="自定义列表字段">
+      <div class="field-settings-header">
+        <button class="modal-close-btn" id="fieldSettingsClose" type="button" aria-label="关闭">×</button>
+        <h2>自定义列表字段</h2>
+      </div>
+      <div class="field-settings-table-wrap">
+        <table class="field-settings-table">
+          <thead>
+            <tr>
+              <th>列顺序</th>
+              <th>字段名称(中文)</th>
+              <th>是否显示</th>
+              <th>操作</th>
+            </tr>
+          </thead>
+          <tbody id="fieldSettingsBody"></tbody>
+        </table>
+      </div>
+      <div class="field-settings-footer">
+        <button class="btn" id="fieldSettingsCancel" type="button">取消</button>
+        <button class="btn primary" id="fieldSettingsApply" type="button">应用</button>
+      </div>
+    </aside>
 
     <div class="modal-overlay" id="logModal" hidden>
       <div class="modal-panel">
