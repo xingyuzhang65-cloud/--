@@ -7,16 +7,17 @@
     <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
     <meta http-equiv="Pragma" content="no-cache" />
     <meta http-equiv="Expires" content="0" />
-    <link rel="stylesheet" href="styles.css?v=20260626" />
+    <link rel="stylesheet" href="styles.css?v=20260628-6" />
     <style>
-      .alert-table th:nth-child(13), .alert-table td:nth-child(13) { position: sticky; right: 0; z-index: 5; width: 148px; background: #fff; box-shadow: -8px 0 12px rgba(31,45,64,0.08); }
-      .alert-table th:nth-child(13) { z-index: 6; background: var(--header-bg); }
-      .alert-table th:nth-child(12), .alert-table td:nth-child(12) { width: 80px; background: #fff; }
-      .alert-table th:nth-child(11), .alert-table td:nth-child(11) { width: 160px; background: #fff; }
+      .alert-table th:nth-child(14), .alert-table td:nth-child(14) { position: sticky; right: 0; z-index: 5; width: 148px; background: #fff; box-shadow: -8px 0 12px rgba(31,45,64,0.08); }
+      .alert-table th:nth-child(14) { z-index: 6; background: var(--header-bg); }
+      .alert-table th:nth-child(13), .alert-table td:nth-child(13) { width: 80px; background: #fff; }
+      .alert-table th:nth-child(12), .alert-table td:nth-child(12) { width: 160px; background: #fff; }
+      .alert-table th:nth-child(5), .alert-table td:nth-child(5) { width: 92px; background: #fff; }
       .board-content-text { color: #1d3b5c; font-size: 12px; cursor: default; }
       .board-content-empty { color: #bcc5d0; }
       .operator-text { color: #3a556d; font-size: 12px; font-weight: 600; }
-      .alert-table { min-width: 1740px; }
+      .alert-table { min-width: 1832px; }
     </style>
   </head>
   <body>
@@ -55,6 +56,10 @@
             <button class="tab-button active" data-tab="overview" type="button">
               <span class="tab-icon" aria-hidden="true">▦</span>
               <span>循环柜预警</span>
+            </button>
+            <button class="tab-button" data-tab="warning-dashboard" type="button">
+              <span class="tab-icon" aria-hidden="true">▥</span>
+              <span>循环柜预警看板</span>
             </button>
           </div>
           <button class="menu-button" type="button">
@@ -141,6 +146,17 @@
                 <option value=""></option>
               </select>
             </label>
+            <label class="field field-filter field-week-filter">
+              <span>未预报周数</span>
+              <select id="overviewUnreportedWeeksSearch">
+                <option value="">全部</option>
+                <option value="1">1</option>
+                <option value="2">2</option>
+                <option value="3">3</option>
+                <option value="4">4</option>
+                <option value="1月以上">1月以上</option>
+              </select>
+            </label>
             <label class="field field-range">
               <span>最新预报时间</span>
               <div class="range-box" id="latestTimeBox">
@@ -203,6 +219,7 @@
                   <th>客户简称</th>
                   <th>业务员</th>
                   <th>最新预报时间</th>
+                  <th>未预报周数</th>
                   <th>洛杉矶仓</th>
                   <th>芝加哥仓</th>
                   <th>新泽西仓</th>
@@ -217,6 +234,65 @@
               <tbody id="alertBody"></tbody>
             </table>
             <div id="overviewEmptyState" class="empty-state" hidden>暂无匹配预警记录</div>
+          </div>
+        </section>
+      </main>
+
+      <main class="page-shell" id="tab-warning-dashboard" hidden>
+        <section class="dashboard-panel" aria-label="循环柜预警看板">
+          <div class="board-header">
+            <div>
+              <h1>循环柜预警看板</h1>
+              <p>按周追踪未预报客户数量，并识别连续未预报周数最高的客户</p>
+            </div>
+            <div class="header-tools">
+              <div class="run-meta" id="dashboardMeta">数据加载中</div>
+            </div>
+          </div>
+
+          <div class="board-filters dashboard-filters">
+            <label class="field field-range">
+              <span>时间范围</span>
+              <div class="range-box" id="dashboardTimeBox">
+                <input class="range-display" id="dashboardTimeDisplay" type="text" placeholder="全部" readonly autocomplete="off" />
+                <button class="range-clear" id="dashboardTimeClear" type="button" title="清除">✕</button>
+                <div class="range-drop" hidden>
+                  <div class="range-drop-row">
+                    <input id="dashboardTimeFrom" type="datetime-local" />
+                    <span>—</span>
+                    <input id="dashboardTimeTo" type="datetime-local" />
+                  </div>
+                </div>
+              </div>
+            </label>
+            <button id="dashboardSearchButton" class="btn primary" type="button">搜索</button>
+            <button id="dashboardResetButton" class="btn" type="button">重置</button>
+          </div>
+
+          <div class="dashboard-grid">
+            <article class="dashboard-card chart-card">
+              <div class="chart-head">
+                <div>
+                  <h2>每周未预报客户数量</h2>
+                  <p>近 8 周趋势</p>
+                </div>
+                <strong id="weeklyWarningTotal">0</strong>
+              </div>
+              <div class="line-chart-wrap">
+                <canvas id="weeklyWarningLineChart" height="260"></canvas>
+              </div>
+            </article>
+
+            <article class="dashboard-card chart-card">
+              <div class="chart-head">
+                <div>
+                  <h2>连续未预报周数 Top 10</h2>
+                  <p>当前预警客户范围，展示实际连续周数</p>
+                </div>
+                <strong id="topUnreportedMax">0</strong>
+              </div>
+              <div class="bar-chart-list" id="topUnreportedBarChart"></div>
+            </article>
           </div>
         </section>
       </main>
@@ -399,7 +475,7 @@
     </div>
 
     <div id="toast" class="toast" hidden></div>
-    <script src="script.js?v=20260626"></script>
+    <script src="script.js?v=20260628-6"></script>
     <script>
       window.addEventListener('error', function(e) {
         document.querySelector('#alertBody') && (document.querySelector('#alertBody').innerHTML = '<tr><td colspan="13" style="color:red;padding:20px;text-align:center;">JS 错误: ' + e.message + ' (行 ' + e.lineno + ':' + e.colno + ')</td></tr>');

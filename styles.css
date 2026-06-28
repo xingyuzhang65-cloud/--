@@ -356,7 +356,7 @@ body.details-open::after {
 
 .alert-table {
   width: 100%;
-  min-width: 1740px;
+  min-width: 1832px;
   border-collapse: collapse;
   table-layout: fixed;
 }
@@ -403,15 +403,20 @@ body.details-open::after {
   width: 148px;
 }
 
-/* 仓库列 5-10 */
-.alert-table th:nth-child(n + 5):nth-child(-n + 10),
-.alert-table td:nth-child(n + 5):nth-child(-n + 10) {
+.alert-table th:nth-child(5),
+.alert-table td:nth-child(5) {
+  width: 92px;
+}
+
+/* 仓库列 6-11 */
+.alert-table th:nth-child(n + 6):nth-child(-n + 11),
+.alert-table td:nth-child(n + 6):nth-child(-n + 11) {
   width: 148px;
 }
 
-/* 预警时间 — 最右侧 sticky (第13列) */
-.alert-table th:nth-child(13),
-.alert-table td:nth-child(13) {
+/* 预警时间 — 最右侧 sticky (第14列) */
+.alert-table th:nth-child(14),
+.alert-table td:nth-child(14) {
   position: sticky;
   right: 0;
   z-index: 5;
@@ -420,18 +425,18 @@ body.details-open::after {
   box-shadow: -8px 0 12px rgba(31, 45, 64, 0.08);
 }
 
-.alert-table th:nth-child(13) {
+.alert-table th:nth-child(14) {
   z-index: 6;
   background: var(--header-bg);
 }
 
-/* 操作人 — 第12列 */
-.alert-table th:nth-child(12),
-.alert-table td:nth-child(12) { width: 80px; }
+/* 操作人 — 第13列 */
+.alert-table th:nth-child(13),
+.alert-table td:nth-child(13) { width: 80px; }
 
-/* 处理内容 — 第11列 */
-.alert-table th:nth-child(11),
-.alert-table td:nth-child(11) { width: 160px; }
+/* 处理内容 — 第12列 */
+.alert-table th:nth-child(12),
+.alert-table td:nth-child(12) { width: 160px; }
 
 tbody tr:hover {
   background: var(--row-hover);
@@ -447,6 +452,107 @@ tbody tr:hover {
 .table-wrap tbody tr:nth-child(even):hover,
 .log-table tbody tr:nth-child(even):hover {
   background: var(--row-hover);
+}
+
+.dashboard-panel {
+  min-height: 100vh;
+  padding: 18px;
+}
+
+.dashboard-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1.1fr) minmax(360px, 0.9fr);
+  gap: 16px;
+}
+
+.dashboard-filters {
+  margin-bottom: 16px;
+}
+
+.dashboard-card {
+  background: #fff;
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  overflow: hidden;
+}
+
+.chart-card {
+  padding: 16px;
+}
+
+.chart-head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 14px;
+  margin-bottom: 12px;
+}
+
+.chart-head h2 {
+  margin: 0 0 4px;
+  color: #08233e;
+  font-size: 16px;
+}
+
+.chart-head p {
+  margin: 0;
+  color: var(--muted);
+}
+
+.chart-head strong {
+  color: #0b65d8;
+  font-size: 24px;
+  line-height: 1;
+}
+
+.line-chart-wrap {
+  height: 300px;
+}
+
+.line-chart-wrap canvas {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+.bar-chart-list {
+  display: grid;
+  gap: 10px;
+}
+
+.bar-chart-row {
+  display: grid;
+  grid-template-columns: 70px minmax(0, 1fr) 64px;
+  align-items: center;
+  gap: 10px;
+  min-height: 30px;
+}
+
+.bar-chart-name {
+  overflow: hidden;
+  color: #0b2948;
+  font-weight: 700;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.bar-chart-track {
+  height: 10px;
+  overflow: hidden;
+  border-radius: 999px;
+  background: #edf3f8;
+}
+
+.bar-chart-fill {
+  height: 100%;
+  border-radius: inherit;
+  background: linear-gradient(90deg, #0b7cff, #1aa37a);
+}
+
+.bar-chart-value {
+  color: #3a556d;
+  font-weight: 700;
+  text-align: right;
 }
 
 .alert-table tbody tr.board-selected,
@@ -525,6 +631,10 @@ tbody tr.is-selected {
 
 .field-filter select {
   width: 100%;
+}
+
+.field-week-filter {
+  min-width: 150px;
 }
 
 .field-range {
@@ -1757,6 +1867,14 @@ input[type="checkbox"] {
 
   .search-row {
     grid-template-columns: 1fr 1fr;
+  }
+
+  .dashboard-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .bar-chart-row {
+    grid-template-columns: 64px minmax(0, 1fr) 60px;
   }
 
   .field-wide,

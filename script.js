@@ -68,7 +68,12 @@ const rows = [
   { customer: "JHT", salesperson: "Cathy", orderType: "普单", status: "预报", createdAt: "2026-06-13 19:14:55", bookingNo: "REQ260610-0007-MW-JHT", pickup: "码头", warehouse: "休斯顿仓", dock: "休斯顿", rail: "", quantity: 10, transit: "", type: "40HQ", containerNo: "FCIU7782341", systemNo: "FCIU7782341-260625", totalBoxes: 10, volume: 760, weight: 28000 },
   // ── TJKD (新客户) ──
   { customer: "TJKD", salesperson: "Tina", orderType: "普单", status: "预报", createdAt: "2026-06-15 11:33:09", bookingNo: "REQ260613-0007-MW-TJKD", pickup: "码头", warehouse: "新泽西仓", dock: "纽瓦克", rail: "", quantity: 8, transit: "", type: "45HQ", containerNo: "NYKU4923105", systemNo: "NYKU4923105-260704", totalBoxes: 8, volume: 688, weight: 23200 },
-  { customer: "TJKD", salesperson: "Tina", orderType: "加急单", status: "提柜", createdAt: "2026-06-10 15:42:19", bookingNo: "REQ260607-0009-UR-TJKD", pickup: "火车站", warehouse: "芝加哥仓", dock: "", rail: "芝加哥站", quantity: 5, transit: "", type: "40GP", containerNo: "HLXU3340912", systemNo: "HLXU3340912-260618", totalBoxes: 5, volume: 335, weight: 13000 }
+  { customer: "TJKD", salesperson: "Tina", orderType: "加急单", status: "提柜", createdAt: "2026-06-10 15:42:19", bookingNo: "REQ260607-0009-UR-TJKD", pickup: "火车站", warehouse: "芝加哥仓", dock: "", rail: "芝加哥站", quantity: 5, transit: "", type: "40GP", containerNo: "HLXU3340912", systemNo: "HLXU3340912-260618", totalBoxes: 5, volume: 335, weight: 13000 },
+  // ── 未预报周数筛选演示数据 ──
+  { customer: "WEEK2", salesperson: "jessie", orderType: "普单", status: "接受", createdAt: "2026-05-28 00:00:00", bookingNo: "REQ260528-0001-MW-WEEK2", pickup: "火车站", warehouse: "洛杉矶仓", dock: "", rail: "", quantity: 6, transit: "", type: "40HQ", containerNo: "CCLU2800002", systemNo: "CCLU2800002-260528", totalBoxes: 6, volume: 456, weight: 16800 },
+  { customer: "WEEK3", salesperson: "Cathy", orderType: "普单", status: "运输中", createdAt: "2026-05-21 00:00:00", bookingNo: "REQ260521-0001-MW-WEEK3", pickup: "码头", warehouse: "芝加哥仓", dock: "芝加哥", rail: "", quantity: 8, transit: "", type: "40HQ", containerNo: "MSCU2100003", systemNo: "MSCU2100003-260521", totalBoxes: 8, volume: 608, weight: 22400 },
+  { customer: "WEEK4", salesperson: "Tina", orderType: "普单", status: "提柜", createdAt: "2026-05-14 00:00:00", bookingNo: "REQ260514-0001-MW-WEEK4", pickup: "火车站", warehouse: "新泽西仓", dock: "", rail: "", quantity: 5, transit: "", type: "40GP", containerNo: "NYKU1400004", systemNo: "NYKU1400004-260514", totalBoxes: 5, volume: 335, weight: 13000 },
+  { customer: "MONTH1", salesperson: "天晟", orderType: "普单", status: "入库处理中", createdAt: "2026-05-13 00:00:00", bookingNo: "REQ260513-0001-MW-MONTH1", pickup: "码头", warehouse: "休斯顿仓", dock: "休斯顿", rail: "", quantity: 7, transit: "", type: "40HQ", containerNo: "TGBU1300001", systemNo: "TGBU1300001-260513", totalBoxes: 7, volume: 532, weight: 19600 }
 ];
 
 const warehouseOptions = ["洛杉矶仓", "芝加哥仓", "新泽西仓", "萨凡纳仓", "休斯顿仓", "奥克兰仓"];
@@ -112,6 +117,9 @@ const state = {
   boardWarningTimeFrom: "",
   boardWarningTimeTo: "",
   boardOperatorFilter: "",
+  boardUnreportedWeeksFilter: "",
+  dashboardTimeFrom: "",
+  dashboardTimeTo: "",
   role: "admin",
   sortKey: "",
   sortDirection: "",
@@ -220,6 +228,18 @@ const els = {
   roleSelect: document.querySelector("#roleSelect"),
   monitorWindowText: document.querySelector("#monitorWindowText"),
   runMeta: document.querySelector("#runMeta"),
+  dashboardMeta: document.querySelector("#dashboardMeta"),
+  weeklyWarningLineChart: document.querySelector("#weeklyWarningLineChart"),
+  weeklyWarningTotal: document.querySelector("#weeklyWarningTotal"),
+  topUnreportedBarChart: document.querySelector("#topUnreportedBarChart"),
+  topUnreportedMax: document.querySelector("#topUnreportedMax"),
+  dashboardTimeFrom: document.querySelector("#dashboardTimeFrom"),
+  dashboardTimeTo: document.querySelector("#dashboardTimeTo"),
+  dashboardTimeDisplay: document.querySelector("#dashboardTimeDisplay"),
+  dashboardTimeBox: document.querySelector("#dashboardTimeBox"),
+  dashboardTimeClear: document.querySelector("#dashboardTimeClear"),
+  dashboardSearchButton: document.querySelector("#dashboardSearchButton"),
+  dashboardResetButton: document.querySelector("#dashboardResetButton"),
   statusTabs: document.querySelector("#statusTabs"),
   countPending: document.querySelector("#countPending"),
   countProcessed: document.querySelector("#countProcessed"),
@@ -227,6 +247,7 @@ const els = {
   overviewCustomerSearch: document.querySelector("#overviewCustomerSearch"),
   overviewSalespersonSearch: document.querySelector("#overviewSalespersonSearch"),
   overviewOperatorSearch: document.querySelector("#overviewOperatorSearch"),
+  overviewUnreportedWeeksSearch: document.querySelector("#overviewUnreportedWeeksSearch"),
   overviewLatestTimeFrom: document.querySelector("#latestTimeFrom"),
   overviewLatestTimeTo: document.querySelector("#latestTimeTo"),
   overviewWarningTimeFrom: document.querySelector("#warningTimeFrom"),
@@ -357,6 +378,31 @@ function getLatestPreorderTime(latestByWarehouse) {
     .sort((a, b) => parseDateTime(b) - parseDateTime(a))[0] || "";
 }
 
+function getUnreportedWeekText(latestPreorderTime, triggeredAt) {
+  if (!latestPreorderTime) {
+    return "1";
+  }
+
+  const diff = parseDateTime(triggeredAt || auditWindow.triggeredAt) - parseDateTime(latestPreorderTime);
+  const weeks = Math.max(1, Math.ceil(diff / (7 * 24 * 60 * 60 * 1000)));
+  return weeks > 4 ? "1月以上" : String(weeks);
+}
+
+function getUnreportedWeekSortValue(record) {
+  const latestTime = getLatestPreorderTime(record.latestByWarehouse);
+  const weekText = getUnreportedWeekText(latestTime, record.triggeredAt);
+  return weekText === "1月以上" ? 5 : Number(weekText);
+}
+
+function getUnreportedWeekCount(latestPreorderTime, triggeredAt) {
+  if (!latestPreorderTime) {
+    return 1;
+  }
+
+  const diff = parseDateTime(triggeredAt || auditWindow.triggeredAt) - parseDateTime(latestPreorderTime);
+  return Math.max(1, Math.ceil(diff / (7 * 24 * 60 * 60 * 1000)));
+}
+
 function hasPreorderInRiskWindow(customer) {
   return rows.some((row) => {
     return (
@@ -444,10 +490,10 @@ function loadWarningStore() {
   try {
     // 版本控制: 清空旧缓存强制重新生成
     var version = localStorage.getItem("cycle-warning-version");
-    if (version !== "v3") {
+    if (version !== "v4") {
       localStorage.removeItem("cycle-warning-records");
       localStorage.removeItem("cycle-warning-logs");
-      localStorage.setItem("cycle-warning-version", "v3");
+      localStorage.setItem("cycle-warning-version", "v4");
       return generatedWarnings.filter((record) => record.status !== "overdue");
     }
     const saved = JSON.parse(localStorage.getItem("cycle-warning-records") || "[]");
@@ -505,7 +551,7 @@ function loadProgressStore() {
   try {
     var saved = JSON.parse(localStorage.getItem("cycle-warning-progress") || "[]");
     var ver = localStorage.getItem("cycle-warning-version");
-    if (ver !== "v3") {
+    if (ver !== "v4") {
       localStorage.removeItem("cycle-warning-progress");
       saved = [];
     }
@@ -844,6 +890,11 @@ function getBoardRows(ignoreStatus = false) {
     .filter((record) => !state.boardSalespersonFilter || record.salesperson === state.boardSalespersonFilter)
     .filter((record) => !state.boardOperatorFilter || (record.operator || "system") === state.boardOperatorFilter)
     .filter((record) => {
+      if (!state.boardUnreportedWeeksFilter) { return true; }
+      const latestTime = getLatestPreorderTime(record.latestByWarehouse);
+      return getUnreportedWeekText(latestTime, record.triggeredAt) === state.boardUnreportedWeeksFilter;
+    })
+    .filter((record) => {
       const from = datetimeLocalToComparable(state.boardLatestTimeFrom);
       const to = datetimeLocalToComparable(state.boardLatestTimeTo);
       if (!from && !to) { return true; }
@@ -863,8 +914,219 @@ function getBoardRows(ignoreStatus = false) {
     })
     .sort((a, b) => {
       const weight = { pending: 0, processed: 1 };
-      return (weight[a.status] ?? 9) - (weight[b.status] ?? 9) || a.customer.localeCompare(b.customer, "zh-Hans-CN");
+      const statusWeight = (weight[a.status] ?? 9) - (weight[b.status] ?? 9);
+      if (statusWeight) { return statusWeight; }
+      const weekWeight = getUnreportedWeekSortValue(b) - getUnreportedWeekSortValue(a);
+      if (weekWeight) { return weekWeight; }
+      return a.customer.localeCompare(b.customer, "zh-Hans-CN");
     });
+}
+
+function addDays(date, days) {
+  const next = new Date(date);
+  next.setDate(next.getDate() + days);
+  return next;
+}
+
+function toDateTimeString(date, endOfDay) {
+  const year = date.getFullYear();
+  const month = String(date.getMonth() + 1).padStart(2, "0");
+  const day = String(date.getDate()).padStart(2, "0");
+  return `${year}-${month}-${day} ${endOfDay ? "23:59:59" : "00:00:00"}`;
+}
+
+function getWeekShortLabel(date) {
+  return `${String(date.getMonth() + 1).padStart(2, "0")}/${String(date.getDate()).padStart(2, "0")}`;
+}
+
+function getWeeklyWarningTrend() {
+  const baseMonday = parseDateTime(auditWindow.weekStart);
+  const scopedCustomers = getDashboardScopedWarnings().map((record) => record.customer);
+  return Array.from({ length: 8 }, (_, index) => {
+    const monday = addDays(baseMonday, (index - 7) * 7);
+    const riskEnd = addDays(monday, 2);
+    const startText = toDateTimeString(monday, false);
+    const endText = toDateTimeString(riskEnd, true);
+    const count = scopedCustomers.filter((customer) => {
+      const hadHistory = rows.some((row) => row.customer === customer && parseDateTime(row.createdAt) <= parseDateTime(endText));
+      if (!hadHistory) { return false; }
+      return !rows.some((row) => (
+        row.customer === customer &&
+        warehouseOptions.includes(row.warehouse) &&
+        row.status === "预报" &&
+        isWithin(row.createdAt, startText, endText)
+      ));
+    }).length;
+
+    return {
+      label: getWeekShortLabel(monday),
+      startText,
+      endText,
+      count
+    };
+  }).filter((item) => isDashboardRangeMatch(item.startText, item.endText));
+}
+
+function getDashboardScopedWarnings() {
+  return getRoleScopedWarnings()
+    .filter((record) => record.status !== "overdue")
+    .filter((record) => isDashboardTimeMatch(record.triggeredAt || ""));
+}
+
+function isDashboardTimeMatch(value) {
+  const from = datetimeLocalToComparable(state.dashboardTimeFrom);
+  const to = datetimeLocalToComparable(state.dashboardTimeTo);
+  if (!from && !to) { return true; }
+  if (!value) { return false; }
+  if (from && to) { return value >= from && value <= to; }
+  if (from) { return value >= from; }
+  return value <= to;
+}
+
+function isDashboardRangeMatch(startText, endText) {
+  const from = datetimeLocalToComparable(state.dashboardTimeFrom);
+  const to = datetimeLocalToComparable(state.dashboardTimeTo);
+  if (!from && !to) { return true; }
+  if (from && to) { return endText >= from && startText <= to; }
+  if (from) { return endText >= from; }
+  return startText <= to;
+}
+
+function getTopUnreportedCustomers() {
+  return getDashboardScopedWarnings()
+    .map((record) => {
+      const latestTime = getLatestPreorderTime(record.latestByWarehouse);
+      const weekCount = getUnreportedWeekCount(latestTime, record.triggeredAt);
+      return {
+        customer: record.customer,
+        weekText: String(weekCount),
+        sortValue: weekCount
+      };
+    })
+    .sort((a, b) => b.sortValue - a.sortValue || a.customer.localeCompare(b.customer, "zh-Hans-CN"))
+    .slice(0, 10);
+}
+
+function drawWeeklyLineChart(items) {
+  const canvas = els.weeklyWarningLineChart;
+  if (!canvas) { return; }
+  const rect = canvas.getBoundingClientRect();
+  const width = Math.max(320, Math.floor(rect.width || canvas.parentElement.clientWidth || 680));
+  const height = Math.max(240, Math.floor(rect.height || 300));
+  const dpr = window.devicePixelRatio || 1;
+  canvas.width = width * dpr;
+  canvas.height = height * dpr;
+  const ctx = canvas.getContext("2d");
+  ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+  ctx.clearRect(0, 0, width, height);
+
+  const padding = { top: 22, right: 18, bottom: 34, left: 42 };
+  const plotWidth = width - padding.left - padding.right;
+  const plotHeight = height - padding.top - padding.bottom;
+  const maxValue = Math.max(1, ...items.map((item) => item.count));
+  const stepX = plotWidth / Math.max(1, items.length - 1);
+
+  ctx.strokeStyle = "#dbe4ef";
+  ctx.lineWidth = 1;
+  ctx.fillStyle = "#6c7e94";
+  ctx.font = "12px Microsoft YaHei, Arial";
+  ctx.textAlign = "right";
+  ctx.textBaseline = "middle";
+
+  for (let i = 0; i <= 4; i += 1) {
+    const y = padding.top + (plotHeight * i / 4);
+    const value = Math.round(maxValue - (maxValue * i / 4));
+    ctx.beginPath();
+    ctx.moveTo(padding.left, y);
+    ctx.lineTo(width - padding.right, y);
+    ctx.stroke();
+    ctx.fillText(String(value), padding.left - 8, y);
+  }
+
+  const points = items.map((item, index) => ({
+    x: padding.left + index * stepX,
+    y: padding.top + plotHeight - (item.count / maxValue) * plotHeight,
+    ...item
+  }));
+
+  ctx.strokeStyle = "#0b7cff";
+  ctx.lineWidth = 3;
+  ctx.beginPath();
+  points.forEach((point, index) => {
+    if (index === 0) {
+      ctx.moveTo(point.x, point.y);
+    } else {
+      ctx.lineTo(point.x, point.y);
+    }
+  });
+  ctx.stroke();
+
+  points.forEach((point) => {
+    ctx.fillStyle = "#ffffff";
+    ctx.strokeStyle = "#0b7cff";
+    ctx.lineWidth = 3;
+    ctx.beginPath();
+    ctx.arc(point.x, point.y, 4, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.stroke();
+
+    ctx.fillStyle = "#08233e";
+    ctx.textAlign = "center";
+    ctx.textBaseline = "bottom";
+    ctx.fillText(String(point.count), point.x, point.y - 8);
+    ctx.fillStyle = "#6c7e94";
+    ctx.textBaseline = "top";
+    ctx.fillText(point.label, point.x, height - padding.bottom + 12);
+  });
+}
+
+function renderTopUnreportedBars(items) {
+  if (!els.topUnreportedBarChart) { return; }
+  const maxValue = Math.max(1, ...items.map((item) => item.sortValue));
+  els.topUnreportedBarChart.innerHTML = items.map((item) => {
+    const width = Math.max(8, Math.round((item.sortValue / maxValue) * 100));
+    return `
+      <div class="bar-chart-row" title="${escapeHtml(item.customer)} ${escapeHtml(item.weekText)}">
+        <span class="bar-chart-name">${escapeHtml(item.customer)}</span>
+        <span class="bar-chart-track"><span class="bar-chart-fill" style="width:${width}%"></span></span>
+        <span class="bar-chart-value">${escapeHtml(item.weekText)}</span>
+      </div>
+    `;
+  }).join("");
+}
+
+function renderWarningDashboard() {
+  const trend = getWeeklyWarningTrend();
+  const topCustomers = getTopUnreportedCustomers();
+  const currentWeek = trend[trend.length - 1];
+  if (els.weeklyWarningTotal) {
+    els.weeklyWarningTotal.textContent = currentWeek ? currentWeek.count : 0;
+  }
+  if (els.topUnreportedMax) {
+    els.topUnreportedMax.textContent = topCustomers[0]?.weekText || "0";
+  }
+  if (els.dashboardMeta) {
+    els.dashboardMeta.textContent = `更新时间：${formatMinute(auditWindow.triggeredAt)}`;
+  }
+  drawWeeklyLineChart(trend);
+  renderTopUnreportedBars(topCustomers);
+}
+
+function applyDashboardSearch() {
+  state.dashboardTimeFrom = els.dashboardTimeFrom ? els.dashboardTimeFrom.value : "";
+  state.dashboardTimeTo = els.dashboardTimeTo ? els.dashboardTimeTo.value : "";
+  syncRangeBox(els.dashboardTimeDisplay, els.dashboardTimeBox, els.dashboardTimeFrom, els.dashboardTimeTo);
+  renderWarningDashboard();
+}
+
+function resetDashboardFilters() {
+  state.dashboardTimeFrom = "";
+  state.dashboardTimeTo = "";
+  if (els.dashboardTimeFrom) { els.dashboardTimeFrom.value = ""; }
+  if (els.dashboardTimeTo) { els.dashboardTimeTo.value = ""; }
+  if (els.dashboardTimeDisplay) { els.dashboardTimeDisplay.value = ""; }
+  if (els.dashboardTimeBox) { els.dashboardTimeBox.classList.remove("has-value"); }
+  renderWarningDashboard();
 }
 
 function getWarningStatusLabel(status) {
@@ -916,6 +1178,7 @@ function renderBoard() {
       var contentHtml = latestContent
         ? '<span class="board-content-text" title="' + escapeHtml(latestContent) + '">' + escapeHtml(latestContent.length > 20 ? latestContent.slice(0, 20) + "…" : latestContent) + '</span>'
         : '<span class="board-content-empty">—</span>';
+      var unreportedWeekText = getUnreportedWeekText(latestPreorderTime, record.triggeredAt);
 
       var isSelected = state.boardSelected.has(record.id);
       return `
@@ -924,6 +1187,7 @@ function renderBoard() {
           <td><strong>${escapeHtml(record.customer)}</strong></td>
           <td>${escapeHtml(record.salesperson)}</td>
           <td><span class="warehouse-time ${latestPreorderTime ? "" : "empty"}" title="${escapeHtml(latestPreorderTime || "无预报")}">${escapeHtml(formatWarehouseTime(latestPreorderTime))}</span></td>
+          <td><span class="warehouse-time">${escapeHtml(unreportedWeekText)}</span></td>
           ${warehouseCells}
           <td>${contentHtml}</td>
           <td><span class="operator-text">${escapeHtml(record.operator || "system")}</span></td>
@@ -942,6 +1206,7 @@ function resetBoardFilters() {
   state.boardCustomerFilter = "";
   state.boardSalespersonFilter = "";
   state.boardOperatorFilter = "";
+  state.boardUnreportedWeeksFilter = "";
   state.boardLatestTimeFrom = "";
   state.boardLatestTimeTo = "";
   state.boardWarningTimeFrom = "";
@@ -949,6 +1214,7 @@ function resetBoardFilters() {
   els.overviewCustomerSearch.value = "";
   els.overviewSalespersonSearch.value = "";
   if (els.overviewOperatorSearch) { els.overviewOperatorSearch.value = ""; }
+  if (els.overviewUnreportedWeeksSearch) { els.overviewUnreportedWeeksSearch.value = ""; }
   els.overviewLatestTimeFrom.value = "";
   els.overviewLatestTimeTo.value = "";
   els.overviewWarningTimeFrom.value = "";
@@ -1041,7 +1307,7 @@ function clearRangeBox(boxEl, displayEl, fromEl, toEl, dropEl) {
   dropEl.hidden = true;
 }
 
-function setupRangeBox(boxEl, displayEl, dropEl, fromEl, toEl, clearBtn) {
+function setupRangeBox(boxEl, displayEl, dropEl, fromEl, toEl, clearBtn, onChange) {
   // Toggle dropdown
   displayEl.addEventListener("click", (e) => {
     e.stopPropagation();
@@ -1052,7 +1318,11 @@ function setupRangeBox(boxEl, displayEl, dropEl, fromEl, toEl, clearBtn) {
   [fromEl, toEl].forEach((input) => {
     input.addEventListener("change", () => {
       syncRangeBox(displayEl, boxEl, fromEl, toEl);
-      renderBoard();
+      if (onChange) {
+        onChange();
+      } else {
+        renderBoard();
+      }
     });
   });
 
@@ -1060,7 +1330,11 @@ function setupRangeBox(boxEl, displayEl, dropEl, fromEl, toEl, clearBtn) {
   clearBtn.addEventListener("click", (e) => {
     e.stopPropagation();
     clearRangeBox(boxEl, displayEl, fromEl, toEl, dropEl);
-    renderBoard();
+    if (onChange) {
+      onChange();
+    } else {
+      renderBoard();
+    }
   });
 }
 
@@ -1085,7 +1359,7 @@ function exportBoardCSV() {
   if (!visibleRows.length) { return; }
 
   const headerColumns = [
-    "客户简称", "业务员", "最新预报时间",
+    "客户简称", "业务员", "最新预报时间", "未预报周数",
     "洛杉矶仓", "芝加哥仓", "新泽西仓", "萨凡纳仓", "休斯顿仓", "奥克兰仓",
     "预警时间", "处理内容", "操作人", "状态"
   ];
@@ -1098,8 +1372,11 @@ function exportBoardCSV() {
       csvCell(record.customer),
       csvCell(record.salesperson),
       csvCell(formatWarehouseTime(latestPreorderTime)),
+      csvCell(getUnreportedWeekText(latestPreorderTime, record.triggeredAt)),
       ...warehouseCells,
-		csvCell(formatMinute(record.triggeredAt)),
+      csvCell(formatMinute(record.triggeredAt)),
+      csvCell(getLatestProgressContent(record.customer)),
+      csvCell(record.operator || "system"),
       csvCell(getWarningStatusLabel(record.status))
     ].join(",");
   });
@@ -1470,11 +1747,17 @@ function switchTab(tabName) {
   document.querySelectorAll(".page-shell").forEach(function (panel) {
     panel.hidden = panel.id !== "tab-" + tabName;
   });
+  els.tabButtons.forEach(function (button) {
+    button.classList.toggle("active", button.dataset.tab === tabName);
+  });
 
   closeDetailsDrawer();
 
   if (tabName === "overview") {
     renderBoard();
+  }
+  if (tabName === "warning-dashboard") {
+    renderWarningDashboard();
   }
 }
 
@@ -1536,6 +1819,7 @@ function bindEvents() {
   els.roleSelect.addEventListener("change", () => {
     state.role = els.roleSelect.value;
     resetBoardFilters();
+    resetDashboardFilters();
     renderTable();
   });
 
@@ -1543,6 +1827,7 @@ function bindEvents() {
     state.boardCustomerFilter = els.overviewCustomerSearch.value.trim();
     state.boardSalespersonFilter = els.overviewSalespersonSearch.value.trim();
     state.boardOperatorFilter = els.overviewOperatorSearch ? els.overviewOperatorSearch.value.trim() : "";
+    state.boardUnreportedWeeksFilter = els.overviewUnreportedWeeksSearch ? els.overviewUnreportedWeeksSearch.value.trim() : "";
     state.boardLatestTimeFrom = els.overviewLatestTimeFrom.value;
     state.boardLatestTimeTo = els.overviewLatestTimeTo.value;
     state.boardWarningTimeFrom = els.overviewWarningTimeFrom.value;
@@ -1560,10 +1845,14 @@ function bindEvents() {
 
   setupRangeBox(els.latestTimeBox, els.latestTimeDisplay, els.latestTimeBox.querySelector(".range-drop"), els.overviewLatestTimeFrom, els.overviewLatestTimeTo, els.latestTimeClear);
   setupRangeBox(els.warningTimeBox, els.warningTimeDisplay, els.warningTimeBox.querySelector(".range-drop"), els.overviewWarningTimeFrom, els.overviewWarningTimeTo, els.warningTimeClear);
+  if (els.dashboardTimeBox) {
+    setupRangeBox(els.dashboardTimeBox, els.dashboardTimeDisplay, els.dashboardTimeBox.querySelector(".range-drop"), els.dashboardTimeFrom, els.dashboardTimeTo, els.dashboardTimeClear, applyDashboardSearch);
+  }
 
   // Click outside to dismiss dropdowns
   document.addEventListener("click", (event) => {
-    [els.latestTimeBox, els.warningTimeBox].forEach((box) => {
+    [els.latestTimeBox, els.warningTimeBox, els.dashboardTimeBox].forEach((box) => {
+      if (!box) { return; }
       if (!box.contains(event.target)) {
         box.querySelector(".range-drop").hidden = true;
       }
@@ -1802,6 +2091,20 @@ function bindEvents() {
   if (els.logCustomerFilter) {
     els.logCustomerFilter.addEventListener("change", renderLogs);
   }
+
+  if (els.dashboardSearchButton) {
+    els.dashboardSearchButton.addEventListener("click", applyDashboardSearch);
+  }
+
+  if (els.dashboardResetButton) {
+    els.dashboardResetButton.addEventListener("click", resetDashboardFilters);
+  }
+
+  window.addEventListener("resize", function () {
+    if (document.querySelector("#tab-warning-dashboard") && !document.querySelector("#tab-warning-dashboard").hidden) {
+      renderWarningDashboard();
+    }
+  });
 }
 
 function init() {
@@ -1818,6 +2121,7 @@ function init() {
   fillSelect(els.statusSelect, statusOptions);
   bindEvents();
   renderBoard();
+  renderWarningDashboard();
   applySearch();
   applyIncomingFilter();
 }
