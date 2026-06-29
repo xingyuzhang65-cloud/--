@@ -7,7 +7,7 @@
     <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
     <meta http-equiv="Pragma" content="no-cache" />
     <meta http-equiv="Expires" content="0" />
-    <link rel="stylesheet" href="styles.css?v=20260629-week" />
+    <link rel="stylesheet" href="styles.css?v=20260629-period" />
     <style>
       .alert-table th:nth-child(14), .alert-table td:nth-child(14) { position: sticky; right: 0; z-index: 5; width: 148px; background: #fff; box-shadow: -8px 0 12px rgba(31,45,64,0.08); }
       .alert-table th:nth-child(14) { z-index: 6; background: var(--header-bg); }
@@ -171,20 +171,6 @@
                 </div>
               </div>
             </label>
-            <label class="field field-range">
-              <span>预警时间</span>
-              <div class="range-box" id="warningTimeBox">
-                <input class="range-display" id="warningTimeDisplay" type="text" placeholder="全部" readonly autocomplete="off" />
-                <button class="range-clear" id="warningTimeClear" type="button" title="清除">✕</button>
-                <div class="range-drop" hidden>
-                  <div class="range-drop-row">
-                    <input id="warningTimeFrom" type="datetime-local" />
-                    <span>—</span>
-                    <input id="warningTimeTo" type="datetime-local" />
-                  </div>
-                </div>
-              </div>
-            </label>
             <button id="boardSearchButton" class="btn primary" type="button">搜索</button>
             <button id="resetBoardButton" class="btn" type="button">重置</button>
           </div>
@@ -228,7 +214,7 @@
                   <th>奥克兰仓</th>
                   <th>处理内容</th>
                   <th>操作人</th>
-                  <th>预警时间</th>
+                  <th>预警周期</th>
                 </tr>
               </thead>
               <tbody id="alertBody"></tbody>
@@ -470,7 +456,7 @@
     </div>
 
     <div id="toast" class="toast" hidden></div>
-    <script src="script.js?v=20260629-week"></script>
+    <script src="script.js?v=20260629-period"></script>
     <script>
       window.addEventListener('error', function(e) {
         document.querySelector('#alertBody') && (document.querySelector('#alertBody').innerHTML = '<tr><td colspan="13" style="color:red;padding:20px;text-align:center;">JS 错误: ' + e.message + ' (行 ' + e.lineno + ':' + e.colno + ')</td></tr>');

@@ -414,7 +414,7 @@ body.details-open::after {
   width: 148px;
 }
 
-/* 预警时间 — 最右侧 sticky (第14列) */
+/* 预警周期 — 最右侧 sticky (第14列) */
 .alert-table th:nth-child(14),
 .alert-table td:nth-child(14) {
   position: sticky;

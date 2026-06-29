@@ -114,8 +114,6 @@ const state = {
   boardSalespersonFilter: "",
   boardLatestTimeFrom: "",
   boardLatestTimeTo: "",
-  boardWarningTimeFrom: "",
-  boardWarningTimeTo: "",
   boardOperatorFilter: "",
   boardUnreportedWeeksFilter: "",
   dashboardWeekRange: "8",
@@ -245,14 +243,9 @@ const els = {
   overviewUnreportedWeeksSearch: document.querySelector("#overviewUnreportedWeeksSearch"),
   overviewLatestTimeFrom: document.querySelector("#latestTimeFrom"),
   overviewLatestTimeTo: document.querySelector("#latestTimeTo"),
-  overviewWarningTimeFrom: document.querySelector("#warningTimeFrom"),
-  overviewWarningTimeTo: document.querySelector("#warningTimeTo"),
   latestTimeDisplay: document.querySelector("#latestTimeDisplay"),
-  warningTimeDisplay: document.querySelector("#warningTimeDisplay"),
   latestTimeBox: document.querySelector("#latestTimeBox"),
-  warningTimeBox: document.querySelector("#warningTimeBox"),
   latestTimeClear: document.querySelector("#latestTimeClear"),
-  warningTimeClear: document.querySelector("#warningTimeClear"),
   boardSearchButton: document.querySelector("#boardSearchButton"),
   resetBoardButton: document.querySelector("#resetBoardButton"),
   alertBody: document.querySelector("#alertBody"),
@@ -898,15 +891,6 @@ function getBoardRows(ignoreStatus = false) {
       if (from) { return latestTime >= from; }
       return latestTime <= to;
     })
-    .filter((record) => {
-      const from = datetimeLocalToComparable(state.boardWarningTimeFrom);
-      const to = datetimeLocalToComparable(state.boardWarningTimeTo);
-      if (!from && !to) { return true; }
-      const triggeredAt = record.triggeredAt || "";
-      if (from && to) { return triggeredAt >= from && triggeredAt <= to; }
-      if (from) { return triggeredAt >= from; }
-      return triggeredAt <= to;
-    })
     .sort((a, b) => {
       const weight = { pending: 0, processed: 1 };
       const statusWeight = (weight[a.status] ?? 9) - (weight[b.status] ?? 9);
@@ -1188,7 +1172,7 @@ function renderBoard() {
           ${warehouseCells}
           <td>${contentHtml}</td>
           <td><span class="operator-text">${escapeHtml(record.operator || "system")}</span></td>
-          <td><span class="warehouse-time">${escapeHtml(formatMinute(record.triggeredAt))}</span></td>
+          <td><span class="warehouse-time">${escapeHtml(record.weekLabel || auditWindow.weekLabel)}</span></td>
         </tr>
       `;
     })
@@ -1206,20 +1190,14 @@ function resetBoardFilters() {
   state.boardUnreportedWeeksFilter = "";
   state.boardLatestTimeFrom = "";
   state.boardLatestTimeTo = "";
-  state.boardWarningTimeFrom = "";
-  state.boardWarningTimeTo = "";
   els.overviewCustomerSearch.value = "";
   els.overviewSalespersonSearch.value = "";
   if (els.overviewOperatorSearch) { els.overviewOperatorSearch.value = ""; }
   if (els.overviewUnreportedWeeksSearch) { els.overviewUnreportedWeeksSearch.value = ""; }
   els.overviewLatestTimeFrom.value = "";
   els.overviewLatestTimeTo.value = "";
-  els.overviewWarningTimeFrom.value = "";
-  els.overviewWarningTimeTo.value = "";
   els.latestTimeDisplay.value = "";
   els.latestTimeBox.classList.remove("has-value");
-  els.warningTimeDisplay.value = "";
-  els.warningTimeBox.classList.remove("has-value");
   state.boardSelected.clear();
   renderBoard();
 }
@@ -1358,7 +1336,7 @@ function exportBoardCSV() {
   const headerColumns = [
     "客户简称", "业务员", "最新预报时间", "未预报周数",
     "洛杉矶仓", "芝加哥仓", "新泽西仓", "萨凡纳仓", "休斯顿仓", "奥克兰仓",
-    "预警时间", "处理内容", "操作人", "状态"
+    "预警周期", "处理内容", "操作人", "状态"
   ];
 
   const header = headerColumns.map(csvCell).join(",");
@@ -1371,7 +1349,7 @@ function exportBoardCSV() {
       csvCell(formatWarehouseTime(latestPreorderTime)),
       csvCell(getUnreportedWeekText(latestPreorderTime, record.triggeredAt)),
       ...warehouseCells,
-      csvCell(formatMinute(record.triggeredAt)),
+      csvCell(record.weekLabel || auditWindow.weekLabel),
       csvCell(getLatestProgressContent(record.customer)),
       csvCell(record.operator || "system"),
       csvCell(getWarningStatusLabel(record.status))
@@ -1827,10 +1805,7 @@ function bindEvents() {
     state.boardUnreportedWeeksFilter = els.overviewUnreportedWeeksSearch ? els.overviewUnreportedWeeksSearch.value.trim() : "";
     state.boardLatestTimeFrom = els.overviewLatestTimeFrom.value;
     state.boardLatestTimeTo = els.overviewLatestTimeTo.value;
-    state.boardWarningTimeFrom = els.overviewWarningTimeFrom.value;
-    state.boardWarningTimeTo = els.overviewWarningTimeTo.value;
     syncRangeBox(els.latestTimeDisplay, els.latestTimeBox, els.overviewLatestTimeFrom, els.overviewLatestTimeTo);
-    syncRangeBox(els.warningTimeDisplay, els.warningTimeBox, els.overviewWarningTimeFrom, els.overviewWarningTimeTo);
     renderBoard();
   }
 
@@ -1841,11 +1816,10 @@ function bindEvents() {
   // ── Range picker events ──
 
   setupRangeBox(els.latestTimeBox, els.latestTimeDisplay, els.latestTimeBox.querySelector(".range-drop"), els.overviewLatestTimeFrom, els.overviewLatestTimeTo, els.latestTimeClear);
-  setupRangeBox(els.warningTimeBox, els.warningTimeDisplay, els.warningTimeBox.querySelector(".range-drop"), els.overviewWarningTimeFrom, els.overviewWarningTimeTo, els.warningTimeClear);
 
   // Click outside to dismiss dropdowns
   document.addEventListener("click", (event) => {
-    [els.latestTimeBox, els.warningTimeBox].forEach((box) => {
+    [els.latestTimeBox].forEach((box) => {
       if (!box) { return; }
       if (!box.contains(event.target)) {
         box.querySelector(".range-drop").hidden = true;
