@@ -118,8 +118,7 @@ const state = {
   boardWarningTimeTo: "",
   boardOperatorFilter: "",
   boardUnreportedWeeksFilter: "",
-  dashboardTimeFrom: "",
-  dashboardTimeTo: "",
+  dashboardWeekRange: "8",
   role: "admin",
   sortKey: "",
   sortDirection: "",
@@ -233,11 +232,7 @@ const els = {
   weeklyWarningTotal: document.querySelector("#weeklyWarningTotal"),
   topUnreportedBarChart: document.querySelector("#topUnreportedBarChart"),
   topUnreportedMax: document.querySelector("#topUnreportedMax"),
-  dashboardTimeFrom: document.querySelector("#dashboardTimeFrom"),
-  dashboardTimeTo: document.querySelector("#dashboardTimeTo"),
-  dashboardTimeDisplay: document.querySelector("#dashboardTimeDisplay"),
-  dashboardTimeBox: document.querySelector("#dashboardTimeBox"),
-  dashboardTimeClear: document.querySelector("#dashboardTimeClear"),
+  dashboardWeekRangeSelect: document.querySelector("#dashboardWeekRangeSelect"),
   dashboardSearchButton: document.querySelector("#dashboardSearchButton"),
   dashboardResetButton: document.querySelector("#dashboardResetButton"),
   statusTabs: document.querySelector("#statusTabs"),
@@ -939,10 +934,27 @@ function getWeekShortLabel(date) {
   return `${String(date.getMonth() + 1).padStart(2, "0")}/${String(date.getDate()).padStart(2, "0")}`;
 }
 
+function getDashboardWeekLimit() {
+  if (state.dashboardWeekRange === "current") { return 1; }
+  if (state.dashboardWeekRange === "4") { return 4; }
+  if (state.dashboardWeekRange === "8") { return 8; }
+  return Infinity;
+}
+
+function getDashboardWeekWindow() {
+  const limit = getDashboardWeekLimit();
+  if (!Number.isFinite(limit)) { return null; }
+  const baseMonday = parseDateTime(auditWindow.weekStart);
+  return {
+    start: addDays(baseMonday, -(limit - 1) * 7),
+    end: addDays(baseMonday, 6)
+  };
+}
+
 function getWeeklyWarningTrend() {
   const baseMonday = parseDateTime(auditWindow.weekStart);
   const scopedCustomers = getDashboardScopedWarnings().map((record) => record.customer);
-  return Array.from({ length: 8 }, (_, index) => {
+  const trend = Array.from({ length: 8 }, (_, index) => {
     const monday = addDays(baseMonday, (index - 7) * 7);
     const riskEnd = addDays(monday, 2);
     const startText = toDateTimeString(monday, false);
@@ -964,32 +976,23 @@ function getWeeklyWarningTrend() {
       endText,
       count
     };
-  }).filter((item) => isDashboardRangeMatch(item.startText, item.endText));
+  });
+  const limit = getDashboardWeekLimit();
+  return Number.isFinite(limit) ? trend.slice(-limit) : trend;
 }
 
 function getDashboardScopedWarnings() {
   return getRoleScopedWarnings()
     .filter((record) => record.status !== "overdue")
-    .filter((record) => isDashboardTimeMatch(record.triggeredAt || ""));
+    .filter((record) => isDashboardWeekMatch(record.triggeredAt || ""));
 }
 
-function isDashboardTimeMatch(value) {
-  const from = datetimeLocalToComparable(state.dashboardTimeFrom);
-  const to = datetimeLocalToComparable(state.dashboardTimeTo);
-  if (!from && !to) { return true; }
+function isDashboardWeekMatch(value) {
+  const windowRange = getDashboardWeekWindow();
+  if (!windowRange) { return true; }
   if (!value) { return false; }
-  if (from && to) { return value >= from && value <= to; }
-  if (from) { return value >= from; }
-  return value <= to;
-}
-
-function isDashboardRangeMatch(startText, endText) {
-  const from = datetimeLocalToComparable(state.dashboardTimeFrom);
-  const to = datetimeLocalToComparable(state.dashboardTimeTo);
-  if (!from && !to) { return true; }
-  if (from && to) { return endText >= from && startText <= to; }
-  if (from) { return endText >= from; }
-  return startText <= to;
+  const time = parseDateTime(value);
+  return time >= windowRange.start && time <= windowRange.end;
 }
 
 function getTopUnreportedCustomers() {
@@ -1113,19 +1116,13 @@ function renderWarningDashboard() {
 }
 
 function applyDashboardSearch() {
-  state.dashboardTimeFrom = els.dashboardTimeFrom ? els.dashboardTimeFrom.value : "";
-  state.dashboardTimeTo = els.dashboardTimeTo ? els.dashboardTimeTo.value : "";
-  syncRangeBox(els.dashboardTimeDisplay, els.dashboardTimeBox, els.dashboardTimeFrom, els.dashboardTimeTo);
+  state.dashboardWeekRange = els.dashboardWeekRangeSelect ? els.dashboardWeekRangeSelect.value : "8";
   renderWarningDashboard();
 }
 
 function resetDashboardFilters() {
-  state.dashboardTimeFrom = "";
-  state.dashboardTimeTo = "";
-  if (els.dashboardTimeFrom) { els.dashboardTimeFrom.value = ""; }
-  if (els.dashboardTimeTo) { els.dashboardTimeTo.value = ""; }
-  if (els.dashboardTimeDisplay) { els.dashboardTimeDisplay.value = ""; }
-  if (els.dashboardTimeBox) { els.dashboardTimeBox.classList.remove("has-value"); }
+  state.dashboardWeekRange = "8";
+  if (els.dashboardWeekRangeSelect) { els.dashboardWeekRangeSelect.value = state.dashboardWeekRange; }
   renderWarningDashboard();
 }
 
@@ -1845,13 +1842,10 @@ function bindEvents() {
 
   setupRangeBox(els.latestTimeBox, els.latestTimeDisplay, els.latestTimeBox.querySelector(".range-drop"), els.overviewLatestTimeFrom, els.overviewLatestTimeTo, els.latestTimeClear);
   setupRangeBox(els.warningTimeBox, els.warningTimeDisplay, els.warningTimeBox.querySelector(".range-drop"), els.overviewWarningTimeFrom, els.overviewWarningTimeTo, els.warningTimeClear);
-  if (els.dashboardTimeBox) {
-    setupRangeBox(els.dashboardTimeBox, els.dashboardTimeDisplay, els.dashboardTimeBox.querySelector(".range-drop"), els.dashboardTimeFrom, els.dashboardTimeTo, els.dashboardTimeClear, applyDashboardSearch);
-  }
 
   // Click outside to dismiss dropdowns
   document.addEventListener("click", (event) => {
-    [els.latestTimeBox, els.warningTimeBox, els.dashboardTimeBox].forEach((box) => {
+    [els.latestTimeBox, els.warningTimeBox].forEach((box) => {
       if (!box) { return; }
       if (!box.contains(event.target)) {
         box.querySelector(".range-drop").hidden = true;
@@ -2094,6 +2088,10 @@ function bindEvents() {
 
   if (els.dashboardSearchButton) {
     els.dashboardSearchButton.addEventListener("click", applyDashboardSearch);
+  }
+
+  if (els.dashboardWeekRangeSelect) {
+    els.dashboardWeekRangeSelect.addEventListener("change", applyDashboardSearch);
   }
 
   if (els.dashboardResetButton) {

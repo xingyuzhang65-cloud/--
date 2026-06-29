@@ -7,7 +7,7 @@
     <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
     <meta http-equiv="Pragma" content="no-cache" />
     <meta http-equiv="Expires" content="0" />
-    <link rel="stylesheet" href="styles.css?v=20260628-6" />
+    <link rel="stylesheet" href="styles.css?v=20260629-week" />
     <style>
       .alert-table th:nth-child(14), .alert-table td:nth-child(14) { position: sticky; right: 0; z-index: 5; width: 148px; background: #fff; box-shadow: -8px 0 12px rgba(31,45,64,0.08); }
       .alert-table th:nth-child(14) { z-index: 6; background: var(--header-bg); }
@@ -251,19 +251,14 @@
           </div>
 
           <div class="board-filters dashboard-filters">
-            <label class="field field-range">
-              <span>时间范围</span>
-              <div class="range-box" id="dashboardTimeBox">
-                <input class="range-display" id="dashboardTimeDisplay" type="text" placeholder="全部" readonly autocomplete="off" />
-                <button class="range-clear" id="dashboardTimeClear" type="button" title="清除">✕</button>
-                <div class="range-drop" hidden>
-                  <div class="range-drop-row">
-                    <input id="dashboardTimeFrom" type="datetime-local" />
-                    <span>—</span>
-                    <input id="dashboardTimeTo" type="datetime-local" />
-                  </div>
-                </div>
-              </div>
+            <label class="field field-week-range">
+              <span>统计周范围</span>
+              <select id="dashboardWeekRangeSelect">
+                <option value="current">本周</option>
+                <option value="4">近4周</option>
+                <option value="8" selected>近8周</option>
+                <option value="all">全部周期</option>
+              </select>
             </label>
             <button id="dashboardSearchButton" class="btn primary" type="button">搜索</button>
             <button id="dashboardResetButton" class="btn" type="button">重置</button>
@@ -274,7 +269,7 @@
               <div class="chart-head">
                 <div>
                   <h2>每周未预报客户数量</h2>
-                  <p>近 8 周趋势</p>
+                  <p>按统计周范围</p>
                 </div>
                 <strong id="weeklyWarningTotal">0</strong>
               </div>
@@ -475,7 +470,7 @@
     </div>
 
     <div id="toast" class="toast" hidden></div>
-    <script src="script.js?v=20260628-6"></script>
+    <script src="script.js?v=20260629-week"></script>
     <script>
       window.addEventListener('error', function(e) {
         document.querySelector('#alertBody') && (document.querySelector('#alertBody').innerHTML = '<tr><td colspan="13" style="color:red;padding:20px;text-align:center;">JS 错误: ' + e.message + ' (行 ' + e.lineno + ':' + e.colno + ')</td></tr>');

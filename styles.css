@@ -637,6 +637,14 @@ tbody tr.is-selected {
   min-width: 150px;
 }
 
+.field-week-range {
+  min-width: 240px;
+}
+
+.field-week-range select {
+  min-width: 132px;
+}
+
 .field-range {
   display: flex;
   align-items: center;
