@@ -7,9 +7,9 @@
     <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
     <meta http-equiv="Pragma" content="no-cache" />
     <meta http-equiv="Expires" content="0" />
-    <link rel="stylesheet" href="styles.css?v=20260629-period" />
+    <link rel="stylesheet" href="styles.css?v=20260629-single-period" />
     <style>
-      .alert-table th:nth-child(14), .alert-table td:nth-child(14) { position: sticky; right: 0; z-index: 5; width: 148px; background: #fff; box-shadow: -8px 0 12px rgba(31,45,64,0.08); }
+      .alert-table th:nth-child(14), .alert-table td:nth-child(14) { position: sticky; right: 0; z-index: 5; width: 190px; background: #fff; box-shadow: -8px 0 12px rgba(31,45,64,0.08); }
       .alert-table th:nth-child(14) { z-index: 6; background: var(--header-bg); }
       .alert-table th:nth-child(13), .alert-table td:nth-child(13) { width: 80px; background: #fff; }
       .alert-table th:nth-child(12), .alert-table td:nth-child(12) { width: 160px; background: #fff; }
@@ -17,7 +17,7 @@
       .board-content-text { color: #1d3b5c; font-size: 12px; cursor: default; }
       .board-content-empty { color: #bcc5d0; }
       .operator-text { color: #3a556d; font-size: 12px; font-weight: 600; }
-      .alert-table { min-width: 1832px; }
+      .alert-table { min-width: 1874px; }
     </style>
   </head>
   <body>
@@ -123,7 +123,6 @@
                 <span>当前视角</span>
                 <select id="roleSelect"></select>
               </label>
-              <div class="run-meta" id="runMeta">周三 24:00 自动检测</div>
             </div>
           </div>
 
@@ -185,6 +184,11 @@
             <button class="status-tab" type="button" data-status="all">
               全部 <strong id="countAll">0</strong>
             </button>
+            <label class="status-period-filter">
+              <span>预警周期</span>
+              <select id="boardWarningPeriodSelect">
+              </select>
+            </label>
           </div>
 
           <div class="board-list-toolbar" id="boardListToolbar">
@@ -456,7 +460,7 @@
     </div>
 
     <div id="toast" class="toast" hidden></div>
-    <script src="script.js?v=20260629-period"></script>
+    <script src="script.js?v=20260629-single-period"></script>
     <script>
       window.addEventListener('error', function(e) {
         document.querySelector('#alertBody') && (document.querySelector('#alertBody').innerHTML = '<tr><td colspan="13" style="color:red;padding:20px;text-align:center;">JS 错误: ' + e.message + ' (行 ' + e.lineno + ':' + e.colno + ')</td></tr>');
