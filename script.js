@@ -107,10 +107,7 @@ const state = {
   boardStatus: "pending",
   boardCustomerFilter: "",
   boardSalespersonFilter: "",
-  boardLatestTimeFrom: "",
-  boardLatestTimeTo: "",
-  boardWarningTimeFrom: "",
-  boardWarningTimeTo: "",
+  boardWeekFilter: auditWindow.weekLabel,
   boardOperatorFilter: "",
   role: "admin",
   sortKey: "",
@@ -227,16 +224,9 @@ const els = {
   overviewCustomerSearch: document.querySelector("#overviewCustomerSearch"),
   overviewSalespersonSearch: document.querySelector("#overviewSalespersonSearch"),
   overviewOperatorSearch: document.querySelector("#overviewOperatorSearch"),
-  overviewLatestTimeFrom: document.querySelector("#latestTimeFrom"),
-  overviewLatestTimeTo: document.querySelector("#latestTimeTo"),
-  overviewWarningTimeFrom: document.querySelector("#warningTimeFrom"),
-  overviewWarningTimeTo: document.querySelector("#warningTimeTo"),
-  latestTimeDisplay: document.querySelector("#latestTimeDisplay"),
-  warningTimeDisplay: document.querySelector("#warningTimeDisplay"),
-  latestTimeBox: document.querySelector("#latestTimeBox"),
-  warningTimeBox: document.querySelector("#warningTimeBox"),
-  latestTimeClear: document.querySelector("#latestTimeClear"),
-  warningTimeClear: document.querySelector("#warningTimeClear"),
+  boardWeekSelect: document.querySelector("#boardWeekSelect"),
+  prevWeekButton: document.querySelector("#prevWeekButton"),
+  nextWeekButton: document.querySelector("#nextWeekButton"),
   boardSearchButton: document.querySelector("#boardSearchButton"),
   resetBoardButton: document.querySelector("#resetBoardButton"),
   alertBody: document.querySelector("#alertBody"),
@@ -305,6 +295,59 @@ function parseDateTime(value) {
   return new Date(year, month - 1, day, hour, minute, second);
 }
 
+function pad2(value) {
+  return String(value).padStart(2, "0");
+}
+
+function addDays(date, days) {
+  const next = new Date(date);
+  next.setDate(next.getDate() + days);
+  return next;
+}
+
+function getMonday(date) {
+  const day = date.getDay() || 7;
+  return addDays(date, 1 - day);
+}
+
+function getIsoWeekInfo(date) {
+  const monday = getMonday(date);
+  const thursday = addDays(monday, 3);
+  const weekYear = thursday.getFullYear();
+  const firstThursday = new Date(weekYear, 0, 4);
+  const firstMonday = getMonday(firstThursday);
+  const week = Math.floor((monday - firstMonday) / 604800000) + 1;
+  return { year: weekYear, week, monday };
+}
+
+function weekKeyFromDate(date) {
+  const info = getIsoWeekInfo(date);
+  return `${info.year}-W${pad2(info.week)}`;
+}
+
+function getWeekRangeFromKey(key) {
+  const match = /^(\d{4})-W(\d{1,2})$/.exec(key || "");
+  if (!match) { return null; }
+  const year = Number(match[1]);
+  const week = Number(match[2]);
+  const firstMonday = getMonday(new Date(year, 0, 4));
+  const start = addDays(firstMonday, (week - 1) * 7);
+  return { start, end: addDays(start, 6), year, week };
+}
+
+function formatWeekLabel(key) {
+  const range = getWeekRangeFromKey(key);
+  if (!range) { return key || "全部周期"; }
+  return `${range.year}年第${range.week}周（${pad2(range.start.getMonth() + 1)}/${pad2(range.start.getDate())}-${pad2(range.end.getMonth() + 1)}/${pad2(range.end.getDate())}）`;
+}
+
+function getRecordWeekKey(record) {
+  if (record.weekLabel) { return record.weekLabel; }
+  if (record.triggeredAt) { return weekKeyFromDate(parseDateTime(record.triggeredAt)); }
+  const latestTime = getLatestPreorderTime(record.latestByWarehouse || {});
+  return latestTime ? weekKeyFromDate(parseDateTime(latestTime)) : "";
+}
+
 function isWithin(value, start, end) {
   const time = parseDateTime(value);
   return time >= parseDateTime(start) && time <= parseDateTime(end);
@@ -329,6 +372,42 @@ function fillSelect(select, values) {
     option.textContent = value;
     select.append(option);
   });
+}
+
+function ensureWeekOption(key) {
+  if (!els.boardWeekSelect || !key) { return; }
+  if ([...els.boardWeekSelect.options].some((option) => option.value === key)) { return; }
+  const option = document.createElement("option");
+  option.value = key;
+  option.textContent = formatWeekLabel(key);
+  els.boardWeekSelect.append(option);
+}
+
+function fillWeekSelect() {
+  if (!els.boardWeekSelect) { return; }
+  const weekKeys = [...new Set([auditWindow.weekLabel, ...warningStore.map(getRecordWeekKey)].filter(Boolean))]
+    .sort((a, b) => {
+      const rangeA = getWeekRangeFromKey(a);
+      const rangeB = getWeekRangeFromKey(b);
+      return (rangeB?.start || 0) - (rangeA?.start || 0);
+    });
+
+  els.boardWeekSelect.innerHTML = '<option value="">全部周期</option>';
+  weekKeys.forEach(ensureWeekOption);
+  ensureWeekOption(state.boardWeekFilter);
+  els.boardWeekSelect.value = state.boardWeekFilter;
+}
+
+function shiftBoardWeek(step) {
+  const currentKey = state.boardWeekFilter || auditWindow.weekLabel;
+  const currentRange = getWeekRangeFromKey(currentKey);
+  if (!currentRange) { return; }
+  const nextKey = weekKeyFromDate(addDays(currentRange.start, step * 7));
+  state.boardWeekFilter = nextKey;
+  ensureWeekOption(nextKey);
+  els.boardWeekSelect.value = nextKey;
+  state.boardSelected.clear();
+  renderBoard();
 }
 
 function getCustomerOwner(customer) {
@@ -843,24 +922,7 @@ function getBoardRows(ignoreStatus = false) {
     .filter((record) => !state.boardCustomerFilter || record.customer === state.boardCustomerFilter)
     .filter((record) => !state.boardSalespersonFilter || record.salesperson === state.boardSalespersonFilter)
     .filter((record) => !state.boardOperatorFilter || (record.operator || "system") === state.boardOperatorFilter)
-    .filter((record) => {
-      const from = datetimeLocalToComparable(state.boardLatestTimeFrom);
-      const to = datetimeLocalToComparable(state.boardLatestTimeTo);
-      if (!from && !to) { return true; }
-      const latestTime = getLatestPreorderTime(record.latestByWarehouse);
-      if (from && to) { return latestTime >= from && latestTime <= to; }
-      if (from) { return latestTime >= from; }
-      return latestTime <= to;
-    })
-    .filter((record) => {
-      const from = datetimeLocalToComparable(state.boardWarningTimeFrom);
-      const to = datetimeLocalToComparable(state.boardWarningTimeTo);
-      if (!from && !to) { return true; }
-      const triggeredAt = record.triggeredAt || "";
-      if (from && to) { return triggeredAt >= from && triggeredAt <= to; }
-      if (from) { return triggeredAt >= from; }
-      return triggeredAt <= to;
-    })
+    .filter((record) => !state.boardWeekFilter || getRecordWeekKey(record) === state.boardWeekFilter)
     .sort((a, b) => {
       const weight = { pending: 0, processed: 1 };
       return (weight[a.status] ?? 9) - (weight[b.status] ?? 9) || a.customer.localeCompare(b.customer, "zh-Hans-CN");
@@ -884,7 +946,7 @@ function renderRoleOptions() {
 }
 
 function renderBoardCounts() {
-  const all = getRoleScopedWarnings().filter((record) => record.status !== "overdue");
+  const all = getBoardRows(true);
   const pending = all.filter((record) => record.status === "pending").length;
   const processed = all.filter((record) => record.status === "processed").length;
 
@@ -942,21 +1004,11 @@ function resetBoardFilters() {
   state.boardCustomerFilter = "";
   state.boardSalespersonFilter = "";
   state.boardOperatorFilter = "";
-  state.boardLatestTimeFrom = "";
-  state.boardLatestTimeTo = "";
-  state.boardWarningTimeFrom = "";
-  state.boardWarningTimeTo = "";
+  state.boardWeekFilter = auditWindow.weekLabel;
   els.overviewCustomerSearch.value = "";
   els.overviewSalespersonSearch.value = "";
   if (els.overviewOperatorSearch) { els.overviewOperatorSearch.value = ""; }
-  els.overviewLatestTimeFrom.value = "";
-  els.overviewLatestTimeTo.value = "";
-  els.overviewWarningTimeFrom.value = "";
-  els.overviewWarningTimeTo.value = "";
-  els.latestTimeDisplay.value = "";
-  els.latestTimeBox.classList.remove("has-value");
-  els.warningTimeDisplay.value = "";
-  els.warningTimeBox.classList.remove("has-value");
+  if (els.boardWeekSelect) { els.boardWeekSelect.value = state.boardWeekFilter; }
   state.boardSelected.clear();
   renderBoard();
 }
@@ -1000,68 +1052,6 @@ function updateBoardSelectAll(visibleRows) {
   const checkedCount = visibleIds.filter((id) => state.boardSelected.has(id)).length;
   els.boardSelectAll.checked = visibleIds.length > 0 && checkedCount === visibleIds.length;
   els.boardSelectAll.indeterminate = checkedCount > 0 && checkedCount < visibleIds.length;
-}
-
-// ── Range picker helpers ──
-
-function datetimeLocalToComparable(value) {
-  return value ? value.replace("T", " ") : "";
-}
-
-function comparableToDisplay(value) {
-  // "2026-06-14 23:07" → "2026-06-14 23:07"
-  return value;
-}
-
-function syncRangeBox(displayEl, boxEl, fromEl, toEl) {
-  const from = fromEl ? fromEl.value : "";
-  const to = toEl ? toEl.value : "";
-  const fromText = datetimeLocalToComparable(from);
-  const toText = datetimeLocalToComparable(to);
-  if (from && to) {
-    displayEl.value = `${fromText}  —  ${toText}`;
-    boxEl.classList.add("has-value");
-  } else if (from) {
-    displayEl.value = `${fromText} 起`;
-    boxEl.classList.add("has-value");
-  } else if (to) {
-    displayEl.value = `截至 ${toText}`;
-    boxEl.classList.add("has-value");
-  } else {
-    displayEl.value = "";
-    boxEl.classList.remove("has-value");
-  }
-}
-
-function clearRangeBox(boxEl, displayEl, fromEl, toEl, dropEl) {
-  fromEl.value = "";
-  toEl.value = "";
-  displayEl.value = "";
-  boxEl.classList.remove("has-value");
-  dropEl.hidden = true;
-}
-
-function setupRangeBox(boxEl, displayEl, dropEl, fromEl, toEl, clearBtn) {
-  // Toggle dropdown
-  displayEl.addEventListener("click", (e) => {
-    e.stopPropagation();
-    dropEl.hidden = !dropEl.hidden;
-  });
-
-  // Apply filter on date change
-  [fromEl, toEl].forEach((input) => {
-    input.addEventListener("change", () => {
-      syncRangeBox(displayEl, boxEl, fromEl, toEl);
-      renderBoard();
-    });
-  });
-
-  // Clear
-  clearBtn.addEventListener("click", (e) => {
-    e.stopPropagation();
-    clearRangeBox(boxEl, displayEl, fromEl, toEl, dropEl);
-    renderBoard();
-  });
 }
 
 function updateBoardListToolbar() {
@@ -1543,12 +1533,8 @@ function bindEvents() {
     state.boardCustomerFilter = els.overviewCustomerSearch.value.trim();
     state.boardSalespersonFilter = els.overviewSalespersonSearch.value.trim();
     state.boardOperatorFilter = els.overviewOperatorSearch ? els.overviewOperatorSearch.value.trim() : "";
-    state.boardLatestTimeFrom = els.overviewLatestTimeFrom.value;
-    state.boardLatestTimeTo = els.overviewLatestTimeTo.value;
-    state.boardWarningTimeFrom = els.overviewWarningTimeFrom.value;
-    state.boardWarningTimeTo = els.overviewWarningTimeTo.value;
-    syncRangeBox(els.latestTimeDisplay, els.latestTimeBox, els.overviewLatestTimeFrom, els.overviewLatestTimeTo);
-    syncRangeBox(els.warningTimeDisplay, els.warningTimeBox, els.overviewWarningTimeFrom, els.overviewWarningTimeTo);
+    state.boardWeekFilter = els.boardWeekSelect ? els.boardWeekSelect.value : "";
+    state.boardSelected.clear();
     renderBoard();
   }
 
@@ -1556,19 +1542,17 @@ function bindEvents() {
 
   els.resetBoardButton.addEventListener("click", resetBoardFilters);
 
-  // ── Range picker events ──
+  if (els.boardWeekSelect) {
+    els.boardWeekSelect.addEventListener("change", applyBoardSearch);
+  }
 
-  setupRangeBox(els.latestTimeBox, els.latestTimeDisplay, els.latestTimeBox.querySelector(".range-drop"), els.overviewLatestTimeFrom, els.overviewLatestTimeTo, els.latestTimeClear);
-  setupRangeBox(els.warningTimeBox, els.warningTimeDisplay, els.warningTimeBox.querySelector(".range-drop"), els.overviewWarningTimeFrom, els.overviewWarningTimeTo, els.warningTimeClear);
+  if (els.prevWeekButton) {
+    els.prevWeekButton.addEventListener("click", () => shiftBoardWeek(-1));
+  }
 
-  // Click outside to dismiss dropdowns
-  document.addEventListener("click", (event) => {
-    [els.latestTimeBox, els.warningTimeBox].forEach((box) => {
-      if (!box.contains(event.target)) {
-        box.querySelector(".range-drop").hidden = true;
-      }
-    });
-  });
+  if (els.nextWeekButton) {
+    els.nextWeekButton.addEventListener("click", () => shiftBoardWeek(1));
+  }
 
   els.alertBody.addEventListener("dblclick", (event) => {
     if (event.target.closest("input[type=checkbox]")) {
@@ -1814,6 +1798,7 @@ function init() {
   if (els.overviewOperatorSearch) {
     fillSelect(els.overviewOperatorSearch, ["system"].concat(uniqueValues("salesperson")));
   }
+  fillWeekSelect();
   fillSelect(els.orderTypeSelect, uniqueValues("orderType"));
   fillSelect(els.statusSelect, statusOptions);
   bindEvents();

@@ -141,34 +141,16 @@
                 <option value=""></option>
               </select>
             </label>
-            <label class="field field-range">
-              <span>最新预报时间</span>
-              <div class="range-box" id="latestTimeBox">
-                <input class="range-display" id="latestTimeDisplay" type="text" placeholder="全部" readonly autocomplete="off" />
-                <button class="range-clear" id="latestTimeClear" type="button" title="清除">✕</button>
-                <div class="range-drop" hidden>
-                  <div class="range-drop-row">
-                    <input id="latestTimeFrom" type="datetime-local" />
-                    <span>—</span>
-                    <input id="latestTimeTo" type="datetime-local" />
-                  </div>
-                </div>
-              </div>
+            <label class="field field-week">
+              <span>统计周期</span>
+              <select id="boardWeekSelect">
+                <option value="">全部周期</option>
+              </select>
             </label>
-            <label class="field field-range">
-              <span>预警时间</span>
-              <div class="range-box" id="warningTimeBox">
-                <input class="range-display" id="warningTimeDisplay" type="text" placeholder="全部" readonly autocomplete="off" />
-                <button class="range-clear" id="warningTimeClear" type="button" title="清除">✕</button>
-                <div class="range-drop" hidden>
-                  <div class="range-drop-row">
-                    <input id="warningTimeFrom" type="datetime-local" />
-                    <span>—</span>
-                    <input id="warningTimeTo" type="datetime-local" />
-                  </div>
-                </div>
-              </div>
-            </label>
+            <div class="week-stepper" aria-label="统计周切换">
+              <button id="prevWeekButton" class="week-step-btn" type="button">上一周</button>
+              <button id="nextWeekButton" class="week-step-btn" type="button">下一周</button>
+            </div>
             <button id="boardSearchButton" class="btn primary" type="button">搜索</button>
             <button id="resetBoardButton" class="btn" type="button">重置</button>
           </div>
