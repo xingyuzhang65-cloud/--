@@ -116,7 +116,6 @@ const state = {
   boardLatestTimeTo: "",
   boardOperatorFilter: "",
   boardUnreportedWeeksFilter: "",
-  boardWarningPeriodFilter: "",
   dashboardWeekRange: "8",
   role: "admin",
   sortKey: "",
@@ -134,16 +133,6 @@ const state = {
 
 const generatedWarnings = buildWarningRecords();
 const warningStore = loadWarningStore();
-
-function getWarningPeriodKeys() {
-  return [...new Set(warningStore.map((record) => record.weekLabel || auditWindow.weekLabel))]
-    .filter(Boolean)
-    .sort((a, b) => b.localeCompare(a));
-}
-
-function getLatestWarningPeriodKey() {
-  return getWarningPeriodKeys()[0] || auditWindow.weekLabel;
-}
 
 const carrierCodeByPrefix = {
   CCLU: "HEDE",
@@ -235,6 +224,7 @@ function getExportColumns() {
 const els = {
   roleSelect: document.querySelector("#roleSelect"),
   monitorWindowText: document.querySelector("#monitorWindowText"),
+  runMeta: document.querySelector("#runMeta"),
   dashboardMeta: document.querySelector("#dashboardMeta"),
   weeklyWarningLineChart: document.querySelector("#weeklyWarningLineChart"),
   weeklyWarningTotal: document.querySelector("#weeklyWarningTotal"),
@@ -247,7 +237,6 @@ const els = {
   countPending: document.querySelector("#countPending"),
   countProcessed: document.querySelector("#countProcessed"),
   countAll: document.querySelector("#countAll"),
-  boardWarningPeriodSelect: document.querySelector("#boardWarningPeriodSelect"),
   overviewCustomerSearch: document.querySelector("#overviewCustomerSearch"),
   overviewSalespersonSearch: document.querySelector("#overviewSalespersonSearch"),
   overviewOperatorSearch: document.querySelector("#overviewOperatorSearch"),
@@ -325,40 +314,6 @@ function parseDateTime(value) {
   return new Date(year, month - 1, day, hour, minute, second);
 }
 
-function formatDateOnly(date) {
-  const year = date.getFullYear();
-  const month = String(date.getMonth() + 1).padStart(2, "0");
-  const day = String(date.getDate()).padStart(2, "0");
-  return `${year}-${month}-${day}`;
-}
-
-function getWeekRangeByLabel(weekLabel) {
-  const match = /^(\d{4})-W(\d{1,2})$/.exec(weekLabel || "");
-  if (!match) { return null; }
-  const year = Number(match[1]);
-  const week = Number(match[2]);
-  const firstMonday = addDays(getMonday(new Date(year, 0, 4)), 0);
-  const start = addDays(firstMonday, (week - 1) * 7);
-  return { start, end: addDays(start, 6) };
-}
-
-function getMonday(date) {
-  const day = date.getDay() || 7;
-  return addDays(date, 1 - day);
-}
-
-function formatWarningPeriodByLabel(weekLabel) {
-  const range = getWeekRangeByLabel(weekLabel || auditWindow.weekLabel);
-  if (range) {
-    return `${formatDateOnly(range.start)} 至 ${formatDateOnly(range.end)}`;
-  }
-  return `${auditWindow.weekStart.slice(0, 10)} 至 ${auditWindow.weekEnd.slice(0, 10)}`;
-}
-
-function formatWarningPeriod(record) {
-  return formatWarningPeriodByLabel(record.weekLabel || auditWindow.weekLabel);
-}
-
 function isWithin(value, start, end) {
   const time = parseDateTime(value);
   return time >= parseDateTime(start) && time <= parseDateTime(end);
@@ -383,22 +338,6 @@ function fillSelect(select, values) {
     option.textContent = value;
     select.append(option);
   });
-}
-
-function fillWarningPeriodSelect() {
-  if (!els.boardWarningPeriodSelect) { return; }
-  const periodKeys = getWarningPeriodKeys();
-
-  els.boardWarningPeriodSelect.innerHTML = "";
-  periodKeys.forEach((key) => {
-    const option = document.createElement("option");
-    option.value = key;
-    option.textContent = formatWarningPeriodByLabel(key);
-    els.boardWarningPeriodSelect.append(option);
-  });
-
-  state.boardWarningPeriodFilter = getLatestWarningPeriodKey();
-  els.boardWarningPeriodSelect.value = state.boardWarningPeriodFilter;
 }
 
 function getCustomerOwner(customer) {
@@ -935,7 +874,6 @@ function getBoardRows(ignoreStatus = false) {
   return getRoleScopedWarnings()
     .filter((record) => record.status !== "overdue")
     .filter((record) => ignoreStatus || state.boardStatus === "all" || record.status === state.boardStatus)
-    .filter((record) => !state.boardWarningPeriodFilter || (record.weekLabel || auditWindow.weekLabel) === state.boardWarningPeriodFilter)
     .filter((record) => !state.boardCustomerFilter || record.customer === state.boardCustomerFilter)
     .filter((record) => !state.boardSalespersonFilter || record.salesperson === state.boardSalespersonFilter)
     .filter((record) => !state.boardOperatorFilter || (record.operator || "system") === state.boardOperatorFilter)
@@ -1189,7 +1127,7 @@ function renderRoleOptions() {
 }
 
 function renderBoardCounts() {
-  const all = getBoardRows(true);
+  const all = getRoleScopedWarnings().filter((record) => record.status !== "overdue");
   const pending = all.filter((record) => record.status === "pending").length;
   const processed = all.filter((record) => record.status === "processed").length;
 
@@ -1234,7 +1172,7 @@ function renderBoard() {
           ${warehouseCells}
           <td>${contentHtml}</td>
           <td><span class="operator-text">${escapeHtml(record.operator || "system")}</span></td>
-          <td><span class="warehouse-time">${escapeHtml(formatWarningPeriod(record))}</span></td>
+          <td><span class="warehouse-time">${escapeHtml(record.weekLabel || auditWindow.weekLabel)}</span></td>
         </tr>
       `;
     })
@@ -1254,8 +1192,6 @@ function resetBoardFilters() {
   state.boardLatestTimeTo = "";
   els.overviewCustomerSearch.value = "";
   els.overviewSalespersonSearch.value = "";
-  state.boardWarningPeriodFilter = getLatestWarningPeriodKey();
-  if (els.boardWarningPeriodSelect) { els.boardWarningPeriodSelect.value = state.boardWarningPeriodFilter; }
   if (els.overviewOperatorSearch) { els.overviewOperatorSearch.value = ""; }
   if (els.overviewUnreportedWeeksSearch) { els.overviewUnreportedWeeksSearch.value = ""; }
   els.overviewLatestTimeFrom.value = "";
@@ -1413,7 +1349,7 @@ function exportBoardCSV() {
       csvCell(formatWarehouseTime(latestPreorderTime)),
       csvCell(getUnreportedWeekText(latestPreorderTime, record.triggeredAt)),
       ...warehouseCells,
-      csvCell(formatWarningPeriod(record)),
+      csvCell(record.weekLabel || auditWindow.weekLabel),
       csvCell(getLatestProgressContent(record.customer)),
       csvCell(record.operator || "system"),
       csvCell(getWarningStatusLabel(record.status))
@@ -1867,7 +1803,6 @@ function bindEvents() {
     state.boardSalespersonFilter = els.overviewSalespersonSearch.value.trim();
     state.boardOperatorFilter = els.overviewOperatorSearch ? els.overviewOperatorSearch.value.trim() : "";
     state.boardUnreportedWeeksFilter = els.overviewUnreportedWeeksSearch ? els.overviewUnreportedWeeksSearch.value.trim() : "";
-    state.boardWarningPeriodFilter = els.boardWarningPeriodSelect ? els.boardWarningPeriodSelect.value : "";
     state.boardLatestTimeFrom = els.overviewLatestTimeFrom.value;
     state.boardLatestTimeTo = els.overviewLatestTimeTo.value;
     syncRangeBox(els.latestTimeDisplay, els.latestTimeBox, els.overviewLatestTimeFrom, els.overviewLatestTimeTo);
@@ -1877,10 +1812,6 @@ function bindEvents() {
   els.boardSearchButton.addEventListener("click", applyBoardSearch);
 
   els.resetBoardButton.addEventListener("click", resetBoardFilters);
-
-  if (els.boardWarningPeriodSelect) {
-    els.boardWarningPeriodSelect.addEventListener("change", applyBoardSearch);
-  }
 
   // ── Range picker events ──
 
@@ -2151,13 +2082,13 @@ function bindEvents() {
 function init() {
   resetDetailFieldState();
   els.monitorWindowText.textContent = `检测区间：${auditWindow.weekStart.slice(0, 10)} 周一 00:00 至 ${auditWindow.riskEnd.slice(0, 10)} 周三 23:59`;
+  els.runMeta.textContent = `触发时间 ${auditWindow.triggeredAt.slice(0, 16)}`;
   renderRoleOptions();
   fillSelect(els.overviewCustomerSearch, uniqueValues("customer"));
   fillSelect(els.overviewSalespersonSearch, uniqueValues("salesperson"));
   if (els.overviewOperatorSearch) {
     fillSelect(els.overviewOperatorSearch, ["system"].concat(uniqueValues("salesperson")));
   }
-  fillWarningPeriodSelect();
   fillSelect(els.orderTypeSelect, uniqueValues("orderType"));
   fillSelect(els.statusSelect, statusOptions);
   bindEvents();

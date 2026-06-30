@@ -293,7 +293,6 @@ body.details-open::after {
 
 .status-tabs {
   display: flex;
-  align-items: center;
   gap: 4px;
   padding: 12px 16px 0;
   border-bottom: 1px solid var(--line);
@@ -339,37 +338,6 @@ body.details-open::after {
   color: var(--primary);
 }
 
-.status-period-filter {
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-  height: 36px;
-  margin-left: auto;
-  padding-bottom: 2px;
-}
-
-.status-period-filter span {
-  color: #263f5a;
-  font-weight: 600;
-  white-space: nowrap;
-}
-
-.status-period-filter select {
-  width: 212px;
-  height: 32px;
-  border: 1px solid var(--line-strong);
-  border-radius: 4px;
-  background: #fff;
-  color: #0b2948;
-  padding: 0 9px;
-  outline: none;
-}
-
-.status-period-filter select:focus {
-  border-color: var(--primary);
-  box-shadow: 0 0 0 2px rgba(22, 119, 255, 0.12);
-}
-
 .board-filters {
   display: flex;
   align-items: center;
@@ -388,7 +356,7 @@ body.details-open::after {
 
 .alert-table {
   width: 100%;
-  min-width: 1874px;
+  min-width: 1832px;
   border-collapse: collapse;
   table-layout: fixed;
 }
@@ -452,7 +420,7 @@ body.details-open::after {
   position: sticky;
   right: 0;
   z-index: 5;
-  width: 190px;
+  width: 148px;
   background: #fff;
   box-shadow: -8px 0 12px rgba(31, 45, 64, 0.08);
 }
@@ -1897,15 +1865,6 @@ input[type="checkbox"] {
 
   .status-tab {
     text-align: left;
-  }
-
-  .status-period-filter {
-    width: 100%;
-    margin-left: 0;
-  }
-
-  .status-period-filter select {
-    width: 100%;
   }
 
   .compact-field,
