@@ -109,7 +109,6 @@ const state = {
   },
   selected: new Set(),
   activeWarehouseTab: "",
-  boardStatus: "pending",
   boardCustomerFilter: "",
   boardSalespersonFilter: "",
   boardLatestTimeFrom: "",
@@ -122,13 +121,6 @@ const state = {
   role: "admin",
   sortKey: "",
   sortDirection: "",
-  boardSelected: new Set(),
-  activeProgressCustomer: "",
-  activeProgressIsPending: false,
-  editingProgressId: "",
-  editingDeletedAttachments: [],
-  isBatchProgress: false,
-  activeRemarkId: "",
   visibleDetailFields: [],
   fieldSettingsDraft: []
 };
@@ -246,10 +238,6 @@ const els = {
   dashboardWeekRangeSelect: document.querySelector("#dashboardWeekRangeSelect"),
   dashboardSearchButton: document.querySelector("#dashboardSearchButton"),
   dashboardResetButton: document.querySelector("#dashboardResetButton"),
-  statusTabs: document.querySelector("#statusTabs"),
-  countPending: document.querySelector("#countPending"),
-  countProcessed: document.querySelector("#countProcessed"),
-  countAll: document.querySelector("#countAll"),
   boardWarningPeriodTrigger: document.querySelector("#boardWarningPeriodTrigger"),
   boardWarningPeriodText: document.querySelector("#boardWarningPeriodText"),
   boardWarningPeriodPopover: document.querySelector("#boardWarningPeriodPopover"),
@@ -289,7 +277,6 @@ const els = {
   fieldSettingsBody: document.querySelector("#fieldSettingsBody"),
   exportSelectedButton: document.querySelector("#exportSelectedButton"),
   clearSelectionButton: document.querySelector("#clearSelectionButton"),
-  boardSelectAll: document.querySelector("#boardSelectAll"),
   detailsTable: document.querySelector("#detailsTable"),
   detailsTableHead: document.querySelector("#detailsTableHead"),
   tableBody: document.querySelector("#tableBody"),
@@ -300,30 +287,7 @@ const els = {
   warehouseTabs: document.querySelectorAll(".warehouse-tab"),
   tabButtons: document.querySelectorAll(".tab-button"),
   boardListToolbar: document.querySelector("#boardListToolbar"),
-  boardListSelectionInfo: document.querySelector("#boardListSelectionInfo"),
   boardListExportBtn: document.querySelector("#boardListExportBtn"),
-  boardListBatchBtn: document.querySelector("#boardListBatchBtn"),
-  boardListBatchRemarkBtn: document.querySelector("#boardListBatchRemarkBtn"),
-  boardListViewLogBtn: document.querySelector("#boardListViewLogBtn"),
-  logModal: document.querySelector("#logModal"),
-  logModalClose: document.querySelector("#logModalClose"),
-  logCustomerFilter: document.querySelector("#logCustomerFilter"),
-  logTableBody: document.querySelector("#logTableBody"),
-  logEmptyState: document.querySelector("#logEmptyState"),
-  progressInput: document.querySelector("#progressInput"),
-  progressAttachment: document.querySelector("#progressAttachment"),
-  progressAttachmentName: document.querySelector("#progressAttachmentName"),
-  progressSubmit: document.querySelector("#progressSubmit"),
-  progressList: document.querySelector("#progressList"),
-  progressEmpty: document.querySelector("#progressEmpty"),
-  progressCustomerName: document.querySelector("#progressCustomerName"),
-  progressUpdateBtn: document.querySelector("#progressUpdateBtn"),
-  progressModal: document.querySelector("#progressModal"),
-  progressModalClose: document.querySelector("#progressModalClose"),
-  progressModalCustomerName: document.querySelector("#progressModalCustomerName"),
-  progressCancelBtn: document.querySelector("#progressCancelBtn"),
-  progressConfirmBtn: document.querySelector("#progressConfirmBtn"),
-  progressEditAttachments: document.querySelector("#progressEditAttachments"),
   toast: document.querySelector("#toast"),
 };
 
@@ -618,7 +582,6 @@ function buildWarningRecords() {
         latestByWarehouse,
         triggeredAt: auditWindow.triggeredAt,
         reason: "周一至周三六个核心仓均无新增循环柜预报",
-        remark: "",
         processedAt: "",
         operator: "system"
       };
@@ -633,7 +596,6 @@ function buildWarningRecords() {
     latestByWarehouse: getLatestByWarehouse("JJGJ"),
     triggeredAt: auditWindow.triggeredAt,
     reason: "周一至周三六个核心仓均无新增循环柜预报",
-    remark: "已确认下周恢复洛杉矶仓循环柜。",
     processedAt: "2026-06-12 11:18:00",
     operator: "jessie"
   });
@@ -642,7 +604,6 @@ function buildWarningRecords() {
   if (jxgj) {
     jxgj.status = "processed";
     jxgj.processedAt = "2026-06-11 15:42:00";
-    jxgj.remark = "已联系客户确认，下周洛杉矶仓有两柜计划。";
     jxgj.triggeredAt = "2026-06-11 00:45:00";
     jxgj.operator = "Cathy";
   }
@@ -651,7 +612,6 @@ function buildWarningRecords() {
   if (blt) {
     blt.status = "processed";
     blt.processedAt = "2026-06-12 09:10:00";
-    blt.remark = "客户反馈暂停发货，预计7月恢复。";
     blt.triggeredAt = "2026-06-11 02:00:00";
     blt.operator = "Tina";
   }
@@ -660,7 +620,6 @@ function buildWarningRecords() {
   if (jht) {
     jht.status = "processed";
     jht.processedAt = "2026-06-13 17:55:00";
-    jht.remark = "已与客户确认，月底前恢复。";
     jht.triggeredAt = "2026-06-11 01:15:00";
     jht.operator = "天晟";
   }
@@ -699,368 +658,6 @@ function persistWarningStore() {
   localStorage.setItem("cycle-warning-records", JSON.stringify(warningStore));
 }
 
-// ── Log store ──
-
-const logStore = loadLogStore();
-const progressStore = loadProgressStore();
-
-function buildInitialLogs() {
-  return warningStore
-    .filter((r) => r.status !== "pending" && r.status !== "overdue")
-    .map((r) => ({
-      id: `log-init-${r.id}`,
-      warningId: r.id,
-      customer: r.customer,
-      oldStatus: "pending",
-      newStatus: r.status,
-      operator: "系统",
-      timestamp: r.processedAt || r.triggeredAt || auditWindow.triggeredAt
-    }));
-}
-
-function loadLogStore() {
-  try {
-    const saved = JSON.parse(localStorage.getItem("cycle-warning-logs") || "[]");
-    const initialLogs = buildInitialLogs();
-    const activeSaved = saved.filter((entry) => entry.oldStatus !== "overdue" && entry.newStatus !== "overdue");
-    const savedIds = new Set(activeSaved.map((e) => e.id));
-    const merged = [...activeSaved, ...initialLogs.filter((e) => !savedIds.has(e.id))];
-    return merged.sort((a, b) => b.timestamp.localeCompare(a.timestamp));
-  } catch (_error) {
-    return buildInitialLogs();
-  }
-}
-
-function persistLogStore() {
-  localStorage.setItem("cycle-warning-logs", JSON.stringify(logStore));
-}
-
-function loadProgressStore() {
-  try {
-    var saved = JSON.parse(localStorage.getItem("cycle-warning-progress") || "[]");
-    var ver = localStorage.getItem("cycle-warning-version");
-    if (ver !== "v4") {
-      localStorage.removeItem("cycle-warning-progress");
-      saved = [];
-    }
-    var demo = [
-      { id: "demo-1", customer: "JJGJ", content: "已确认下周恢复洛杉矶仓循环柜，预计两个柜。", attachments: [], operator: "jessie", timestamp: "2026-06-12 11:18:00" },
-      { id: "demo-2", customer: "JXGJ", content: "电话联系客户确认，下周将有两票预报。", attachments: [], operator: "Cathy", timestamp: "2026-06-11 15:42:00" },
-      { id: "demo-3", customer: "BLT", content: "客户反馈暂停发货，预计7月恢复。", attachments: [], operator: "Tina", timestamp: "2026-06-12 09:10:00" },
-      { id: "demo-4", customer: "JHT", content: "已与客户确认，月底前恢复两个萨凡纳仓。", attachments: [], operator: "天晟", timestamp: "2026-06-13 17:55:00" },
-      { id: "demo-5", customer: "TTTX", content: "Tim确认下周洛杉矶仓有新柜，芝加哥仓需协调火车站资源。", attachments: [], operator: "天晟", timestamp: "2026-06-14 10:30:00" },
-      { id: "demo-6", customer: "SLGYL", content: "已邮件沟通，客户本周反馈预报计划。", attachments: [], operator: "jessie", timestamp: "2026-06-13 14:20:00" }
-    ];
-    var existing = new Set(saved.map(function (e) { return e.id; }));
-    var changed = false;
-    demo.forEach(function (d) { if (!existing.has(d.id)) { saved.push(d); changed = true; } });
-    if (changed) { localStorage.setItem("cycle-warning-progress", JSON.stringify(saved)); }
-    return saved;
-  } catch (_error) {
-    return [];
-  }
-}
-
-function persistProgressStore() {
-  localStorage.setItem("cycle-warning-progress", JSON.stringify(progressStore));
-}
-
-function getProgressEntries(customer) {
-  return progressStore
-    .filter((entry) => entry.customer === customer)
-    .sort((a, b) => b.timestamp.localeCompare(a.timestamp));
-}
-
-function resetProgressEditor() {
-  state.editingProgressId = "";
-  state.editingDeletedAttachments = [];
-  if (els.progressInput) {
-    els.progressInput.value = "";
-  }
-  if (els.progressAttachment) {
-    els.progressAttachment.value = "";
-  }
-  if (els.progressAttachmentName) {
-    els.progressAttachmentName.textContent = "未选择任何文件";
-  }
-  if (els.progressEditAttachments) {
-    els.progressEditAttachments.innerHTML = "";
-    els.progressEditAttachments.hidden = true;
-  }
-}
-
-function renderProgress() {
-  if (!els.progressList) { return; }
-  if (els.progressCustomerName) {
-    els.progressCustomerName.textContent = state.activeProgressCustomer ? "— " + state.activeProgressCustomer : "";
-  }
-  // 非待处理状态隐藏更新进度按钮和编辑/删除
-  var isPending = state.activeProgressIsPending;
-  if (els.progressUpdateBtn) {
-    els.progressUpdateBtn.hidden = !isPending;
-  }
-  var entries = getProgressEntries(state.activeProgressCustomer);
-  var showActions = isPending;
-  els.progressEmpty.hidden = entries.length > 0;
-  els.progressList.innerHTML = entries
-    .map(function (entry) {
-      // 兼容旧数据格式: attachments 可能是字符串数组 (仅名称) 或对象数组 (name+size)
-      var attachmentItems = entry.attachments || [];
-      var attachmentHtml = "";
-      if (attachmentItems.length) {
-        attachmentHtml = '<div class="progress-attachments">' +
-          attachmentItems.map(function (item) {
-            var name = typeof item === "string" ? item : item.name;
-            var sizeText = (typeof item === "object" && item.size) ? " (" + formatFileSize(item.size) + ")" : "";
-            return '<span title="' + escapeHtml(name) + sizeText + '">' + escapeHtml(name) + sizeText + '</span>';
-          }).join("") +
-          '</div>';
-      }
-      var actionsHtml = showActions
-        ? '<div class="progress-item-actions">' +
-            '<button class="progress-edit-btn" type="button" data-id="' + escapeHtml(entry.id) + '" title="编辑">编辑</button>' +
-            '<button class="progress-delete-btn" type="button" data-id="' + escapeHtml(entry.id) + '" title="删除此条进度">删除</button>' +
-          '</div>'
-        : '';
-      return (
-        '<article class="progress-item">' +
-          '<div class="progress-dot" aria-hidden="true"></div>' +
-          '<div class="progress-meta">' +
-            '<strong>' + escapeHtml(entry.operator) + '</strong>' +
-            '<span>' + escapeHtml(entry.timestamp) + '</span>' +
-          '</div>' +
-          '<div class="progress-content">' + escapeHtml(entry.content) + '</div>' +
-          attachmentHtml +
-          actionsHtml +
-        '</article>'
-      );
-    })
-    .join("");
-}
-
-function updateProgressAttachmentName() {
-  if (!els.progressAttachmentName || !els.progressAttachment) { return; }
-  const files = [...els.progressAttachment.files];
-  els.progressAttachmentName.textContent = files.length
-    ? files.map(function (file) { return file.name + " (" + formatFileSize(file.size) + ")"; }).join("、")
-    : "未选择附件";
-}
-
-function submitProgress() {
-  if (!els.progressInput) { return; }
-  const content = els.progressInput.value.trim();
-  if (!content) {
-    showToast("请输入处理进度描述", "warning");
-    return;
-  }
-
-  if (state.isBatchProgress) {
-    // 批量模式: 为每个选中行创建进度
-    var selectedIds = [...state.boardSelected];
-    if (!selectedIds.length) { return; }
-    var timestamp = new Date().toISOString().slice(0, 19).replace("T", " ");
-    var fileItems = els.progressAttachment
-      ? [...els.progressAttachment.files].map(function (f) { return { name: f.name, size: f.size }; })
-      : [];
-    selectedIds.forEach(function (id) {
-      var record = warningStore.find(function (r) { return r.id === id; });
-      if (record) {
-        progressStore.push({
-          id: "progress-" + record.customer + "-" + Date.now() + "-" + Math.random().toString(36).slice(2, 6),
-          customer: record.customer,
-          content: content,
-          attachments: fileItems,
-          operator: getRole().label,
-          timestamp: timestamp
-        });
-      }
-    });
-    persistProgressStore();
-    state.boardSelected.clear();
-    state.isBatchProgress = false;
-    showToast("✅ 已为 " + selectedIds.length + " 个客户批量添加进度", "success");
-  } else if (state.editingProgressId) {
-    // 编辑模式
-    var entry = progressStore.find(function (e) { return e.id === state.editingProgressId; });
-    if (entry) {
-      entry.content = content;
-      var oldItems = (entry.attachments || []).filter(function (_, index) {
-        return !state.editingDeletedAttachments.includes(index);
-      });
-      var newItems = els.progressAttachment
-        ? [...els.progressAttachment.files].map(function (file) { return { name: file.name, size: file.size }; })
-        : [];
-      entry.attachments = oldItems.concat(newItems);
-      entry.timestamp = new Date().toISOString().slice(0, 19).replace("T", " ");
-    }
-    showToast("✅ 进度修改成功", "success");
-  } else if (state.activeProgressCustomer) {
-    // 单条新增模式
-    var fileItems2 = els.progressAttachment
-      ? [...els.progressAttachment.files].map(function (file) { return { name: file.name, size: file.size }; })
-      : [];
-    progressStore.push({
-      id: "progress-" + state.activeProgressCustomer + "-" + Date.now(),
-      customer: state.activeProgressCustomer,
-      content: content,
-      attachments: fileItems2,
-      operator: getRole().label,
-      timestamp: new Date().toISOString().slice(0, 19).replace("T", " ")
-    });
-    showToast("✅ 进度更新成功", "success");
-  }
-
-  persistProgressStore();
-  resetProgressEditor();
-  closeProgressModal();
-  renderProgress();
-  renderBoard();
-}
-
-function renderEditAttachments(entry) {
-  if (!els.progressEditAttachments) { return; }
-  state.editingDeletedAttachments = [];
-  var items = entry.attachments || [];
-  if (!items.length) {
-    els.progressEditAttachments.innerHTML = "";
-    els.progressEditAttachments.hidden = true;
-    return;
-  }
-  els.progressEditAttachments.hidden = false;
-  els.progressEditAttachments.innerHTML =
-    '<span class="progress-edit-attach-label">已有附件：</span>' +
-    items.map(function (item, index) {
-      var name = typeof item === "string" ? item : item.name;
-      var sizeText = (typeof item === "object" && item.size) ? " (" + formatFileSize(item.size) + ")" : "";
-      return (
-        '<span class="progress-edit-attach-item" data-index="' + index + '">' +
-          '<span class="progress-edit-attach-name" title="' + escapeHtml(name) + sizeText + '">' + escapeHtml(name) + sizeText + '</span>' +
-          '<button class="progress-edit-attach-del" type="button" data-index="' + index + '" title="删除此附件">✕</button>' +
-        '</span>'
-      );
-    }).join("");
-}
-
-function editProgressEntry(entryId) {
-  var entry = progressStore.find(function (e) { return e.id === entryId; });
-  if (!entry || !els.progressInput || !els.progressModal) { return; }
-  state.editingProgressId = entryId;
-  state.editingDeletedAttachments = [];
-  els.progressInput.value = entry.content;
-  els.progressModal.hidden = false;
-  if (els.progressAttachment) {
-    els.progressAttachment.value = "";
-  }
-  if (els.progressAttachmentName) {
-    els.progressAttachmentName.textContent = "点击选择文件追加附件";
-  }
-  if (els.progressModalCustomerName) {
-    els.progressModalCustomerName.textContent = "— " + (entry.customer || state.activeProgressCustomer);
-  }
-  renderEditAttachments(entry);
-}
-
-function openProgressModal() {
-  if (!els.progressModal) { return; }
-  if (!state.isBatchProgress) {
-    if (!state.activeProgressCustomer) { return; }
-    if (!state.activeProgressIsPending) { showToast("已完成状态不支持更新进度", "warning"); return; }
-  }
-  resetProgressEditor();
-  if (els.progressModalCustomerName) {
-    if (state.isBatchProgress) {
-      var ids = [...state.boardSelected];
-      var names = ids.map(function (id) {
-        var r = warningStore.find(function (w) { return w.id === id; });
-        return r ? r.customer : "";
-      }).filter(Boolean);
-      els.progressModalCustomerName.textContent = "— 批量 (" + names.length + "个: " + names.slice(0, 3).join(", ") + (names.length > 3 ? "…" : "") + ")";
-    } else {
-      els.progressModalCustomerName.textContent = "— " + state.activeProgressCustomer;
-    }
-  }
-  els.progressModal.hidden = false;
-}
-
-function closeProgressModal() {
-  if (!els.progressModal) { return; }
-  els.progressModal.hidden = true;
-}
-
-// ── Remark Modal ──
-
-function deleteProgressEntry(entryId) {
-  var index = progressStore.findIndex(function (entry) { return entry.id === entryId; });
-  if (index === -1) { return; }
-  progressStore.splice(index, 1);
-  persistProgressStore();
-  renderProgress();
-  showToast("进度记录已删除", "info");
-}
-
-function addLogEntry(warningId, customer, oldStatus, newStatus) {
-  const entry = {
-    id: `log-${warningId}-${Date.now()}`,
-    warningId,
-    customer,
-    oldStatus,
-    newStatus,
-    operator: getRole().label,
-    timestamp: new Date().toISOString().slice(0, 19).replace("T", " ")
-  };
-  logStore.push(entry);
-  logStore.sort((a, b) => b.timestamp.localeCompare(a.timestamp));
-  persistLogStore();
-}
-
-function getFilteredLogs() {
-  const customerFilter = els.logCustomerFilter ? els.logCustomerFilter.value : "";
-  return logStore.filter((entry) => !customerFilter || entry.customer === customerFilter);
-}
-
-function renderLogs() {
-  if (!els.logTableBody) { return; }
-  const visibleLogs = getFilteredLogs();
-  els.logTableBody.innerHTML = visibleLogs
-    .map(
-      (entry) => `
-        <tr>
-          <td>${escapeHtml(entry.timestamp)}</td>
-          <td><strong>${escapeHtml(entry.customer)}</strong></td>
-          <td><span class="log-status-badge ${escapeHtml(entry.oldStatus)}">${escapeHtml(getWarningStatusLabel(entry.oldStatus))}</span> → <span class="log-status-badge ${escapeHtml(entry.newStatus)}">${escapeHtml(getWarningStatusLabel(entry.newStatus))}</span></td>
-          <td>${escapeHtml(entry.operator)}</td>
-        </tr>`
-    )
-    .join("");
-  els.logEmptyState.hidden = visibleLogs.length > 0;
-}
-
-function openLogModal() {
-  if (!els.logModal) { return; }
-  populateLogCustomerFilter();
-  renderLogs();
-  els.logModal.hidden = false;
-}
-
-function closeLogModal() {
-  if (!els.logModal) { return; }
-  els.logModal.hidden = true;
-}
-
-function populateLogCustomerFilter() {
-  if (!els.logCustomerFilter) { return; }
-  const customers = [...new Set(logStore.map((e) => e.customer).filter(Boolean))].sort((a, b) => a.localeCompare(b, "zh-Hans-CN"));
-  const currentValue = els.logCustomerFilter.value;
-  els.logCustomerFilter.innerHTML = '<option value="">全部</option>';
-  customers.forEach((c) => {
-    const option = document.createElement("option");
-    option.value = c;
-    option.textContent = c;
-    els.logCustomerFilter.append(option);
-  });
-  els.logCustomerFilter.value = currentValue;
-}
-
 function getRole() {
   return roleOptions.find((role) => role.value === state.role) || roleOptions[0];
 }
@@ -1070,10 +667,9 @@ function getRoleScopedWarnings() {
   return warningStore.filter((record) => role.isAdmin || record.salesperson === role.value);
 }
 
-function getBoardRows(ignoreStatus = false) {
+function getBoardRows() {
   return getRoleScopedWarnings()
     .filter((record) => record.status !== "overdue")
-    .filter((record) => ignoreStatus || state.boardStatus === "all" || record.status === state.boardStatus)
     .filter((record) => !state.boardWarningPeriodFilter.length || state.boardWarningPeriodFilter.includes(record.weekLabel || auditWindow.weekLabel))
     .filter((record) => !state.boardCustomerFilter || record.customer === state.boardCustomerFilter)
     .filter((record) => !state.boardSalespersonFilter || record.salesperson === state.boardSalespersonFilter)
@@ -1324,23 +920,7 @@ function renderRoleOptions() {
   });
 }
 
-function renderBoardCounts() {
-  const all = getBoardRows(true);
-  const pending = all.filter((record) => record.status === "pending").length;
-  const processed = all.filter((record) => record.status === "processed").length;
-
-  els.countPending.textContent = pending;
-  els.countProcessed.textContent = processed;
-  els.countAll.textContent = all.length;
-}
-
-function getLatestProgressContent(customer) {
-  var entries = getProgressEntries(customer);
-  return entries.length ? entries[0].content : "";
-}
-
 function renderBoard() {
-  renderBoardCounts();
   const visibleRows = getBoardRows();
 
   els.alertBody.innerHTML = visibleRows
@@ -1353,22 +933,15 @@ function renderBoard() {
         })
         .join("");
       const latestPreorderTime = getLatestPreorderTime(record.latestByWarehouse);
-      var latestContent = getLatestProgressContent(record.customer);
-      var contentHtml = latestContent
-        ? '<span class="board-content-text" title="' + escapeHtml(latestContent) + '">' + escapeHtml(latestContent.length > 20 ? latestContent.slice(0, 20) + "…" : latestContent) + '</span>'
-        : '<span class="board-content-empty">—</span>';
       var unreportedWeekText = getUnreportedWeekText(latestPreorderTime, record.triggeredAt);
 
-      var isSelected = state.boardSelected.has(record.id);
       return `
-        <tr data-customer="${escapeHtml(record.customer)}" data-id="${escapeHtml(record.id)}" class="${isSelected ? "board-selected" : ""}">
-          <td><input class="board-row-check" type="checkbox" data-id="${escapeHtml(record.id)}" ${isSelected ? "checked" : ""} /></td>
+        <tr data-customer="${escapeHtml(record.customer)}" data-id="${escapeHtml(record.id)}">
           <td><strong>${escapeHtml(record.customer)}</strong></td>
           <td>${escapeHtml(record.salesperson)}</td>
           <td><span class="warehouse-time ${latestPreorderTime ? "" : "empty"}" title="${escapeHtml(latestPreorderTime || "无预报")}">${escapeHtml(formatWarehouseTime(latestPreorderTime))}</span></td>
           <td><span class="warehouse-time">${escapeHtml(unreportedWeekText)}</span></td>
           ${warehouseCells}
-          <td>${contentHtml}</td>
           <td><span class="operator-text">${escapeHtml(record.operator || "system")}</span></td>
           <td><span class="warehouse-time">${escapeHtml(formatWarningPeriod(record))}</span></td>
         </tr>
@@ -1377,7 +950,6 @@ function renderBoard() {
     .join("");
 
   els.overviewEmptyState.hidden = visibleRows.length > 0;
-  updateBoardSelectAll(visibleRows);
   updateBoardListToolbar();
 }
 
@@ -1400,18 +972,11 @@ function resetBoardFilters() {
   els.overviewLatestTimeTo.value = "";
   els.latestTimeDisplay.value = "";
   els.latestTimeBox.classList.remove("has-value");
-  state.boardSelected.clear();
   renderBoard();
 }
 
 function drillToDetails(customer, warehouse = "") {
   openDetailsDrawer();
-  state.activeProgressCustomer = customer;
-  // 判断当前客户的预警状态
-  var w = warningStore.find(function (r) { return r.customer === customer; });
-  state.activeProgressIsPending = w ? w.status === "pending" : false;
-  resetProgressEditor();
-  renderProgress();
   els.customerInput.value = customer;
   setActiveWarehouseTab(warehouse);
   applySearch();
@@ -1436,14 +1001,6 @@ function applyIncomingFilter() {
 }
 
 window.incoming_filter = window.incoming_filter || null;
-
-function updateBoardSelectAll(visibleRows) {
-  if (!els.boardSelectAll) { return; }
-  const visibleIds = visibleRows.map((r) => r.id);
-  const checkedCount = visibleIds.filter((id) => state.boardSelected.has(id)).length;
-  els.boardSelectAll.checked = visibleIds.length > 0 && checkedCount === visibleIds.length;
-  els.boardSelectAll.indeterminate = checkedCount > 0 && checkedCount < visibleIds.length;
-}
 
 // ── Range picker helpers ──
 
@@ -1517,18 +1074,6 @@ function setupRangeBox(boxEl, displayEl, dropEl, fromEl, toEl, clearBtn, onChang
 
 function updateBoardListToolbar() {
   if (!els.boardListToolbar) { return; }
-  const count = state.boardSelected.size;
-  els.boardListSelectionInfo.textContent = "已选 " + count + " 条";
-  if (els.boardListBatchBtn) {
-    const hide = state.boardStatus === "processed" || state.boardStatus === "all";
-    els.boardListBatchBtn.hidden = hide;
-    if (!hide) { els.boardListBatchBtn.disabled = count === 0; }
-  }
-  if (els.boardListBatchRemarkBtn) {
-    const hideR = state.boardStatus === "processed" || state.boardStatus === "all";
-    els.boardListBatchRemarkBtn.hidden = hideR;
-    if (!hideR) { els.boardListBatchRemarkBtn.disabled = count === 0; }
-  }
 }
 
 function exportBoardCSV() {
@@ -1538,7 +1083,7 @@ function exportBoardCSV() {
   const headerColumns = [
     "客户简称", "业务员", "最新预报时间", "未预报周数",
     "洛杉矶仓", "芝加哥仓", "新泽西仓", "萨凡纳仓", "休斯顿仓", "奥克兰仓",
-    "预警周期", "处理内容", "操作人", "状态"
+    "预警周期", "操作人", "状态"
   ];
 
   const header = headerColumns.map(csvCell).join(",");
@@ -1552,7 +1097,6 @@ function exportBoardCSV() {
       csvCell(getUnreportedWeekText(latestPreorderTime, record.triggeredAt)),
       ...warehouseCells,
       csvCell(formatWarningPeriod(record)),
-      csvCell(getLatestProgressContent(record.customer)),
       csvCell(record.operator || "system"),
       csvCell(getWarningStatusLabel(record.status))
     ].join(",");
@@ -1577,28 +1121,6 @@ function getBoardExportFileName() {
     .replace("T", "_")
     .replaceAll(":", "");
   return `循环柜预警_${timestamp}.csv`;
-}
-
-function batchUpdateBoardStatus(newStatus) {
-  const ids = [...state.boardSelected];
-  if (!ids.length) { return; }
-
-  ids.forEach((id) => {
-    const record = warningStore.find((r) => r.id === id);
-    if (record && record.status !== newStatus) {
-      const oldStatus = record.status;
-      record.status = newStatus;
-      record.operator = getRole().label;
-      if (newStatus === "processed") {
-        record.processedAt = new Date().toISOString().slice(0, 19).replace("T", " ");
-      }
-      addLogEntry(record.id, record.customer, oldStatus, newStatus);
-    }
-  });
-
-  state.boardSelected.clear();
-  persistWarningStore();
-  renderBoard();
 }
 
 function exportSelectedCSV() {
@@ -1723,13 +1245,6 @@ function renderDetailsCell(field, row) {
   const title = escapeHtml(rawValue ?? "");
   const className = field.className ? ` class="${field.className}"` : "";
   return `<td${className} style="width:${field.width}px" title="${title}">${content}</td>`;
-}
-
-function formatFileSize(bytes) {
-  if (!bytes) { return "0 B"; }
-  if (bytes < 1024) { return bytes + " B"; }
-  if (bytes < 1048576) { return (bytes / 1024).toFixed(1) + " KB"; }
-  return (bytes / 1048576).toFixed(2) + " MB";
 }
 
 let _toastTimer = 0;
@@ -1945,15 +1460,11 @@ function openDetailsDrawer() {
 }
 
 function closeDetailsDrawer() {
-  closeProgressModal();
   const drawer = document.querySelector("#tab-details");
   if (drawer) {
     drawer.hidden = true;
   }
   document.body.classList.remove("details-open");
-  state.activeProgressCustomer = "";
-  resetProgressEditor();
-  renderProgress();
 }
 
 function bindEvents() {
@@ -1966,32 +1477,6 @@ function bindEvents() {
       switchTab(btn.dataset.tab);
     });
   });
-
-  els.statusTabs.addEventListener("click", (event) => {
-    const button = event.target.closest(".status-tab");
-    if (!button) {
-      return;
-    }
-
-    state.boardStatus = button.dataset.status;
-    state.boardSelected.clear();
-    document.querySelectorAll(".status-tab").forEach((tab) => tab.classList.toggle("active", tab === button));
-    renderBoard();
-  });
-
-  if (els.boardSelectAll) {
-    els.boardSelectAll.addEventListener("change", () => {
-      const visibleRows = getBoardRows();
-      visibleRows.forEach((record) => {
-        if (els.boardSelectAll.checked) {
-          state.boardSelected.add(record.id);
-        } else {
-          state.boardSelected.delete(record.id);
-        }
-      });
-      renderBoard();
-    });
-  }
 
   els.roleSelect.addEventListener("change", () => {
     state.role = els.roleSelect.value;
@@ -2097,19 +1582,6 @@ function bindEvents() {
     drillToDetails(row.dataset.customer);
   });
 
-  els.alertBody.addEventListener("change", (event) => {
-    if (!event.target.matches(".board-row-check")) {
-      return;
-    }
-    const id = event.target.dataset.id;
-    if (event.target.checked) {
-      state.boardSelected.add(id);
-    } else {
-      state.boardSelected.delete(id);
-    }
-    renderBoard();
-  });
-
   els.backButton.addEventListener("click", closeDetailsDrawer);
   els.searchButton.addEventListener("click", applySearch);
   els.resetButton.addEventListener("click", resetSearch);
@@ -2150,65 +1622,6 @@ function bindEvents() {
     els.clearSelectionButton.addEventListener("click", () => {
       state.selected.clear();
       renderTable();
-    });
-  }
-
-  if (els.progressAttachment) {
-    els.progressAttachment.addEventListener("change", updateProgressAttachmentName);
-  }
-
-  if (els.progressUpdateBtn) {
-    els.progressUpdateBtn.addEventListener("click", openProgressModal);
-  }
-
-  if (els.progressConfirmBtn) {
-    els.progressConfirmBtn.addEventListener("click", submitProgress);
-  }
-
-  if (els.progressCancelBtn) {
-    els.progressCancelBtn.addEventListener("click", closeProgressModal);
-  }
-
-  if (els.progressList) {
-    els.progressList.addEventListener("click", function (event) {
-      var deleteBtn = event.target.closest(".progress-delete-btn");
-      if (deleteBtn) {
-        deleteProgressEntry(deleteBtn.dataset.id);
-        return;
-      }
-      var editBtn = event.target.closest(".progress-edit-btn");
-      if (editBtn) {
-        editProgressEntry(editBtn.dataset.id);
-        return;
-      }
-    });
-  }
-
-  if (els.progressModalClose) {
-    els.progressModalClose.addEventListener("click", closeProgressModal);
-  }
-
-  if (els.progressModal) {
-    els.progressModal.addEventListener("click", function (event) {
-      if (event.target === els.progressModal) {
-        closeProgressModal();
-      }
-    });
-  }
-
-  // 编辑模式下删除已有附件
-  if (els.progressEditAttachments) {
-    els.progressEditAttachments.addEventListener("click", function (event) {
-      var delBtn = event.target.closest(".progress-edit-attach-del");
-      if (!delBtn) { return; }
-      var index = parseInt(delBtn.dataset.index, 10);
-      if (!isNaN(index)) {
-        state.editingDeletedAttachments.push(index);
-        var item = delBtn.closest(".progress-edit-attach-item");
-        if (item) {
-          item.style.display = "none";
-        }
-      }
     });
   }
 
@@ -2278,43 +1691,6 @@ function bindEvents() {
 
   if (els.boardListExportBtn) {
     els.boardListExportBtn.addEventListener("click", exportBoardCSV);
-  }
-
-  if (els.boardListBatchBtn) {
-    els.boardListBatchBtn.addEventListener("click", () => {
-      if (state.boardSelected.size === 0 || state.boardStatus === "processed" || state.boardStatus === "all") { return; }
-      batchUpdateBoardStatus("processed");
-    });
-  }
-
-  if (els.boardListViewLogBtn) {
-    els.boardListViewLogBtn.addEventListener("click", openLogModal);
-  }
-
-  if (els.boardListBatchRemarkBtn) {
-    els.boardListBatchRemarkBtn.addEventListener("click", function () {
-      if (state.boardSelected.size === 0) { return; }
-      state.isBatchProgress = true;
-      openProgressModal();
-    });
-  }
-
-  // ── Log modal ──
-
-  if (els.logModalClose) {
-    els.logModalClose.addEventListener("click", closeLogModal);
-  }
-
-  if (els.logModal) {
-    els.logModal.addEventListener("click", (event) => {
-      if (event.target === els.logModal) {
-        closeLogModal();
-      }
-    });
-  }
-
-  if (els.logCustomerFilter) {
-    els.logCustomerFilter.addEventListener("change", renderLogs);
   }
 
   if (els.dashboardSearchButton) {
