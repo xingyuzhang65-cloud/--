@@ -9,15 +9,9 @@
     <meta http-equiv="Expires" content="0" />
     <link rel="stylesheet" href="styles.css?v=20260629-single-period" />
     <style>
-      .alert-table th:nth-child(14), .alert-table td:nth-child(14) { position: sticky; right: 0; z-index: 5; width: 190px; background: #fff; box-shadow: -8px 0 12px rgba(31,45,64,0.08); }
-      .alert-table th:nth-child(14) { z-index: 6; background: var(--header-bg); }
-      .alert-table th:nth-child(13), .alert-table td:nth-child(13) { width: 80px; background: #fff; }
-      .alert-table th:nth-child(12), .alert-table td:nth-child(12) { width: 160px; background: #fff; }
-      .alert-table th:nth-child(5), .alert-table td:nth-child(5) { width: 92px; background: #fff; }
-      .board-content-text { color: #1d3b5c; font-size: 12px; cursor: default; }
-      .board-content-empty { color: #bcc5d0; }
-      .operator-text { color: #3a556d; font-size: 12px; font-weight: 600; }
-      .alert-table { min-width: 1874px; }
+      .customer-status-badge { display: inline-flex; align-items: center; justify-content: center; min-width: 64px; height: 22px; padding: 0 8px; border-radius: 3px; font-weight: 700; font-size: 11px; background: #e6f7e6; color: #2d8a2d; }
+      .customer-status-badge.inactive { background: #fde8e8; color: #b33a3a; }
+      .alert-table { min-width: 1520px; }
     </style>
   </head>
   <body>
@@ -139,23 +133,6 @@
                 <option value=""></option>
               </select>
             </label>
-            <label class="field field-filter">
-              <span>操作人</span>
-              <select id="overviewOperatorSearch">
-                <option value=""></option>
-              </select>
-            </label>
-            <label class="field field-filter field-week-filter">
-              <span>未预报周数</span>
-              <select id="overviewUnreportedWeeksSearch">
-                <option value="">全部</option>
-                <option value="1">1</option>
-                <option value="2">2</option>
-                <option value="3">3</option>
-                <option value="4">4</option>
-                <option value="1月以上">1月以上</option>
-              </select>
-            </label>
             <label class="field field-range">
               <span>最新预报时间</span>
               <div class="range-box" id="latestTimeBox">
@@ -174,31 +151,11 @@
             <button id="resetBoardButton" class="btn" type="button">重置</button>
           </div>
 
-          <div class="status-tabs" id="statusTabs" aria-label="预警状态筛选">
-            <button class="status-tab active" type="button" data-status="pending">
-              待处理 <strong id="countPending">0</strong>
-            </button>
-            <button class="status-tab" type="button" data-status="processed">
-              已完成 <strong id="countProcessed">0</strong>
-            </button>
-            <button class="status-tab" type="button" data-status="all">
-              全部 <strong id="countAll">0</strong>
-            </button>
-            <label class="status-period-filter">
-              <span>预警周期</span>
-              <select id="boardWarningPeriodSelect">
-              </select>
-            </label>
-          </div>
-
           <div class="board-list-toolbar" id="boardListToolbar">
             <div class="toolbar-actions">
               <button class="btn tiny" id="boardListExportBtn" type="button">导出</button>
-              <button class="btn tiny primary" id="boardListBatchBtn" type="button" disabled>批量完成</button>
-              <button class="btn tiny" id="boardListBatchRemarkBtn" type="button" disabled>批量备注</button>
-              <button class="btn tiny" id="boardListViewLogBtn" type="button">查看日志</button>
+              <button class="btn tiny primary" id="boardListCsBtn" type="button">修改客户状态</button>
             </div>
-            <span class="toolbar-selection-info" id="boardListSelectionInfo">已选 0 条</span>
           </div>
 
           <div class="alert-table-wrap">
@@ -208,17 +165,15 @@
                   <th class="col-check"><input id="boardSelectAll" type="checkbox" aria-label="全选" /></th>
                   <th>客户简称</th>
                   <th>业务员</th>
+                  <th>客户状态</th>
+                  <th>建code时间</th>
                   <th>最新预报时间</th>
-                  <th>未预报周数</th>
                   <th>洛杉矶仓</th>
                   <th>芝加哥仓</th>
                   <th>新泽西仓</th>
                   <th>萨凡纳仓</th>
                   <th>休斯顿仓</th>
                   <th>奥克兰仓</th>
-                  <th>处理内容</th>
-                  <th>操作人</th>
-                  <th>预警周期</th>
                 </tr>
               </thead>
               <tbody id="alertBody"></tbody>
@@ -355,14 +310,6 @@
           </div>
         </section>
 
-        <section class="progress-section" aria-label="问题进度">
-          <div class="progress-header">
-            <h2>问题进度 <span id="progressCustomerName"></span></h2>
-            <button id="progressUpdateBtn" class="btn tiny primary" type="button">更新进度</button>
-          </div>
-          <div class="progress-list" id="progressList"></div>
-          <div class="empty-state progress-empty" id="progressEmpty" hidden>暂无问题进度</div>
-        </section>
       </main>
     </div>
 
@@ -391,79 +338,42 @@
       </div>
     </aside>
 
-    <div class="modal-overlay" id="logModal" hidden>
-      <div class="modal-panel">
-        <div class="modal-header">
-          <h2>操作日志</h2>
-          <button class="modal-close-btn" id="logModalClose" type="button" aria-label="关闭">✕</button>
-        </div>
-        <div class="modal-filters">
-          <label class="field">
-            <span>客户简称</span>
-            <select id="logCustomerFilter"><option value="">全部</option></select>
-          </label>
-        </div>
-        <div class="modal-table-wrap">
-          <table class="log-table">
-            <thead>
-              <tr>
-                <th>时间</th>
-                <th>客户简称</th>
-                <th>原状态</th>
-                <th>新状态</th>
-                <th>操作人</th>
-              </tr>
-            </thead>
-            <tbody id="logTableBody"></tbody>
-          </table>
-          <div class="empty-state" id="logEmptyState" hidden>暂无操作日志</div>
-        </div>
-      </div>
-    </div>
-
-    <div class="modal-overlay" id="progressModal" hidden>
-      <div class="modal-panel progress-modal-panel">
-        <div class="modal-header">
-          <h2>更新进度 <span id="progressModalCustomerName"></span></h2>
-          <button class="modal-close-btn" id="progressModalClose" type="button" aria-label="关闭">✕</button>
-        </div>
-        <div class="progress-modal-body">
-          <div class="progress-form-row">
-            <label class="progress-form-label">
-              处理进度描述
-              <span class="progress-required">*</span>
-            </label>
-            <div class="progress-form-control">
-              <textarea id="progressInput" rows="5" placeholder="请输入本次跟进处理的具体内容…"></textarea>
-            </div>
-          </div>
-          <div class="progress-form-row">
-            <label class="progress-form-label">文件附件</label>
-            <div class="progress-form-control">
-              <div class="progress-file-row">
-                <label class="attachment-picker">
-                  <input id="progressAttachment" type="file" multiple />
-                  <span>📎 选择文件</span>
-                </label>
-                <span class="attachment-name" id="progressAttachmentName">未选择任何文件</span>
-              </div>
-              <div class="progress-edit-attachments" id="progressEditAttachments" hidden></div>
-              <p class="progress-form-hint">支持上传图片、PDF 等格式，单文件不超过 10MB</p>
-            </div>
-          </div>
-          <div class="progress-modal-actions">
-            <button class="btn" id="progressCancelBtn" type="button">取消</button>
-            <button class="btn primary" id="progressConfirmBtn" type="button">确认</button>
-          </div>
-        </div>
-      </div>
-    </div>
-
     <div id="toast" class="toast" hidden></div>
+
+    <div class="modal-overlay" id="customerStatusModal" hidden>
+      <div class="modal-panel" style="width:480px;">
+        <div class="modal-header">
+          <h2>修改客户状态</h2>
+          <button class="modal-close-btn" id="customerStatusModalClose" type="button" aria-label="关闭">✕</button>
+        </div>
+        <div class="progress-modal-body" style="padding:20px 24px;">
+          <div class="progress-form-row">
+            <label class="progress-form-label">客户简称</label>
+            <div class="progress-form-control">
+              <div id="csCustomerList" style="max-height:160px;overflow-y:auto;background:#f8fafc;border:1px solid #e0e5ec;border-radius:4px;padding:10px 14px;font-size:13px;color:#0b2948;line-height:1.8;"></div>
+            </div>
+          </div>
+          <div class="progress-form-row">
+            <label class="progress-form-label">调整状态为</label>
+            <div class="progress-form-control">
+              <select id="csNewStatus" style="width:100%;height:34px;border:1px solid #d0d7df;border-radius:4px;padding:0 10px;font-size:13px;outline:none;">
+                <option value="合作中">合作中</option>
+                <option value="不再合作">不再合作</option>
+              </select>
+            </div>
+          </div>
+          <div class="progress-modal-actions" style="margin-top:18px;">
+            <button class="btn" id="csCancelBtn" type="button">取消</button>
+            <button class="btn primary" id="csConfirmBtn" type="button">确认</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
     <script src="script.js?v=20260629-single-period"></script>
     <script>
       window.addEventListener('error', function(e) {
-        document.querySelector('#alertBody') && (document.querySelector('#alertBody').innerHTML = '<tr><td colspan="13" style="color:red;padding:20px;text-align:center;">JS 错误: ' + e.message + ' (行 ' + e.lineno + ':' + e.colno + ')</td></tr>');
+        document.querySelector('#alertBody') && (document.querySelector('#alertBody').innerHTML = '<tr><td colspan="12" style="color:red;padding:20px;text-align:center;">JS 错误: ' + e.message + ' (行 ' + e.lineno + ':' + e.colno + ')</td></tr>');
         document.querySelector('#monitorWindowText') && (document.querySelector('#monitorWindowText').textContent = '脚本加载异常');
       });
     </script>
