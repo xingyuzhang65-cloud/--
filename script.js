@@ -109,24 +109,19 @@ const state = {
   },
   selected: new Set(),
   activeWarehouseTab: "",
-  boardStatus: "pending",
   boardCustomerFilter: "",
   boardSalespersonFilter: "",
   boardLatestTimeFrom: "",
   boardLatestTimeTo: "",
-  boardOperatorFilter: "",
-  boardUnreportedWeeksFilter: "",
   dashboardWeekRange: "8",
   role: "admin",
   sortKey: "",
   sortDirection: "",
   boardSelected: new Set(),
-  activeProgressCustomer: "",
-  activeProgressIsPending: false,
+  activeRemarkId: "",
   editingProgressId: "",
   editingDeletedAttachments: [],
   isBatchProgress: false,
-  activeRemarkId: "",
   visibleDetailFields: [],
   fieldSettingsDraft: []
 };
@@ -224,7 +219,6 @@ function getExportColumns() {
 const els = {
   roleSelect: document.querySelector("#roleSelect"),
   monitorWindowText: document.querySelector("#monitorWindowText"),
-  runMeta: document.querySelector("#runMeta"),
   dashboardMeta: document.querySelector("#dashboardMeta"),
   weeklyWarningLineChart: document.querySelector("#weeklyWarningLineChart"),
   weeklyWarningTotal: document.querySelector("#weeklyWarningTotal"),
@@ -233,14 +227,8 @@ const els = {
   dashboardWeekRangeSelect: document.querySelector("#dashboardWeekRangeSelect"),
   dashboardSearchButton: document.querySelector("#dashboardSearchButton"),
   dashboardResetButton: document.querySelector("#dashboardResetButton"),
-  statusTabs: document.querySelector("#statusTabs"),
-  countPending: document.querySelector("#countPending"),
-  countProcessed: document.querySelector("#countProcessed"),
-  countAll: document.querySelector("#countAll"),
   overviewCustomerSearch: document.querySelector("#overviewCustomerSearch"),
   overviewSalespersonSearch: document.querySelector("#overviewSalespersonSearch"),
-  overviewOperatorSearch: document.querySelector("#overviewOperatorSearch"),
-  overviewUnreportedWeeksSearch: document.querySelector("#overviewUnreportedWeeksSearch"),
   overviewLatestTimeFrom: document.querySelector("#latestTimeFrom"),
   overviewLatestTimeTo: document.querySelector("#latestTimeTo"),
   latestTimeDisplay: document.querySelector("#latestTimeDisplay"),
@@ -280,31 +268,15 @@ const els = {
   warehouseTabs: document.querySelectorAll(".warehouse-tab"),
   tabButtons: document.querySelectorAll(".tab-button"),
   boardListToolbar: document.querySelector("#boardListToolbar"),
-  boardListSelectionInfo: document.querySelector("#boardListSelectionInfo"),
   boardListExportBtn: document.querySelector("#boardListExportBtn"),
-  boardListBatchBtn: document.querySelector("#boardListBatchBtn"),
-  boardListBatchRemarkBtn: document.querySelector("#boardListBatchRemarkBtn"),
-  boardListViewLogBtn: document.querySelector("#boardListViewLogBtn"),
-  logModal: document.querySelector("#logModal"),
-  logModalClose: document.querySelector("#logModalClose"),
-  logCustomerFilter: document.querySelector("#logCustomerFilter"),
-  logTableBody: document.querySelector("#logTableBody"),
-  logEmptyState: document.querySelector("#logEmptyState"),
-  progressInput: document.querySelector("#progressInput"),
-  progressAttachment: document.querySelector("#progressAttachment"),
-  progressAttachmentName: document.querySelector("#progressAttachmentName"),
-  progressSubmit: document.querySelector("#progressSubmit"),
-  progressList: document.querySelector("#progressList"),
-  progressEmpty: document.querySelector("#progressEmpty"),
-  progressCustomerName: document.querySelector("#progressCustomerName"),
-  progressUpdateBtn: document.querySelector("#progressUpdateBtn"),
-  progressModal: document.querySelector("#progressModal"),
-  progressModalClose: document.querySelector("#progressModalClose"),
-  progressModalCustomerName: document.querySelector("#progressModalCustomerName"),
-  progressCancelBtn: document.querySelector("#progressCancelBtn"),
-  progressConfirmBtn: document.querySelector("#progressConfirmBtn"),
-  progressEditAttachments: document.querySelector("#progressEditAttachments"),
+  boardListCsBtn: document.querySelector("#boardListCsBtn"),
   toast: document.querySelector("#toast"),
+  csModal: document.querySelector("#customerStatusModal"),
+  csModalClose: document.querySelector("#customerStatusModalClose"),
+  csCustomerList: document.querySelector("#csCustomerList"),
+  csNewStatus: document.querySelector("#csNewStatus"),
+  csCancelBtn: document.querySelector("#csCancelBtn"),
+  csConfirmBtn: document.querySelector("#csConfirmBtn"),
 };
 
 function parseDateTime(value) {
@@ -340,6 +312,7 @@ function fillSelect(select, values) {
   });
 }
 
+
 function getCustomerOwner(customer) {
   const customerRows = rows.filter((row) => row.customer === customer);
   const counts = customerRows.reduce((map, row) => {
@@ -358,6 +331,14 @@ function getLatestByWarehouse(customer) {
       return [warehouse, latest?.createdAt || ""];
     })
   );
+}
+
+function getCodeCreateTime(customer) {
+  const customerRows = rows.filter(function (r) { return r.customer === customer; });
+  if (!customerRows.length) { return ""; }
+  return customerRows
+    .sort(function (a, b) { return parseDateTime(a.createdAt) - parseDateTime(b.createdAt); })[0]
+    .createdAt;
 }
 
 function getLatestPreorderTime(latestByWarehouse) {
@@ -414,15 +395,25 @@ function buildWarningRecords() {
         customer,
         salesperson: owner,
         status: "pending",
+        codeCreateTime: getCodeCreateTime(customer),
         weekLabel: auditWindow.weekLabel,
         latestByWarehouse,
         triggeredAt: auditWindow.triggeredAt,
         reason: "周一至周三六个核心仓均无新增循环柜预报",
         remark: "",
         processedAt: "",
-        operator: "system"
+        operator: "system",
+        customerStatus: "合作中"
       };
     });
+
+  // 演示数据：部分客户设为不再合作
+  const inactiveCustomers = ["MONTH1", "WEEK4"];
+  records.forEach(function(r) {
+    if (inactiveCustomers.indexOf(r.customer) !== -1) {
+      r.customerStatus = "不再合作";
+    }
+  });
 
   records.push({
     id: `${auditWindow.weekLabel}-JJGJ`,
@@ -435,7 +426,9 @@ function buildWarningRecords() {
     reason: "周一至周三六个核心仓均无新增循环柜预报",
     remark: "已确认下周恢复洛杉矶仓循环柜。",
     processedAt: "2026-06-12 11:18:00",
-    operator: "jessie"
+    operator: "jessie",
+    customerStatus: "合作中",
+    codeCreateTime: getCodeCreateTime("JJGJ")
   });
 
   const jxgj = records.find((record) => record.customer === "JXGJ");
@@ -499,41 +492,7 @@ function persistWarningStore() {
   localStorage.setItem("cycle-warning-records", JSON.stringify(warningStore));
 }
 
-// ── Log store ──
-
-const logStore = loadLogStore();
 const progressStore = loadProgressStore();
-
-function buildInitialLogs() {
-  return warningStore
-    .filter((r) => r.status !== "pending" && r.status !== "overdue")
-    .map((r) => ({
-      id: `log-init-${r.id}`,
-      warningId: r.id,
-      customer: r.customer,
-      oldStatus: "pending",
-      newStatus: r.status,
-      operator: "系统",
-      timestamp: r.processedAt || r.triggeredAt || auditWindow.triggeredAt
-    }));
-}
-
-function loadLogStore() {
-  try {
-    const saved = JSON.parse(localStorage.getItem("cycle-warning-logs") || "[]");
-    const initialLogs = buildInitialLogs();
-    const activeSaved = saved.filter((entry) => entry.oldStatus !== "overdue" && entry.newStatus !== "overdue");
-    const savedIds = new Set(activeSaved.map((e) => e.id));
-    const merged = [...activeSaved, ...initialLogs.filter((e) => !savedIds.has(e.id))];
-    return merged.sort((a, b) => b.timestamp.localeCompare(a.timestamp));
-  } catch (_error) {
-    return buildInitialLogs();
-  }
-}
-
-function persistLogStore() {
-  localStorage.setItem("cycle-warning-logs", JSON.stringify(logStore));
-}
 
 function loadProgressStore() {
   try {
@@ -798,69 +757,6 @@ function deleteProgressEntry(entryId) {
   showToast("进度记录已删除", "info");
 }
 
-function addLogEntry(warningId, customer, oldStatus, newStatus) {
-  const entry = {
-    id: `log-${warningId}-${Date.now()}`,
-    warningId,
-    customer,
-    oldStatus,
-    newStatus,
-    operator: getRole().label,
-    timestamp: new Date().toISOString().slice(0, 19).replace("T", " ")
-  };
-  logStore.push(entry);
-  logStore.sort((a, b) => b.timestamp.localeCompare(a.timestamp));
-  persistLogStore();
-}
-
-function getFilteredLogs() {
-  const customerFilter = els.logCustomerFilter ? els.logCustomerFilter.value : "";
-  return logStore.filter((entry) => !customerFilter || entry.customer === customerFilter);
-}
-
-function renderLogs() {
-  if (!els.logTableBody) { return; }
-  const visibleLogs = getFilteredLogs();
-  els.logTableBody.innerHTML = visibleLogs
-    .map(
-      (entry) => `
-        <tr>
-          <td>${escapeHtml(entry.timestamp)}</td>
-          <td><strong>${escapeHtml(entry.customer)}</strong></td>
-          <td><span class="log-status-badge ${escapeHtml(entry.oldStatus)}">${escapeHtml(getWarningStatusLabel(entry.oldStatus))}</span> → <span class="log-status-badge ${escapeHtml(entry.newStatus)}">${escapeHtml(getWarningStatusLabel(entry.newStatus))}</span></td>
-          <td>${escapeHtml(entry.operator)}</td>
-        </tr>`
-    )
-    .join("");
-  els.logEmptyState.hidden = visibleLogs.length > 0;
-}
-
-function openLogModal() {
-  if (!els.logModal) { return; }
-  populateLogCustomerFilter();
-  renderLogs();
-  els.logModal.hidden = false;
-}
-
-function closeLogModal() {
-  if (!els.logModal) { return; }
-  els.logModal.hidden = true;
-}
-
-function populateLogCustomerFilter() {
-  if (!els.logCustomerFilter) { return; }
-  const customers = [...new Set(logStore.map((e) => e.customer).filter(Boolean))].sort((a, b) => a.localeCompare(b, "zh-Hans-CN"));
-  const currentValue = els.logCustomerFilter.value;
-  els.logCustomerFilter.innerHTML = '<option value="">全部</option>';
-  customers.forEach((c) => {
-    const option = document.createElement("option");
-    option.value = c;
-    option.textContent = c;
-    els.logCustomerFilter.append(option);
-  });
-  els.logCustomerFilter.value = currentValue;
-}
-
 function getRole() {
   return roleOptions.find((role) => role.value === state.role) || roleOptions[0];
 }
@@ -870,18 +766,11 @@ function getRoleScopedWarnings() {
   return warningStore.filter((record) => role.isAdmin || record.salesperson === role.value);
 }
 
-function getBoardRows(ignoreStatus = false) {
+function getBoardRows() {
   return getRoleScopedWarnings()
     .filter((record) => record.status !== "overdue")
-    .filter((record) => ignoreStatus || state.boardStatus === "all" || record.status === state.boardStatus)
     .filter((record) => !state.boardCustomerFilter || record.customer === state.boardCustomerFilter)
     .filter((record) => !state.boardSalespersonFilter || record.salesperson === state.boardSalespersonFilter)
-    .filter((record) => !state.boardOperatorFilter || (record.operator || "system") === state.boardOperatorFilter)
-    .filter((record) => {
-      if (!state.boardUnreportedWeeksFilter) { return true; }
-      const latestTime = getLatestPreorderTime(record.latestByWarehouse);
-      return getUnreportedWeekText(latestTime, record.triggeredAt) === state.boardUnreportedWeeksFilter;
-    })
     .filter((record) => {
       const from = datetimeLocalToComparable(state.boardLatestTimeFrom);
       const to = datetimeLocalToComparable(state.boardLatestTimeTo);
@@ -892,9 +781,9 @@ function getBoardRows(ignoreStatus = false) {
       return latestTime <= to;
     })
     .sort((a, b) => {
-      const weight = { pending: 0, processed: 1 };
-      const statusWeight = (weight[a.status] ?? 9) - (weight[b.status] ?? 9);
-      if (statusWeight) { return statusWeight; }
+      const aInactive = (a.customerStatus || "合作中") === "不再合作" ? 1 : 0;
+      const bInactive = (b.customerStatus || "合作中") === "不再合作" ? 1 : 0;
+      if (aInactive !== bInactive) { return aInactive - bInactive; }
       const weekWeight = getUnreportedWeekSortValue(b) - getUnreportedWeekSortValue(a);
       if (weekWeight) { return weekWeight; }
       return a.customer.localeCompare(b.customer, "zh-Hans-CN");
@@ -1110,13 +999,6 @@ function resetDashboardFilters() {
   renderWarningDashboard();
 }
 
-function getWarningStatusLabel(status) {
-  return {
-    pending: "待处理",
-    processed: "已完成"
-  }[status] || status;
-}
-
 function renderRoleOptions() {
   roleOptions.forEach((role) => {
     const option = document.createElement("option");
@@ -1126,23 +1008,7 @@ function renderRoleOptions() {
   });
 }
 
-function renderBoardCounts() {
-  const all = getRoleScopedWarnings().filter((record) => record.status !== "overdue");
-  const pending = all.filter((record) => record.status === "pending").length;
-  const processed = all.filter((record) => record.status === "processed").length;
-
-  els.countPending.textContent = pending;
-  els.countProcessed.textContent = processed;
-  els.countAll.textContent = all.length;
-}
-
-function getLatestProgressContent(customer) {
-  var entries = getProgressEntries(customer);
-  return entries.length ? entries[0].content : "";
-}
-
 function renderBoard() {
-  renderBoardCounts();
   const visibleRows = getBoardRows();
 
   els.alertBody.innerHTML = visibleRows
@@ -1155,11 +1021,6 @@ function renderBoard() {
         })
         .join("");
       const latestPreorderTime = getLatestPreorderTime(record.latestByWarehouse);
-      var latestContent = getLatestProgressContent(record.customer);
-      var contentHtml = latestContent
-        ? '<span class="board-content-text" title="' + escapeHtml(latestContent) + '">' + escapeHtml(latestContent.length > 20 ? latestContent.slice(0, 20) + "…" : latestContent) + '</span>'
-        : '<span class="board-content-empty">—</span>';
-      var unreportedWeekText = getUnreportedWeekText(latestPreorderTime, record.triggeredAt);
 
       var isSelected = state.boardSelected.has(record.id);
       return `
@@ -1167,12 +1028,10 @@ function renderBoard() {
           <td><input class="board-row-check" type="checkbox" data-id="${escapeHtml(record.id)}" ${isSelected ? "checked" : ""} /></td>
           <td><strong>${escapeHtml(record.customer)}</strong></td>
           <td>${escapeHtml(record.salesperson)}</td>
+          <td><span class="customer-status-badge ${(record.customerStatus || "合作中") === "不再合作" ? "inactive" : ""}">${escapeHtml(record.customerStatus || "合作中")}</span></td>
+          <td><span class="warehouse-time ${record.codeCreateTime ? "" : "empty"}">${escapeHtml(formatWarehouseTime(record.codeCreateTime))}</span></td>
           <td><span class="warehouse-time ${latestPreorderTime ? "" : "empty"}" title="${escapeHtml(latestPreorderTime || "无预报")}">${escapeHtml(formatWarehouseTime(latestPreorderTime))}</span></td>
-          <td><span class="warehouse-time">${escapeHtml(unreportedWeekText)}</span></td>
           ${warehouseCells}
-          <td>${contentHtml}</td>
-          <td><span class="operator-text">${escapeHtml(record.operator || "system")}</span></td>
-          <td><span class="warehouse-time">${escapeHtml(record.weekLabel || auditWindow.weekLabel)}</span></td>
         </tr>
       `;
     })
@@ -1186,14 +1045,10 @@ function renderBoard() {
 function resetBoardFilters() {
   state.boardCustomerFilter = "";
   state.boardSalespersonFilter = "";
-  state.boardOperatorFilter = "";
-  state.boardUnreportedWeeksFilter = "";
   state.boardLatestTimeFrom = "";
   state.boardLatestTimeTo = "";
   els.overviewCustomerSearch.value = "";
   els.overviewSalespersonSearch.value = "";
-  if (els.overviewOperatorSearch) { els.overviewOperatorSearch.value = ""; }
-  if (els.overviewUnreportedWeeksSearch) { els.overviewUnreportedWeeksSearch.value = ""; }
   els.overviewLatestTimeFrom.value = "";
   els.overviewLatestTimeTo.value = "";
   els.latestTimeDisplay.value = "";
@@ -1314,19 +1169,6 @@ function setupRangeBox(boxEl, displayEl, dropEl, fromEl, toEl, clearBtn, onChang
 }
 
 function updateBoardListToolbar() {
-  if (!els.boardListToolbar) { return; }
-  const count = state.boardSelected.size;
-  els.boardListSelectionInfo.textContent = "已选 " + count + " 条";
-  if (els.boardListBatchBtn) {
-    const hide = state.boardStatus === "processed" || state.boardStatus === "all";
-    els.boardListBatchBtn.hidden = hide;
-    if (!hide) { els.boardListBatchBtn.disabled = count === 0; }
-  }
-  if (els.boardListBatchRemarkBtn) {
-    const hideR = state.boardStatus === "processed" || state.boardStatus === "all";
-    els.boardListBatchRemarkBtn.hidden = hideR;
-    if (!hideR) { els.boardListBatchRemarkBtn.disabled = count === 0; }
-  }
 }
 
 function exportBoardCSV() {
@@ -1334,9 +1176,8 @@ function exportBoardCSV() {
   if (!visibleRows.length) { return; }
 
   const headerColumns = [
-    "客户简称", "业务员", "最新预报时间", "未预报周数",
-    "洛杉矶仓", "芝加哥仓", "新泽西仓", "萨凡纳仓", "休斯顿仓", "奥克兰仓",
-    "预警周期", "处理内容", "操作人", "状态"
+    "客户简称", "业务员", "客户状态", "建code时间", "最新预报时间",
+    "洛杉矶仓", "芝加哥仓", "新泽西仓", "萨凡纳仓", "休斯顿仓", "奥克兰仓"
   ];
 
   const header = headerColumns.map(csvCell).join(",");
@@ -1346,13 +1187,10 @@ function exportBoardCSV() {
     return [
       csvCell(record.customer),
       csvCell(record.salesperson),
+      csvCell(record.customerStatus || "合作中"),
+      csvCell(formatWarehouseTime(record.codeCreateTime || "")),
       csvCell(formatWarehouseTime(latestPreorderTime)),
-      csvCell(getUnreportedWeekText(latestPreorderTime, record.triggeredAt)),
-      ...warehouseCells,
-      csvCell(record.weekLabel || auditWindow.weekLabel),
-      csvCell(getLatestProgressContent(record.customer)),
-      csvCell(record.operator || "system"),
-      csvCell(getWarningStatusLabel(record.status))
+      ...warehouseCells
     ].join(",");
   });
 
@@ -1375,28 +1213,6 @@ function getBoardExportFileName() {
     .replace("T", "_")
     .replaceAll(":", "");
   return `循环柜预警_${timestamp}.csv`;
-}
-
-function batchUpdateBoardStatus(newStatus) {
-  const ids = [...state.boardSelected];
-  if (!ids.length) { return; }
-
-  ids.forEach((id) => {
-    const record = warningStore.find((r) => r.id === id);
-    if (record && record.status !== newStatus) {
-      const oldStatus = record.status;
-      record.status = newStatus;
-      record.operator = getRole().label;
-      if (newStatus === "processed") {
-        record.processedAt = new Date().toISOString().slice(0, 19).replace("T", " ");
-      }
-      addLogEntry(record.id, record.customer, oldStatus, newStatus);
-    }
-  });
-
-  state.boardSelected.clear();
-  persistWarningStore();
-  renderBoard();
 }
 
 function exportSelectedCSV() {
@@ -1754,6 +1570,44 @@ function closeDetailsDrawer() {
   renderProgress();
 }
 
+// ── 修改客户状态 Modal ──
+
+function openCustomerStatusModal(customers) {
+  if (!els.csModal) { return; }
+  var list = Array.isArray(customers) ? customers : [customers];
+  els.csModal._customers = list;
+  els.csCustomerList.innerHTML = list.map(function (c) { return escapeHtml(c); }).join("、");
+  els.csNewStatus.value = "合作中";
+  els.csModal.hidden = false;
+}
+
+function closeCustomerStatusModal() {
+  if (!els.csModal) { return; }
+  els.csModal.hidden = true;
+}
+
+function confirmCustomerStatus() {
+  if (!els.csModal) { return; }
+  var customers = els.csModal._customers || [];
+  var newStatus = els.csNewStatus.value;
+  var changed = 0;
+  customers.forEach(function (customer) {
+    var records = warningStore.filter(function (r) { return r.customer === customer; });
+    records.forEach(function (record) {
+      if (record.customerStatus !== newStatus) {
+        record.customerStatus = newStatus;
+        changed++;
+      }
+    });
+  });
+  if (changed > 0) {
+    persistWarningStore();
+    showToast(customers.length + " 个客户状态已调整为 " + newStatus, "success");
+  }
+  closeCustomerStatusModal();
+  renderBoard();
+}
+
 function bindEvents() {
   els.tabButtons.forEach(function (btn) {
     btn.addEventListener("click", function () {
@@ -1763,18 +1617,6 @@ function bindEvents() {
 
       switchTab(btn.dataset.tab);
     });
-  });
-
-  els.statusTabs.addEventListener("click", (event) => {
-    const button = event.target.closest(".status-tab");
-    if (!button) {
-      return;
-    }
-
-    state.boardStatus = button.dataset.status;
-    state.boardSelected.clear();
-    document.querySelectorAll(".status-tab").forEach((tab) => tab.classList.toggle("active", tab === button));
-    renderBoard();
   });
 
   if (els.boardSelectAll) {
@@ -1801,8 +1643,6 @@ function bindEvents() {
   function applyBoardSearch() {
     state.boardCustomerFilter = els.overviewCustomerSearch.value.trim();
     state.boardSalespersonFilter = els.overviewSalespersonSearch.value.trim();
-    state.boardOperatorFilter = els.overviewOperatorSearch ? els.overviewOperatorSearch.value.trim() : "";
-    state.boardUnreportedWeeksFilter = els.overviewUnreportedWeeksSearch ? els.overviewUnreportedWeeksSearch.value.trim() : "";
     state.boardLatestTimeFrom = els.overviewLatestTimeFrom.value;
     state.boardLatestTimeTo = els.overviewLatestTimeTo.value;
     syncRangeBox(els.latestTimeDisplay, els.latestTimeBox, els.overviewLatestTimeFrom, els.overviewLatestTimeTo);
@@ -1822,7 +1662,8 @@ function bindEvents() {
     [els.latestTimeBox].forEach((box) => {
       if (!box) { return; }
       if (!box.contains(event.target)) {
-        box.querySelector(".range-drop").hidden = true;
+        var drop = box.querySelector(".range-drop");
+        if (drop) { drop.hidden = true; }
       }
     });
   });
@@ -1838,6 +1679,14 @@ function bindEvents() {
     }
 
     drillToDetails(row.dataset.customer);
+  });
+
+  els.alertBody.addEventListener("click", (event) => {
+    var badge = event.target.closest(".customer-status-badge");
+    if (!badge) { return; }
+    var row = badge.closest("tr[data-customer]");
+    if (!row) { return; }
+    openCustomerStatusModal([row.dataset.customer]);
   });
 
   els.alertBody.addEventListener("change", (event) => {
@@ -1863,6 +1712,23 @@ function bindEvents() {
   els.fieldSettingsMask.addEventListener("click", closeFieldSettings);
   els.fieldSettingsApply.addEventListener("click", applyFieldSettings);
 
+  // ── 修改客户状态 Modal 事件 ──
+  if (els.csConfirmBtn) {
+    els.csConfirmBtn.addEventListener("click", confirmCustomerStatus);
+  }
+  if (els.csCancelBtn) {
+    els.csCancelBtn.addEventListener("click", closeCustomerStatusModal);
+  }
+  if (els.csModalClose) {
+    els.csModalClose.addEventListener("click", closeCustomerStatusModal);
+  }
+  if (els.csModal) {
+    els.csModal.addEventListener("click", function (event) {
+      if (event.target === els.csModal) {
+        closeCustomerStatusModal();
+      }
+    });
+  }
   els.fieldSettingsBody.addEventListener("change", (event) => {
     if (!event.target.matches(".field-visible-check")) {
       return;
@@ -2023,42 +1889,31 @@ function bindEvents() {
     els.boardListExportBtn.addEventListener("click", exportBoardCSV);
   }
 
-  if (els.boardListBatchBtn) {
-    els.boardListBatchBtn.addEventListener("click", () => {
-      if (state.boardSelected.size === 0 || state.boardStatus === "processed" || state.boardStatus === "all") { return; }
-      batchUpdateBoardStatus("processed");
-    });
-  }
-
-  if (els.boardListViewLogBtn) {
-    els.boardListViewLogBtn.addEventListener("click", openLogModal);
-  }
-
-  if (els.boardListBatchRemarkBtn) {
-    els.boardListBatchRemarkBtn.addEventListener("click", function () {
-      if (state.boardSelected.size === 0) { return; }
-      state.isBatchProgress = true;
-      openProgressModal();
-    });
-  }
-
-  // ── Log modal ──
-
-  if (els.logModalClose) {
-    els.logModalClose.addEventListener("click", closeLogModal);
-  }
-
-  if (els.logModal) {
-    els.logModal.addEventListener("click", (event) => {
-      if (event.target === els.logModal) {
-        closeLogModal();
+  if (els.boardListCsBtn) {
+    els.boardListCsBtn.addEventListener("click", function () {
+      var ids = [...state.boardSelected];
+      var customers = [];
+      if (ids.length > 0) {
+        customers = ids.map(function (id) {
+          var r = warningStore.find(function (w) { return w.id === id; });
+          return r ? r.customer : null;
+        }).filter(Boolean);
+      }
+      // 去重
+      customers = [...new Set(customers)];
+      if (customers.length === 0) {
+        var visibleRows = getBoardRows();
+        customers = visibleRows.map(function (r) { return r.customer; });
+        customers = [...new Set(customers)];
+      }
+      if (customers.length > 0) {
+        openCustomerStatusModal(customers);
+      } else {
+        showToast("暂无客户数据", "warning");
       }
     });
   }
 
-  if (els.logCustomerFilter) {
-    els.logCustomerFilter.addEventListener("change", renderLogs);
-  }
 
   if (els.dashboardSearchButton) {
     els.dashboardSearchButton.addEventListener("click", applyDashboardSearch);
@@ -2082,7 +1937,6 @@ function bindEvents() {
 function init() {
   resetDetailFieldState();
   els.monitorWindowText.textContent = `检测区间：${auditWindow.weekStart.slice(0, 10)} 周一 00:00 至 ${auditWindow.riskEnd.slice(0, 10)} 周三 23:59`;
-  els.runMeta.textContent = `触发时间 ${auditWindow.triggeredAt.slice(0, 16)}`;
   renderRoleOptions();
   fillSelect(els.overviewCustomerSearch, uniqueValues("customer"));
   fillSelect(els.overviewSalespersonSearch, uniqueValues("salesperson"));
