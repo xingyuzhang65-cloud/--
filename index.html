@@ -116,7 +116,6 @@
           <div class="board-header">
             <div>
               <h1>循环柜预警</h1>
-              <p id="monitorWindowText">监控周期加载中</p>
             </div>
             <div class="header-tools">
               <label class="field compact-field">
@@ -184,11 +183,39 @@
             <button class="status-tab" type="button" data-status="all">
               全部 <strong id="countAll">0</strong>
             </button>
-            <label class="status-period-filter">
+            <div class="status-period-filter">
               <span>预警周期</span>
-              <select id="boardWarningPeriodSelect">
-              </select>
-            </label>
+              <button class="period-picker-trigger" id="boardWarningPeriodTrigger" type="button" title="">
+                <span id="boardWarningPeriodText">第24周｜06/08-06/14</span>
+                <span class="period-picker-caret" aria-hidden="true">⌄</span>
+              </button>
+              <div class="period-picker-popover" id="boardWarningPeriodPopover" hidden>
+                <div class="period-picker-head">
+                  <strong>选择预警周</strong>
+                </div>
+                <div class="period-picker-section">
+                  <span class="period-picker-label">快捷选择：</span>
+                  <div class="period-quick-list">
+                    <button type="button" data-period-quick="current">本周</button>
+                    <button type="button" data-period-quick="previous">上周</button>
+                    <button type="button" data-period-quick="4">最近4周</button>
+                    <button type="button" data-period-quick="8">最近8周</button>
+                    <button type="button" data-period-quick="month">本月</button>
+                    <button type="button" data-period-quick="lastMonth">上月</button>
+                  </div>
+                </div>
+                <div class="period-picker-section">
+                  <span class="period-picker-label">周期列表：</span>
+                  <div class="period-option-list" id="boardWarningPeriodList"></div>
+                </div>
+                <div class="period-picker-actions">
+                  <button class="btn tiny" id="boardWarningPeriodClear" type="button">清空</button>
+                  <span class="period-picker-spacer"></span>
+                  <button class="btn tiny" id="boardWarningPeriodCancel" type="button">取消</button>
+                  <button class="btn tiny primary" id="boardWarningPeriodConfirm" type="button">确定</button>
+                </div>
+              </div>
+            </div>
           </div>
 
           <div class="board-list-toolbar" id="boardListToolbar">
@@ -234,9 +261,6 @@
             <div>
               <h1>循环柜预警看板</h1>
               <p>按周追踪未预报客户数量，并识别连续未预报周数最高的客户</p>
-            </div>
-            <div class="header-tools">
-              <div class="run-meta" id="dashboardMeta">数据加载中</div>
             </div>
           </div>
 
@@ -464,7 +488,6 @@
     <script>
       window.addEventListener('error', function(e) {
         document.querySelector('#alertBody') && (document.querySelector('#alertBody').innerHTML = '<tr><td colspan="13" style="color:red;padding:20px;text-align:center;">JS 错误: ' + e.message + ' (行 ' + e.lineno + ':' + e.colno + ')</td></tr>');
-        document.querySelector('#monitorWindowText') && (document.querySelector('#monitorWindowText').textContent = '脚本加载异常');
       });
     </script>
   </body>

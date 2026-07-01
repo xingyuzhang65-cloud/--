@@ -116,7 +116,8 @@ const state = {
   boardLatestTimeTo: "",
   boardOperatorFilter: "",
   boardUnreportedWeeksFilter: "",
-  boardWarningPeriodFilter: "",
+  boardWarningPeriodFilter: [],
+  boardWarningPeriodDraft: [],
   dashboardWeekRange: "8",
   role: "admin",
   sortKey: "",
@@ -136,8 +137,12 @@ const generatedWarnings = buildWarningRecords();
 const warningStore = loadWarningStore();
 
 function getWarningPeriodKeys() {
-  return [...new Set(warningStore.map((record) => record.weekLabel || auditWindow.weekLabel))]
-    .filter(Boolean)
+  const savedKeys = [...new Set(warningStore.map((record) => record.weekLabel || auditWindow.weekLabel))]
+    .filter(Boolean);
+  const latestKey = savedKeys.sort((a, b) => b.localeCompare(a))[0] || auditWindow.weekLabel;
+  const recentKeys = getRecentWarningPeriodKeys(latestKey, 8);
+
+  return [...new Set([...savedKeys, ...recentKeys])]
     .sort((a, b) => b.localeCompare(a));
 }
 
@@ -234,8 +239,6 @@ function getExportColumns() {
 
 const els = {
   roleSelect: document.querySelector("#roleSelect"),
-  monitorWindowText: document.querySelector("#monitorWindowText"),
-  dashboardMeta: document.querySelector("#dashboardMeta"),
   weeklyWarningLineChart: document.querySelector("#weeklyWarningLineChart"),
   weeklyWarningTotal: document.querySelector("#weeklyWarningTotal"),
   topUnreportedBarChart: document.querySelector("#topUnreportedBarChart"),
@@ -247,7 +250,13 @@ const els = {
   countPending: document.querySelector("#countPending"),
   countProcessed: document.querySelector("#countProcessed"),
   countAll: document.querySelector("#countAll"),
-  boardWarningPeriodSelect: document.querySelector("#boardWarningPeriodSelect"),
+  boardWarningPeriodTrigger: document.querySelector("#boardWarningPeriodTrigger"),
+  boardWarningPeriodText: document.querySelector("#boardWarningPeriodText"),
+  boardWarningPeriodPopover: document.querySelector("#boardWarningPeriodPopover"),
+  boardWarningPeriodList: document.querySelector("#boardWarningPeriodList"),
+  boardWarningPeriodClear: document.querySelector("#boardWarningPeriodClear"),
+  boardWarningPeriodCancel: document.querySelector("#boardWarningPeriodCancel"),
+  boardWarningPeriodConfirm: document.querySelector("#boardWarningPeriodConfirm"),
   overviewCustomerSearch: document.querySelector("#overviewCustomerSearch"),
   overviewSalespersonSearch: document.querySelector("#overviewSalespersonSearch"),
   overviewOperatorSearch: document.querySelector("#overviewOperatorSearch"),
@@ -342,6 +351,25 @@ function getWeekRangeByLabel(weekLabel) {
   return { start, end: addDays(start, 6) };
 }
 
+function getWeekNumberByLabel(weekLabel) {
+  const match = /^(\d{4})-W(\d{1,2})$/.exec(weekLabel || "");
+  return match ? Number(match[2]) : null;
+}
+
+function getWeekLabelFromDate(date) {
+  const monday = getMonday(date);
+  const year = monday.getFullYear();
+  const firstMonday = getMonday(new Date(year, 0, 4));
+  const week = Math.floor((monday - firstMonday) / (7 * 24 * 60 * 60 * 1000)) + 1;
+  return `${year}-W${String(week).padStart(2, "0")}`;
+}
+
+function getRecentWarningPeriodKeys(baseWeekLabel, count) {
+  const baseRange = getWeekRangeByLabel(baseWeekLabel);
+  if (!baseRange) { return [auditWindow.weekLabel]; }
+  return Array.from({ length: count }, (_, index) => getWeekLabelFromDate(addDays(baseRange.start, -index * 7)));
+}
+
 function getMonday(date) {
   const day = date.getDay() || 7;
   return addDays(date, 1 - day);
@@ -349,14 +377,68 @@ function getMonday(date) {
 
 function formatWarningPeriodByLabel(weekLabel) {
   const range = getWeekRangeByLabel(weekLabel || auditWindow.weekLabel);
+  const week = getWeekNumberByLabel(weekLabel || auditWindow.weekLabel);
   if (range) {
-    return `${formatDateOnly(range.start)} 至 ${formatDateOnly(range.end)}`;
+    return `${range.start.getFullYear()}年第${week}周｜${formatMonthDay(range.start)} 至 ${formatMonthDay(range.end)}`;
   }
   return `${auditWindow.weekStart.slice(0, 10)} 至 ${auditWindow.weekEnd.slice(0, 10)}`;
 }
 
 function formatWarningPeriod(record) {
   return formatWarningPeriodByLabel(record.weekLabel || auditWindow.weekLabel);
+}
+
+function formatWarningPeriodOption(weekLabel) {
+  const range = getWeekRangeByLabel(weekLabel || auditWindow.weekLabel);
+  const week = getWeekNumberByLabel(weekLabel || auditWindow.weekLabel);
+  if (!range || !week) { return formatWarningPeriodByLabel(weekLabel); }
+  return `第${week}周｜${formatMonthDaySlash(range.start)}-${formatMonthDaySlash(range.end)}`;
+}
+
+function formatMonthDay(date) {
+  const month = String(date.getMonth() + 1).padStart(2, "0");
+  const day = String(date.getDate()).padStart(2, "0");
+  return `${month}-${day}`;
+}
+
+function formatMonthDaySlash(date) {
+  const month = String(date.getMonth() + 1).padStart(2, "0");
+  const day = String(date.getDate()).padStart(2, "0");
+  return `${month}/${day}`;
+}
+
+function getWarningPeriodCounts(weekLabel) {
+  const scoped = getRoleScopedWarnings().filter((record) => (record.weekLabel || auditWindow.weekLabel) === weekLabel);
+  return {
+    pending: scoped.filter((record) => record.status === "pending").length,
+    processed: scoped.filter((record) => record.status === "processed").length
+  };
+}
+
+function getWarningPeriodSummary(keys) {
+  if (!keys.length) { return "全部预警周"; }
+  if (keys.length === 1) { return formatWarningPeriodOption(keys[0]); }
+
+  const ordered = [...keys].sort((a, b) => b.localeCompare(a));
+  const ranges = ordered.map(getWeekRangeByLabel).filter(Boolean);
+  const isContinuous = ordered.every((key, index) => {
+    if (index === 0) { return true; }
+    const prev = getWeekRangeByLabel(ordered[index - 1]);
+    const current = getWeekRangeByLabel(key);
+    return prev && current && Math.round((prev.start - current.start) / (7 * 24 * 60 * 60 * 1000)) === 1;
+  });
+
+  if (isContinuous && ranges.length === ordered.length) {
+    const newest = ranges[0];
+    const oldest = ranges[ranges.length - 1];
+    return `最近${ordered.length}周｜${formatMonthDaySlash(oldest.start)}-${formatMonthDaySlash(newest.end)}`;
+  }
+
+  return `已选${ordered.length}周`;
+}
+
+function getWarningPeriodTooltip(keys) {
+  return [...keys].sort((a, b) => b.localeCompare(a)).map(formatWarningPeriodOption).join("\n");
 }
 
 function isWithin(value, start, end) {
@@ -386,19 +468,76 @@ function fillSelect(select, values) {
 }
 
 function fillWarningPeriodSelect() {
-  if (!els.boardWarningPeriodSelect) { return; }
-  const periodKeys = getWarningPeriodKeys();
+  const latest = getLatestWarningPeriodKey();
+  state.boardWarningPeriodFilter = [latest];
+  state.boardWarningPeriodDraft = [...state.boardWarningPeriodFilter];
+  renderWarningPeriodPicker();
+  updateWarningPeriodTrigger();
+}
 
-  els.boardWarningPeriodSelect.innerHTML = "";
-  periodKeys.forEach((key) => {
-    const option = document.createElement("option");
-    option.value = key;
-    option.textContent = formatWarningPeriodByLabel(key);
-    els.boardWarningPeriodSelect.append(option);
-  });
+function renderWarningPeriodPicker() {
+  if (!els.boardWarningPeriodList) { return; }
+  const selected = new Set(state.boardWarningPeriodDraft);
+  els.boardWarningPeriodList.innerHTML = getWarningPeriodKeys().map((key) => {
+    const counts = getWarningPeriodCounts(key);
+    return `
+      <label class="period-option">
+        <input type="checkbox" value="${escapeHtml(key)}" ${selected.has(key) ? "checked" : ""} />
+        <span class="period-option-name">${escapeHtml(formatWarningPeriodOption(key))}</span>
+        <span class="period-option-count">｜待处理${counts.pending}</span>
+        <span class="period-option-count">｜已完成${counts.processed}</span>
+      </label>
+    `;
+  }).join("");
+}
 
-  state.boardWarningPeriodFilter = getLatestWarningPeriodKey();
-  els.boardWarningPeriodSelect.value = state.boardWarningPeriodFilter;
+function updateWarningPeriodTrigger() {
+  if (!els.boardWarningPeriodText || !els.boardWarningPeriodTrigger) { return; }
+  const text = getWarningPeriodSummary(state.boardWarningPeriodFilter);
+  els.boardWarningPeriodText.textContent = text;
+  els.boardWarningPeriodTrigger.title = getWarningPeriodTooltip(state.boardWarningPeriodFilter) || "全部预警周";
+}
+
+function openWarningPeriodPopover() {
+  if (!els.boardWarningPeriodPopover) { return; }
+  state.boardWarningPeriodDraft = [...state.boardWarningPeriodFilter];
+  renderWarningPeriodPicker();
+  els.boardWarningPeriodPopover.hidden = false;
+}
+
+function closeWarningPeriodPopover() {
+  if (!els.boardWarningPeriodPopover) { return; }
+  els.boardWarningPeriodPopover.hidden = true;
+}
+
+function applyWarningPeriodQuick(type) {
+  const keys = getWarningPeriodKeys();
+  const latest = keys[0] || auditWindow.weekLabel;
+  const latestRange = getWeekRangeByLabel(latest);
+  let selected = [];
+
+  if (type === "current") {
+    selected = [latest];
+  } else if (type === "previous") {
+    selected = keys.slice(1, 2);
+  } else if (type === "4" || type === "8") {
+    selected = keys.slice(0, Number(type));
+  } else if (latestRange) {
+    const monthOffset = type === "lastMonth" ? -1 : 0;
+    const targetMonth = new Date(latestRange.start.getFullYear(), latestRange.start.getMonth() + monthOffset, 1);
+    selected = keys.filter((key) => {
+      const range = getWeekRangeByLabel(key);
+      return range && range.start.getFullYear() === targetMonth.getFullYear() && range.start.getMonth() === targetMonth.getMonth();
+    });
+  }
+
+  state.boardWarningPeriodDraft = selected.length ? selected : [latest];
+  renderWarningPeriodPicker();
+}
+
+function syncWarningPeriodDraftFromList() {
+  if (!els.boardWarningPeriodList) { return; }
+  state.boardWarningPeriodDraft = [...els.boardWarningPeriodList.querySelectorAll("input:checked")].map((input) => input.value);
 }
 
 function getCustomerOwner(customer) {
@@ -935,7 +1074,7 @@ function getBoardRows(ignoreStatus = false) {
   return getRoleScopedWarnings()
     .filter((record) => record.status !== "overdue")
     .filter((record) => ignoreStatus || state.boardStatus === "all" || record.status === state.boardStatus)
-    .filter((record) => !state.boardWarningPeriodFilter || (record.weekLabel || auditWindow.weekLabel) === state.boardWarningPeriodFilter)
+    .filter((record) => !state.boardWarningPeriodFilter.length || state.boardWarningPeriodFilter.includes(record.weekLabel || auditWindow.weekLabel))
     .filter((record) => !state.boardCustomerFilter || record.customer === state.boardCustomerFilter)
     .filter((record) => !state.boardSalespersonFilter || record.salesperson === state.boardSalespersonFilter)
     .filter((record) => !state.boardOperatorFilter || (record.operator || "system") === state.boardOperatorFilter)
@@ -1154,9 +1293,6 @@ function renderWarningDashboard() {
   if (els.topUnreportedMax) {
     els.topUnreportedMax.textContent = topCustomers[0]?.weekText || "0";
   }
-  if (els.dashboardMeta) {
-    els.dashboardMeta.textContent = `更新时间：${formatMinute(auditWindow.triggeredAt)}`;
-  }
   drawWeeklyLineChart(trend);
   renderTopUnreportedBars(topCustomers);
 }
@@ -1254,8 +1390,10 @@ function resetBoardFilters() {
   state.boardLatestTimeTo = "";
   els.overviewCustomerSearch.value = "";
   els.overviewSalespersonSearch.value = "";
-  state.boardWarningPeriodFilter = getLatestWarningPeriodKey();
-  if (els.boardWarningPeriodSelect) { els.boardWarningPeriodSelect.value = state.boardWarningPeriodFilter; }
+  state.boardWarningPeriodFilter = [getLatestWarningPeriodKey()];
+  state.boardWarningPeriodDraft = [...state.boardWarningPeriodFilter];
+  renderWarningPeriodPicker();
+  updateWarningPeriodTrigger();
   if (els.overviewOperatorSearch) { els.overviewOperatorSearch.value = ""; }
   if (els.overviewUnreportedWeeksSearch) { els.overviewUnreportedWeeksSearch.value = ""; }
   els.overviewLatestTimeFrom.value = "";
@@ -1867,7 +2005,6 @@ function bindEvents() {
     state.boardSalespersonFilter = els.overviewSalespersonSearch.value.trim();
     state.boardOperatorFilter = els.overviewOperatorSearch ? els.overviewOperatorSearch.value.trim() : "";
     state.boardUnreportedWeeksFilter = els.overviewUnreportedWeeksSearch ? els.overviewUnreportedWeeksSearch.value.trim() : "";
-    state.boardWarningPeriodFilter = els.boardWarningPeriodSelect ? els.boardWarningPeriodSelect.value : "";
     state.boardLatestTimeFrom = els.overviewLatestTimeFrom.value;
     state.boardLatestTimeTo = els.overviewLatestTimeTo.value;
     syncRangeBox(els.latestTimeDisplay, els.latestTimeBox, els.overviewLatestTimeFrom, els.overviewLatestTimeTo);
@@ -1878,8 +2015,50 @@ function bindEvents() {
 
   els.resetBoardButton.addEventListener("click", resetBoardFilters);
 
-  if (els.boardWarningPeriodSelect) {
-    els.boardWarningPeriodSelect.addEventListener("change", applyBoardSearch);
+  if (els.boardWarningPeriodTrigger) {
+    els.boardWarningPeriodTrigger.addEventListener("click", (event) => {
+      event.stopPropagation();
+      if (els.boardWarningPeriodPopover && !els.boardWarningPeriodPopover.hidden) {
+        closeWarningPeriodPopover();
+      } else {
+        openWarningPeriodPopover();
+      }
+    });
+  }
+
+  if (els.boardWarningPeriodPopover) {
+    els.boardWarningPeriodPopover.addEventListener("click", (event) => {
+      event.stopPropagation();
+      const quick = event.target.closest("[data-period-quick]");
+      if (quick) {
+        applyWarningPeriodQuick(quick.dataset.periodQuick);
+      }
+    });
+  }
+
+  if (els.boardWarningPeriodList) {
+    els.boardWarningPeriodList.addEventListener("change", syncWarningPeriodDraftFromList);
+  }
+
+  if (els.boardWarningPeriodClear) {
+    els.boardWarningPeriodClear.addEventListener("click", () => {
+      state.boardWarningPeriodDraft = [];
+      renderWarningPeriodPicker();
+    });
+  }
+
+  if (els.boardWarningPeriodCancel) {
+    els.boardWarningPeriodCancel.addEventListener("click", closeWarningPeriodPopover);
+  }
+
+  if (els.boardWarningPeriodConfirm) {
+    els.boardWarningPeriodConfirm.addEventListener("click", () => {
+      syncWarningPeriodDraftFromList();
+      state.boardWarningPeriodFilter = [...state.boardWarningPeriodDraft];
+      updateWarningPeriodTrigger();
+      closeWarningPeriodPopover();
+      renderBoard();
+    });
   }
 
   // ── Range picker events ──
@@ -1894,6 +2073,15 @@ function bindEvents() {
         box.querySelector(".range-drop").hidden = true;
       }
     });
+    if (
+      els.boardWarningPeriodPopover &&
+      els.boardWarningPeriodTrigger &&
+      !els.boardWarningPeriodPopover.hidden &&
+      !els.boardWarningPeriodPopover.contains(event.target) &&
+      !els.boardWarningPeriodTrigger.contains(event.target)
+    ) {
+      closeWarningPeriodPopover();
+    }
   });
 
   els.alertBody.addEventListener("dblclick", (event) => {
@@ -2150,7 +2338,6 @@ function bindEvents() {
 
 function init() {
   resetDetailFieldState();
-  els.monitorWindowText.textContent = `检测区间：${auditWindow.weekStart.slice(0, 10)} 周一 00:00 至 ${auditWindow.riskEnd.slice(0, 10)} 周三 23:59`;
   renderRoleOptions();
   fillSelect(els.overviewCustomerSearch, uniqueValues("customer"));
   fillSelect(els.overviewSalespersonSearch, uniqueValues("salesperson"));
@@ -2170,6 +2357,5 @@ function init() {
 try {
   init();
 } catch (e) {
-  document.getElementById('monitorWindowText') && (document.getElementById('monitorWindowText').textContent = '初始化失败: ' + e.message);
   document.getElementById('alertBody') && (document.getElementById('alertBody').innerHTML = '<tr><td colspan="13" style="color:red;padding:20px;text-align:center;">初始化错误: ' + e.message + '</td></tr>');
 }
