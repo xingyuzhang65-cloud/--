@@ -111,6 +111,7 @@ const state = {
   activeWarehouseTab: "",
   boardCustomerFilter: "",
   boardSalespersonFilter: "",
+  boardCustomerStatusFilter: "",
   boardLatestTimeFrom: "",
   boardLatestTimeTo: "",
   dashboardWeekRange: "8",
@@ -184,7 +185,7 @@ const detailFieldDefaults = [
   { id: "volume", title: "总体积", width: 92, getText: (row) => row.volume },
   { id: "weight", title: "重量", width: 92, getText: (row) => row.weight },
   { id: "salesperson", title: "业务员", width: 140, getText: (row) => row.salesperson },
-  { id: "orderType", title: "字段类型", width: 92, getText: (row) => row.orderType },
+  { id: "orderType", title: "类型", width: 92, getText: (row) => row.orderType },
   { id: "status", title: "运单状态", width: 92, getText: (row) => row.status, render: (row) => `<span class="status-badge">${escapeHtml(row.status)}</span>` },
   { id: "createdAt", title: "创建时间", width: 150, sortable: true, getText: (row) => row.createdAt }
 ];
@@ -229,6 +230,7 @@ const els = {
   dashboardResetButton: document.querySelector("#dashboardResetButton"),
   overviewCustomerSearch: document.querySelector("#overviewCustomerSearch"),
   overviewSalespersonSearch: document.querySelector("#overviewSalespersonSearch"),
+  overviewCustomerStatusSearch: document.querySelector("#overviewCustomerStatusSearch"),
   overviewLatestTimeFrom: document.querySelector("#latestTimeFrom"),
   overviewLatestTimeTo: document.querySelector("#latestTimeTo"),
   latestTimeDisplay: document.querySelector("#latestTimeDisplay"),
@@ -370,6 +372,16 @@ function getUnreportedWeekCount(latestPreorderTime, triggeredAt) {
 
   const diff = parseDateTime(triggeredAt || auditWindow.triggeredAt) - parseDateTime(latestPreorderTime);
   return Math.max(1, Math.ceil(diff / (7 * 24 * 60 * 60 * 1000)));
+}
+
+function getUnreportedDayCount(record, latestPreorderTime) {
+  const baseTime = latestPreorderTime || record.codeCreateTime;
+  if (!baseTime) {
+    return "";
+  }
+
+  const diff = parseDateTime(record.triggeredAt || auditWindow.triggeredAt) - parseDateTime(baseTime);
+  return Math.max(0, Math.ceil(diff / (24 * 60 * 60 * 1000)));
 }
 
 function hasPreorderInRiskWindow(customer) {
@@ -771,6 +783,7 @@ function getBoardRows() {
     .filter((record) => record.status !== "overdue")
     .filter((record) => !state.boardCustomerFilter || record.customer === state.boardCustomerFilter)
     .filter((record) => !state.boardSalespersonFilter || record.salesperson === state.boardSalespersonFilter)
+    .filter((record) => !state.boardCustomerStatusFilter || (record.customerStatus || "合作中") === state.boardCustomerStatusFilter)
     .filter((record) => {
       const from = datetimeLocalToComparable(state.boardLatestTimeFrom);
       const to = datetimeLocalToComparable(state.boardLatestTimeTo);
@@ -1021,6 +1034,7 @@ function renderBoard() {
         })
         .join("");
       const latestPreorderTime = getLatestPreorderTime(record.latestByWarehouse);
+      const unreportedDays = getUnreportedDayCount(record, latestPreorderTime);
 
       var isSelected = state.boardSelected.has(record.id);
       return `
@@ -1031,6 +1045,7 @@ function renderBoard() {
           <td><span class="customer-status-badge ${(record.customerStatus || "合作中") === "不再合作" ? "inactive" : ""}">${escapeHtml(record.customerStatus || "合作中")}</span></td>
           <td><span class="warehouse-time ${record.codeCreateTime ? "" : "empty"}">${escapeHtml(formatWarehouseTime(record.codeCreateTime))}</span></td>
           <td><span class="warehouse-time ${latestPreorderTime ? "" : "empty"}" title="${escapeHtml(latestPreorderTime || "无预报")}">${escapeHtml(formatWarehouseTime(latestPreorderTime))}</span></td>
+          <td><span class="warehouse-time ${unreportedDays === "" ? "empty" : ""}">${escapeHtml(unreportedDays === "" ? "--" : String(unreportedDays))}</span></td>
           ${warehouseCells}
         </tr>
       `;
@@ -1045,10 +1060,12 @@ function renderBoard() {
 function resetBoardFilters() {
   state.boardCustomerFilter = "";
   state.boardSalespersonFilter = "";
+  state.boardCustomerStatusFilter = "";
   state.boardLatestTimeFrom = "";
   state.boardLatestTimeTo = "";
   els.overviewCustomerSearch.value = "";
   els.overviewSalespersonSearch.value = "";
+  els.overviewCustomerStatusSearch.value = "";
   els.overviewLatestTimeFrom.value = "";
   els.overviewLatestTimeTo.value = "";
   els.latestTimeDisplay.value = "";
@@ -1176,13 +1193,14 @@ function exportBoardCSV() {
   if (!visibleRows.length) { return; }
 
   const headerColumns = [
-    "客户简称", "业务员", "客户状态", "建code时间", "最新预报时间",
+    "客户简称", "业务员", "客户状态", "开户时间", "最新预报时间", "未循环天数",
     "洛杉矶仓", "芝加哥仓", "新泽西仓", "萨凡纳仓", "休斯顿仓", "奥克兰仓"
   ];
 
   const header = headerColumns.map(csvCell).join(",");
   const body = visibleRows.map((record) => {
     const latestPreorderTime = getLatestPreorderTime(record.latestByWarehouse);
+    const unreportedDays = getUnreportedDayCount(record, latestPreorderTime);
     const warehouseCells = warehouseOptions.map((wh) => csvCell(formatWarehouseTime(record.latestByWarehouse[wh])));
     return [
       csvCell(record.customer),
@@ -1190,6 +1208,7 @@ function exportBoardCSV() {
       csvCell(record.customerStatus || "合作中"),
       csvCell(formatWarehouseTime(record.codeCreateTime || "")),
       csvCell(formatWarehouseTime(latestPreorderTime)),
+      csvCell(unreportedDays === "" ? "" : unreportedDays),
       ...warehouseCells
     ].join(",");
   });
@@ -1254,7 +1273,7 @@ function updateDetailsBatchUI() {
 function readFilters() {
   state.filters.customer = els.customerInput.value.trim().toLowerCase();
   state.filters.salesperson = els.salespersonInput.value.trim().toLowerCase();
-  state.filters.orderType = els.orderTypeSelect.value;
+  state.filters.orderType = els.orderTypeSelect ? els.orderTypeSelect.value : "";
   state.filters.status = els.statusSelect.value;
   state.filters.createdAt = els.createdAtInput.value.trim().toLowerCase();
   state.filters.carrierCode = els.carrierCodeInput.value.trim().toLowerCase();
@@ -1518,7 +1537,9 @@ function exportRows() {
 function resetSearch() {
   els.customerInput.value = "";
   els.salespersonInput.value = "";
-  els.orderTypeSelect.value = "";
+  if (els.orderTypeSelect) {
+    els.orderTypeSelect.value = "";
+  }
   els.statusSelect.value = "";
   els.createdAtInput.value = "";
   els.carrierCodeInput.value = "";
@@ -1643,6 +1664,7 @@ function bindEvents() {
   function applyBoardSearch() {
     state.boardCustomerFilter = els.overviewCustomerSearch.value.trim();
     state.boardSalespersonFilter = els.overviewSalespersonSearch.value.trim();
+    state.boardCustomerStatusFilter = els.overviewCustomerStatusSearch.value.trim();
     state.boardLatestTimeFrom = els.overviewLatestTimeFrom.value;
     state.boardLatestTimeTo = els.overviewLatestTimeTo.value;
     syncRangeBox(els.latestTimeDisplay, els.latestTimeBox, els.overviewLatestTimeFrom, els.overviewLatestTimeTo);
@@ -1829,7 +1851,7 @@ function bindEvents() {
     });
   });
 
-  [els.orderTypeSelect, els.statusSelect].forEach((select) => {
+  [els.orderTypeSelect, els.statusSelect].filter(Boolean).forEach((select) => {
     select.addEventListener("change", applySearch);
   });
 
@@ -1940,10 +1962,13 @@ function init() {
   renderRoleOptions();
   fillSelect(els.overviewCustomerSearch, uniqueValues("customer"));
   fillSelect(els.overviewSalespersonSearch, uniqueValues("salesperson"));
+  fillSelect(els.overviewCustomerStatusSearch, ["合作中", "不再合作"]);
   if (els.overviewOperatorSearch) {
     fillSelect(els.overviewOperatorSearch, ["system"].concat(uniqueValues("salesperson")));
   }
-  fillSelect(els.orderTypeSelect, uniqueValues("orderType"));
+  if (els.orderTypeSelect) {
+    fillSelect(els.orderTypeSelect, uniqueValues("orderType"));
+  }
   fillSelect(els.statusSelect, statusOptions);
   bindEvents();
   renderBoard();

@@ -366,9 +366,14 @@ body.details-open::after {
   width: 140px;
 }
 
-/* 仓库列 7-12 */
-.alert-table th:nth-child(n + 7):nth-child(-n + 12),
-.alert-table td:nth-child(n + 7):nth-child(-n + 12) {
+.alert-table th:nth-child(7),
+.alert-table td:nth-child(7) {
+  width: 96px;
+}
+
+/* 仓库列 8-13 */
+.alert-table th:nth-child(n + 8):nth-child(-n + 13),
+.alert-table td:nth-child(n + 8):nth-child(-n + 13) {
   width: 148px;
 }
 
