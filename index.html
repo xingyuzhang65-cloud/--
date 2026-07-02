@@ -9,12 +9,14 @@
     <meta http-equiv="Expires" content="0" />
     <link rel="stylesheet" href="styles.css?v=20260629-single-period" />
     <style>
-      .alert-table th:nth-child(12), .alert-table td:nth-child(12) { position: sticky; right: 0; z-index: 5; width: 190px; background: #fff; box-shadow: -8px 0 12px rgba(31,45,64,0.08); }
-      .alert-table th:nth-child(12) { z-index: 6; background: var(--header-bg); }
-      .alert-table th:nth-child(11), .alert-table td:nth-child(11) { width: 80px; background: #fff; }
-      .alert-table th:nth-child(4), .alert-table td:nth-child(4) { width: 92px; background: #fff; }
+      .alert-table th:nth-child(15), .alert-table td:nth-child(15) { position: sticky; right: 0; z-index: 5; width: 190px; background: #fff; box-shadow: -8px 0 12px rgba(31,45,64,0.08); }
+      .alert-table th:nth-child(15) { z-index: 6; background: var(--header-bg); }
+      .alert-table th:nth-child(14), .alert-table td:nth-child(14) { width: 80px; background: #fff; }
+      .alert-table th:nth-child(6), .alert-table td:nth-child(6) { width: 92px; background: #fff; }
       .operator-text { color: #3a556d; font-size: 12px; font-weight: 600; }
-      .alert-table { min-width: 1664px; }
+      .customer-status-badge { display: inline-flex; align-items: center; justify-content: center; min-width: 64px; height: 22px; padding: 0 8px; border-radius: 3px; font-weight: 700; font-size: 11px; background: #e6f7e6; color: #2d8a2d; }
+      .customer-status-badge.inactive { background: #fde8e8; color: #b33a3a; }
+      .alert-table { min-width: 2080px; }
     </style>
   </head>
   <body>
@@ -141,6 +143,12 @@
                 <option value=""></option>
               </select>
             </label>
+            <label class="field field-filter">
+              <span>客户状态</span>
+              <select id="overviewCustomerStatusSearch">
+                <option value=""></option>
+              </select>
+            </label>
             <label class="field field-filter field-week-filter">
               <span>未预报周数</span>
               <select id="overviewUnreportedWeeksSearch">
@@ -218,8 +226,11 @@
                 <tr>
                   <th>客户简称</th>
                   <th>业务员</th>
+                  <th>客户状态</th>
+                  <th>开户时间</th>
                   <th>最新预报时间</th>
                   <th>未预报周数</th>
+                  <th>未循环天数</th>
                   <th>洛杉矶仓</th>
                   <th>芝加哥仓</th>
                   <th>新泽西仓</th>
@@ -311,12 +322,6 @@
               <input id="salespersonInput" type="text" placeholder="如 jessie" autocomplete="off" />
             </label>
             <label class="field">
-              <span>字段类型</span>
-              <select id="orderTypeSelect">
-                <option value="">全部字段类型</option>
-              </select>
-            </label>
-            <label class="field">
               <span>运单状态</span>
               <select id="statusSelect">
                 <option value="">全部运单状态</option>
@@ -393,7 +398,7 @@
     <script src="script.js?v=20260629-single-period"></script>
     <script>
       window.addEventListener('error', function(e) {
-        document.querySelector('#alertBody') && (document.querySelector('#alertBody').innerHTML = '<tr><td colspan="13" style="color:red;padding:20px;text-align:center;">JS 错误: ' + e.message + ' (行 ' + e.lineno + ':' + e.colno + ')</td></tr>');
+        document.querySelector('#alertBody') && (document.querySelector('#alertBody').innerHTML = '<tr><td colspan="15" style="color:red;padding:20px;text-align:center;">JS 错误: ' + e.message + ' (行 ' + e.lineno + ':' + e.colno + ')</td></tr>');
       });
     </script>
   </body>

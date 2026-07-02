@@ -467,7 +467,7 @@ body.details-open::after {
 
 .alert-table {
   width: 100%;
-  min-width: 1664px;
+  min-width: 2080px;
   border-collapse: collapse;
   table-layout: fixed;
 }
@@ -507,23 +507,38 @@ body.details-open::after {
 
 .alert-table th:nth-child(3),
 .alert-table td:nth-child(3) {
-  width: 148px;
+  width: 82px;
 }
 
 .alert-table th:nth-child(4),
 .alert-table td:nth-child(4) {
-  width: 92px;
+  width: 140px;
 }
 
-/* 仓库列 5-10 */
-.alert-table th:nth-child(n + 5):nth-child(-n + 10),
-.alert-table td:nth-child(n + 5):nth-child(-n + 10) {
+.alert-table th:nth-child(5),
+.alert-table td:nth-child(5) {
   width: 148px;
 }
 
-/* 预警周期 — 最右侧 sticky (第12列) */
-.alert-table th:nth-child(12),
-.alert-table td:nth-child(12) {
+.alert-table th:nth-child(6),
+.alert-table td:nth-child(6) {
+  width: 92px;
+}
+
+.alert-table th:nth-child(7),
+.alert-table td:nth-child(7) {
+  width: 96px;
+}
+
+/* 仓库列 8-13 */
+.alert-table th:nth-child(n + 8):nth-child(-n + 13),
+.alert-table td:nth-child(n + 8):nth-child(-n + 13) {
+  width: 148px;
+}
+
+/* 预警周期 — 最右侧 sticky (第15列) */
+.alert-table th:nth-child(15),
+.alert-table td:nth-child(15) {
   position: sticky;
   right: 0;
   z-index: 5;
@@ -532,14 +547,14 @@ body.details-open::after {
   box-shadow: -8px 0 12px rgba(31, 45, 64, 0.08);
 }
 
-.alert-table th:nth-child(12) {
+.alert-table th:nth-child(15) {
   z-index: 6;
   background: var(--header-bg);
 }
 
-/* 操作人 — 第11列 */
-.alert-table th:nth-child(11),
-.alert-table td:nth-child(11) { width: 80px; }
+/* 操作人 — 第14列 */
+.alert-table th:nth-child(14),
+.alert-table td:nth-child(14) { width: 80px; }
 
 tbody tr:hover {
   background: var(--row-hover);
