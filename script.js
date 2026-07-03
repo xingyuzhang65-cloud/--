@@ -78,6 +78,33 @@ const rows = [
 
 const warehouseOptions = ["洛杉矶仓", "芝加哥仓", "新泽西仓", "萨凡纳仓", "休斯顿仓", "奥克兰仓"];
 const statusOptions = ["预报", "接受", "运输中", "预约池", "提柜", "入库处理中"];
+
+function formatOffsetDate(value, dayOffset) {
+  const [datePart, timePart = "00:00:00"] = value.split(" ");
+  const [year, month, day] = datePart.split("-").map(Number);
+  const [sourceHour = 0, sourceMinute = 0] = timePart.split(":").map(Number);
+  const date = new Date(year, month - 1, day, sourceHour, sourceMinute, 0);
+  date.setDate(date.getDate() + dayOffset);
+
+  const pad = (number) => String(number).padStart(2, "0");
+  return `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(date.getDate())}`;
+}
+
+function applyTransitTimeDefaults(row, index) {
+  const arrivalOffset = row.pickup === "火车站" ? 9 : 6;
+  const pickOffset = row.pickup === "火车站" ? 12 : 8;
+  row.etaAt = row.etaAt || formatOffsetDate(row.createdAt, arrivalOffset);
+  row.actualArrivalAt = row.actualArrivalAt || (["运输中", "预约池", "提柜", "入库处理中"].includes(row.status)
+    ? formatOffsetDate(row.createdAt, arrivalOffset + (index % 2))
+    : "");
+  row.estimatedPickupAt = row.estimatedPickupAt || formatOffsetDate(row.createdAt, pickOffset);
+  row.actualPickupAt = row.actualPickupAt || (["提柜", "入库处理中"].includes(row.status)
+    ? formatOffsetDate(row.createdAt, pickOffset + (index % 2))
+    : "");
+}
+
+rows.forEach(applyTransitTimeDefaults);
+
 const roleOptions = [
   { value: "admin", label: "管理员", isAdmin: true },
   { value: "天晟", label: "天晟", isAdmin: false },
@@ -176,6 +203,10 @@ const detailFieldDefaults = [
   { id: "carrierCode", title: "船司代码", width: 76, className: "carrier-code-cell", getText: (row) => getCarrierCode(row), sortValue: (row) => getCarrierCode(row) },
   { id: "dock", title: "码头", width: 90, getText: (row) => row.dock },
   { id: "rail", title: "火车站", width: 90, getText: (row) => row.rail },
+  { id: "etaAt", title: "预计到港时间", width: 130, sortable: true, getText: (row) => row.etaAt },
+  { id: "actualArrivalAt", title: "实际到港/火车站时间", width: 165, sortable: true, getText: (row) => row.actualArrivalAt },
+  { id: "estimatedPickupAt", title: "预计提柜时间", width: 130, sortable: true, getText: (row) => row.estimatedPickupAt },
+  { id: "actualPickupAt", title: "实际提柜时间", width: 130, sortable: true, getText: (row) => row.actualPickupAt },
   { id: "quantity", title: "库点数量", width: 76, getText: (row) => row.quantity },
   { id: "transit", title: "中转仓", width: 90, getText: (row) => row.transit },
   { id: "type", title: "集装箱类型", width: 90, getText: (row) => row.type },
