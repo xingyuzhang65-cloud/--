@@ -7,11 +7,11 @@
     <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
     <meta http-equiv="Pragma" content="no-cache" />
     <meta http-equiv="Expires" content="0" />
-    <link rel="stylesheet" href="styles.css?v=20260701" />
+    <link rel="stylesheet" href="styles.css?v=20260706-update-time" />
     <style>
       .customer-status-badge { display: inline-flex; align-items: center; justify-content: center; min-width: 64px; height: 22px; padding: 0 8px; border-radius: 3px; font-weight: 700; font-size: 11px; background: #e6f7e6; color: #2d8a2d; }
+      .customer-status-badge.paused { background: #fff4d6; color: #9a6a00; }
       .customer-status-badge.inactive { background: #fde8e8; color: #b33a3a; }
-      .alert-table { min-width: 1520px; }
     </style>
   </head>
   <body>
@@ -133,8 +133,14 @@
                 <option value=""></option>
               </select>
             </label>
+            <label class="field field-filter">
+              <span>客户状态</span>
+              <select id="overviewCustomerStatusSearch">
+                <option value=""></option>
+              </select>
+            </label>
             <label class="field field-range">
-              <span>最新预报时间</span>
+              <span>最近预报时间</span>
               <div class="range-box" id="latestTimeBox">
                 <input class="range-display" id="latestTimeDisplay" type="text" placeholder="全部" readonly autocomplete="off" />
                 <button class="range-clear" id="latestTimeClear" type="button" title="清除">✕</button>
@@ -151,11 +157,19 @@
             <button id="resetBoardButton" class="btn" type="button">重置</button>
           </div>
 
+          <div class="board-status-tabs" aria-label="客户合作状态筛选">
+            <button class="board-status-tab active" type="button" data-status="">全部</button>
+            <button class="board-status-tab" type="button" data-status="合作中">合作中</button>
+            <button class="board-status-tab" type="button" data-status="暂停合作">暂停合作</button>
+            <button class="board-status-tab" type="button" data-status="终止合作">终止合作</button>
+          </div>
+
           <div class="board-list-toolbar" id="boardListToolbar">
             <div class="toolbar-actions">
               <button class="btn tiny" id="boardListExportBtn" type="button">导出</button>
               <button class="btn tiny primary" id="boardListCsBtn" type="button">修改客户状态</button>
             </div>
+            <span class="toolbar-update-time" id="boardUpdateTime"></span>
           </div>
 
           <div class="alert-table-wrap">
@@ -164,16 +178,26 @@
                 <tr>
                   <th class="col-check"><input id="boardSelectAll" type="checkbox" aria-label="全选" /></th>
                   <th>客户简称</th>
+                  <th>客户编码</th>
                   <th>业务员</th>
+                  <th>当前在库总方数</th>
                   <th>客户状态</th>
-                  <th>建code时间</th>
-                  <th>最新预报时间</th>
-                  <th>洛杉矶仓</th>
-                  <th>芝加哥仓</th>
-                  <th>新泽西仓</th>
-                  <th>萨凡纳仓</th>
-                  <th>休斯顿仓</th>
-                  <th>奥克兰仓</th>
+                  <th>开户时间</th>
+                  <th>最近预报时间</th>
+                  <th>最近预报仓库</th>
+                  <th>未循环天数</th>
+                  <th>洛杉矶仓最近预报时间</th>
+                  <th>洛杉矶仓在库方数</th>
+                  <th>芝加哥仓最近预报时间</th>
+                  <th>芝加哥仓在库方数</th>
+                  <th>新泽西仓最近预报时间</th>
+                  <th>新泽西仓在库方数</th>
+                  <th>萨凡纳仓最近预报时间</th>
+                  <th>萨凡纳仓在库方数</th>
+                  <th>休斯顿仓最近预报时间</th>
+                  <th>休斯顿仓在库方数</th>
+                  <th>奥克兰仓最近预报时间</th>
+                  <th>奥克兰仓在库方数</th>
                 </tr>
               </thead>
               <tbody id="alertBody"></tbody>
@@ -258,12 +282,6 @@
             <label class="field">
               <span>业务员</span>
               <input id="salespersonInput" type="text" placeholder="如 jessie" autocomplete="off" />
-            </label>
-            <label class="field">
-              <span>字段类型</span>
-              <select id="orderTypeSelect">
-                <option value="">全部字段类型</option>
-              </select>
             </label>
             <label class="field">
               <span>运单状态</span>
@@ -358,7 +376,8 @@
             <div class="progress-form-control">
               <select id="csNewStatus" style="width:100%;height:34px;border:1px solid #d0d7df;border-radius:4px;padding:0 10px;font-size:13px;outline:none;">
                 <option value="合作中">合作中</option>
-                <option value="不再合作">不再合作</option>
+                <option value="暂停合作">暂停合作</option>
+                <option value="终止合作">终止合作</option>
               </select>
             </div>
           </div>
@@ -370,10 +389,10 @@
       </div>
     </div>
 
-    <script src="script.js?v=20260701"></script>
+    <script src="script.js?v=20260706-update-time"></script>
     <script>
       window.addEventListener('error', function(e) {
-        document.querySelector('#alertBody') && (document.querySelector('#alertBody').innerHTML = '<tr><td colspan="12" style="color:red;padding:20px;text-align:center;">JS 错误: ' + e.message + ' (行 ' + e.lineno + ':' + e.colno + ')</td></tr>');
+        document.querySelector('#alertBody') && (document.querySelector('#alertBody').innerHTML = '<tr><td colspan="22" style="color:red;padding:20px;text-align:center;">JS 错误: ' + e.message + ' (行 ' + e.lineno + ':' + e.colno + ')</td></tr>');
         document.querySelector('#monitorWindowText') && (document.querySelector('#monitorWindowText').textContent = '脚本加载异常');
       });
     </script>

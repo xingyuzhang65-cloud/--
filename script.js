@@ -77,7 +77,35 @@ const rows = [
 ];
 
 const warehouseOptions = ["洛杉矶仓", "芝加哥仓", "新泽西仓", "萨凡纳仓", "休斯顿仓", "奥克兰仓"];
+const warehouseColumnLabels = {};
 const statusOptions = ["预报", "接受", "运输中", "预约池", "提柜", "入库处理中"];
+
+function formatOffsetDate(value, dayOffset) {
+  const [datePart, timePart = "00:00:00"] = value.split(" ");
+  const [year, month, day] = datePart.split("-").map(Number);
+  const [sourceHour = 0, sourceMinute = 0] = timePart.split(":").map(Number);
+  const date = new Date(year, month - 1, day, sourceHour, sourceMinute, 0);
+  date.setDate(date.getDate() + dayOffset);
+
+  const pad = (number) => String(number).padStart(2, "0");
+  return `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(date.getDate())}`;
+}
+
+function applyTransitTimeDefaults(row, index) {
+  const arrivalOffset = row.pickup === "火车站" ? 9 : 6;
+  const pickOffset = row.pickup === "火车站" ? 12 : 8;
+  row.etaAt = row.etaAt || formatOffsetDate(row.createdAt, arrivalOffset);
+  row.actualArrivalAt = row.actualArrivalAt || (["运输中", "预约池", "提柜", "入库处理中"].includes(row.status)
+    ? formatOffsetDate(row.createdAt, arrivalOffset + (index % 2))
+    : "");
+  row.estimatedPickupAt = row.estimatedPickupAt || formatOffsetDate(row.createdAt, pickOffset);
+  row.actualPickupAt = row.actualPickupAt || (["提柜", "入库处理中"].includes(row.status)
+    ? formatOffsetDate(row.createdAt, pickOffset + (index % 2))
+    : "");
+}
+
+rows.forEach(applyTransitTimeDefaults);
+
 const roleOptions = [
   { value: "admin", label: "管理员", isAdmin: true },
   { value: "天晟", label: "天晟", isAdmin: false },
@@ -93,6 +121,8 @@ const auditWindow = {
   weekEnd: "2026-06-14 23:59:59",
   triggeredAt: "2026-06-11 00:00:00"
 };
+
+const customerStatusOptions = ["合作中", "暂停合作", "终止合作"];
 
 const state = {
   filters: {
@@ -111,6 +141,8 @@ const state = {
   activeWarehouseTab: "",
   boardCustomerFilter: "",
   boardSalespersonFilter: "",
+  boardCustomerStatusFilter: "",
+  boardStatusTab: "",
   boardLatestTimeFrom: "",
   boardLatestTimeTo: "",
   dashboardWeekRange: "8",
@@ -170,6 +202,10 @@ function getCarrierCode(row) {
 const detailFieldDefaults = [
   { id: "customer", title: "客户名称", width: 100, getText: (row) => row.customer },
   { id: "bookingNo", title: "预报单号", width: 180, sortable: true, getText: (row) => row.bookingNo, render: (row) => linkCell(row.bookingNo) },
+  { id: "etaAt", title: "预计到港时间", width: 130, sortable: true, getText: (row) => row.etaAt },
+  { id: "actualArrivalAt", title: "实际到港/火车站时间", width: 165, sortable: true, getText: (row) => row.actualArrivalAt },
+  { id: "estimatedPickupAt", title: "预计提柜时间", width: 130, sortable: true, getText: (row) => row.estimatedPickupAt },
+  { id: "actualPickupAt", title: "实际提柜时间", width: 130, sortable: true, getText: (row) => row.actualPickupAt },
   { id: "pickup", title: "提柜地点", width: 100, getText: (row) => row.pickup },
   { id: "warehouse", title: "仓库", width: 100, getText: (row) => row.warehouse },
   { id: "carrierCode", title: "船司代码", width: 76, className: "carrier-code-cell", getText: (row) => getCarrierCode(row), sortValue: (row) => getCarrierCode(row) },
@@ -184,7 +220,7 @@ const detailFieldDefaults = [
   { id: "volume", title: "总体积", width: 92, getText: (row) => row.volume },
   { id: "weight", title: "重量", width: 92, getText: (row) => row.weight },
   { id: "salesperson", title: "业务员", width: 140, getText: (row) => row.salesperson },
-  { id: "orderType", title: "字段类型", width: 92, getText: (row) => row.orderType },
+  { id: "orderType", title: "类型", width: 92, getText: (row) => row.orderType },
   { id: "status", title: "运单状态", width: 92, getText: (row) => row.status, render: (row) => `<span class="status-badge">${escapeHtml(row.status)}</span>` },
   { id: "createdAt", title: "创建时间", width: 150, sortable: true, getText: (row) => row.createdAt }
 ];
@@ -229,6 +265,8 @@ const els = {
   dashboardResetButton: document.querySelector("#dashboardResetButton"),
   overviewCustomerSearch: document.querySelector("#overviewCustomerSearch"),
   overviewSalespersonSearch: document.querySelector("#overviewSalespersonSearch"),
+  overviewCustomerStatusSearch: document.querySelector("#overviewCustomerStatusSearch"),
+  boardStatusTabs: document.querySelectorAll(".board-status-tab"),
   overviewLatestTimeFrom: document.querySelector("#latestTimeFrom"),
   overviewLatestTimeTo: document.querySelector("#latestTimeTo"),
   latestTimeDisplay: document.querySelector("#latestTimeDisplay"),
@@ -270,6 +308,7 @@ const els = {
   boardListToolbar: document.querySelector("#boardListToolbar"),
   boardListExportBtn: document.querySelector("#boardListExportBtn"),
   boardListCsBtn: document.querySelector("#boardListCsBtn"),
+  boardUpdateTime: document.querySelector("#boardUpdateTime"),
   toast: document.querySelector("#toast"),
   csModal: document.querySelector("#customerStatusModal"),
   csModalClose: document.querySelector("#customerStatusModalClose"),
@@ -297,6 +336,79 @@ function formatMinute(value) {
 
 function formatWarehouseTime(value) {
   return value || "--";
+}
+
+function getWarehouseDisplayTime(record, warehouse) {
+  return record.latestByWarehouse[warehouse] || getLatestPreorderTime(record.latestByWarehouse) || record.codeCreateTime || "";
+}
+
+function getWarehouseLabel(warehouse) {
+  return warehouseColumnLabels[warehouse] || warehouse;
+}
+
+function isEmptyValue(value) {
+  return value === "" || value === null || value === undefined;
+}
+
+function getExplicitWarehouseStockVolume(record, warehouse) {
+  const label = getWarehouseLabel(warehouse);
+  const fieldNames = [
+    `${warehouse}在库方数`,
+    `${label}在库方数`,
+    `${warehouse}库存体积`,
+    `${label}库存体积`,
+    `${warehouse}方数`,
+    `${label}方数`
+  ];
+
+  for (const fieldName of fieldNames) {
+    if (Object.prototype.hasOwnProperty.call(record, fieldName) && !isEmptyValue(record[fieldName])) {
+      return record[fieldName];
+    }
+  }
+
+  const nestedValues = [
+    record.warehouseStockVolumes?.[warehouse],
+    record.warehouseStockVolumes?.[label],
+    record.stockVolumesByWarehouse?.[warehouse],
+    record.stockVolumesByWarehouse?.[label],
+    record.inventoryVolumeByWarehouse?.[warehouse],
+    record.inventoryVolumeByWarehouse?.[label]
+  ];
+
+  for (const value of nestedValues) {
+    if (!isEmptyValue(value)) {
+      return value;
+    }
+  }
+
+  return undefined;
+}
+
+function getWarehouseStockVolume(record, warehouse) {
+  const explicitValue = getExplicitWarehouseStockVolume(record, warehouse);
+  if (!isEmptyValue(explicitValue)) {
+    return explicitValue;
+  }
+
+  const total = rows
+    .filter((row) => row.customer === record.customer && row.warehouse === warehouse)
+    .reduce((sum, row) => sum + (Number(row.volume) || 0), 0);
+
+  return total;
+}
+
+function formatStockVolume(value) {
+  if (isEmptyValue(value)) {
+    return "0";
+  }
+
+  const number = Number(value);
+  if (!Number.isFinite(number)) {
+    return String(value);
+  }
+
+  return number.toFixed(2).replace(/\.?0+$/, "");
 }
 
 function uniqueValues(key) {
@@ -341,10 +453,54 @@ function getCodeCreateTime(customer) {
     .createdAt;
 }
 
+function getCustomerCode(customer) {
+  const customerRows = rows.filter(function (r) { return r.customer === customer; });
+  return customerRows[0]?.customerCode || customerRows[0]?.customer_code || `CUS-${customer}`;
+}
+
+function getCustomerStockVolume(customer) {
+  return rows
+    .filter((row) => row.customer === customer)
+    .reduce((totals, row) => {
+      const volume = Number(row.volume) || 0;
+      const bucket = ["预报", "接受", "运输中", "预约池"].includes(row.status) ? "temporary" : "regular";
+      totals[bucket] += volume;
+      return totals;
+    }, { regular: 0, temporary: 0 });
+}
+
+function getWarehouseStockVolumeSplit(customer, warehouse) {
+  return rows
+    .filter((row) => row.customer === customer && row.warehouse === warehouse)
+    .reduce((totals, row) => {
+      const volume = Number(row.volume) || 0;
+      const bucket = ["预报", "接受", "运输中", "预约池"].includes(row.status) ? "temporary" : "regular";
+      totals[bucket] += volume;
+      return totals;
+    }, { regular: 0, temporary: 0 });
+}
+
+function formatVolume(value) {
+  const number = Number(value) || 0;
+  return Number.isInteger(number) ? String(number) : number.toFixed(3).replace(/0+$/, "").replace(/\.$/, "");
+}
+
 function getLatestPreorderTime(latestByWarehouse) {
   return Object.values(latestByWarehouse)
     .filter(Boolean)
     .sort((a, b) => parseDateTime(b) - parseDateTime(a))[0] || "";
+}
+
+function getLatestPreorderWarehouse(latestByWarehouse) {
+  const latestTime = getLatestPreorderTime(latestByWarehouse);
+  if (!latestTime) {
+    return "";
+  }
+
+  return Object.entries(latestByWarehouse)
+    .filter(([, time]) => time === latestTime)
+    .map(([warehouse]) => warehouse)
+    .join("、");
 }
 
 function getUnreportedWeekText(latestPreorderTime, triggeredAt) {
@@ -372,6 +528,16 @@ function getUnreportedWeekCount(latestPreorderTime, triggeredAt) {
   return Math.max(1, Math.ceil(diff / (7 * 24 * 60 * 60 * 1000)));
 }
 
+function getUnreportedDayCount(record, latestPreorderTime) {
+  const baseTime = latestPreorderTime || record.codeCreateTime;
+  if (!baseTime) {
+    return "";
+  }
+
+  const diff = parseDateTime(record.triggeredAt || auditWindow.triggeredAt) - parseDateTime(baseTime);
+  return Math.max(0, Math.ceil(diff / (24 * 60 * 60 * 1000)));
+}
+
 function hasPreorderInRiskWindow(customer) {
   return rows.some((row) => {
     return (
@@ -393,6 +559,7 @@ function buildWarningRecords() {
       return {
         id: `${auditWindow.weekLabel}-${customer}`,
         customer,
+        customerCode: getCustomerCode(customer),
         salesperson: owner,
         status: "pending",
         codeCreateTime: getCodeCreateTime(customer),
@@ -407,17 +574,21 @@ function buildWarningRecords() {
       };
     });
 
-  // 演示数据：部分客户设为不再合作
-  const inactiveCustomers = ["MONTH1", "WEEK4"];
+  const pausedCustomers = ["WEEK4"];
+  const terminatedCustomers = ["MONTH1"];
   records.forEach(function(r) {
-    if (inactiveCustomers.indexOf(r.customer) !== -1) {
-      r.customerStatus = "不再合作";
+    if (pausedCustomers.indexOf(r.customer) !== -1) {
+      r.customerStatus = "暂停合作";
+    }
+    if (terminatedCustomers.indexOf(r.customer) !== -1) {
+      r.customerStatus = "终止合作";
     }
   });
 
   records.push({
     id: `${auditWindow.weekLabel}-JJGJ`,
     customer: "JJGJ",
+    customerCode: getCustomerCode("JJGJ"),
     salesperson: "jessie",
     status: "processed",
     weekLabel: auditWindow.weekLabel,
@@ -766,11 +937,27 @@ function getRoleScopedWarnings() {
   return warningStore.filter((record) => role.isAdmin || record.salesperson === role.value);
 }
 
-function getBoardRows() {
+function normalizeCustomerStatus(status) {
+  return status === "不再合作" ? "终止合作" : (status || "合作中");
+}
+
+function sortBoardRows(records) {
+  return records.slice().sort((a, b) => {
+    const aInactive = normalizeCustomerStatus(a.customerStatus) === "终止合作" ? 1 : 0;
+    const bInactive = normalizeCustomerStatus(b.customerStatus) === "终止合作" ? 1 : 0;
+    if (aInactive !== bInactive) { return aInactive - bInactive; }
+    const weekWeight = getUnreportedWeekSortValue(b) - getUnreportedWeekSortValue(a);
+    if (weekWeight) { return weekWeight; }
+    return a.customer.localeCompare(b.customer, "zh-Hans-CN");
+  });
+}
+
+function getBoardBaseRows() {
   return getRoleScopedWarnings()
     .filter((record) => record.status !== "overdue")
     .filter((record) => !state.boardCustomerFilter || record.customer === state.boardCustomerFilter)
     .filter((record) => !state.boardSalespersonFilter || record.salesperson === state.boardSalespersonFilter)
+    .filter((record) => !state.boardCustomerStatusFilter || normalizeCustomerStatus(record.customerStatus) === state.boardCustomerStatusFilter)
     .filter((record) => {
       const from = datetimeLocalToComparable(state.boardLatestTimeFrom);
       const to = datetimeLocalToComparable(state.boardLatestTimeTo);
@@ -779,15 +966,13 @@ function getBoardRows() {
       if (from && to) { return latestTime >= from && latestTime <= to; }
       if (from) { return latestTime >= from; }
       return latestTime <= to;
-    })
-    .sort((a, b) => {
-      const aInactive = (a.customerStatus || "合作中") === "不再合作" ? 1 : 0;
-      const bInactive = (b.customerStatus || "合作中") === "不再合作" ? 1 : 0;
-      if (aInactive !== bInactive) { return aInactive - bInactive; }
-      const weekWeight = getUnreportedWeekSortValue(b) - getUnreportedWeekSortValue(a);
-      if (weekWeight) { return weekWeight; }
-      return a.customer.localeCompare(b.customer, "zh-Hans-CN");
     });
+}
+
+function getBoardRows() {
+  return sortBoardRows(
+    getBoardBaseRows().filter((record) => !state.boardStatusTab || normalizeCustomerStatus(record.customerStatus) === state.boardStatusTab)
+  );
 }
 
 function addDays(date, days) {
@@ -1015,22 +1200,38 @@ function renderBoard() {
     .map((record) => {
       const warehouseCells = warehouseOptions
         .map((warehouse) => {
-          const time = record.latestByWarehouse[warehouse];
-          const empty = !time;
-          return `<td><span class="warehouse-time ${empty ? "empty" : ""}" title="${escapeHtml(time || "无预报")}">${escapeHtml(formatWarehouseTime(time))}</span></td>`;
+          const time = getWarehouseDisplayTime(record, warehouse);
+          const stockSplit = getWarehouseStockVolumeSplit(record.customer, warehouse);
+          return `
+            <td><span class="warehouse-time" title="${escapeHtml(time)}">${escapeHtml(formatWarehouseTime(time))}</span></td>
+            <td>
+              <div class="stock-volume-cell">
+                <span>常规 ${escapeHtml(formatVolume(stockSplit.regular))}</span>
+                <span>暂存 ${escapeHtml(formatVolume(stockSplit.temporary))}</span>
+              </div>
+            </td>
+          `;
         })
         .join("");
       const latestPreorderTime = getLatestPreorderTime(record.latestByWarehouse);
+      const latestPreorderWarehouse = getLatestPreorderWarehouse(record.latestByWarehouse);
+      const unreportedDays = getUnreportedDayCount(record, latestPreorderTime);
+      const customerStatus = normalizeCustomerStatus(record.customerStatus);
+      const stockVolume = getCustomerStockVolume(record.customer);
 
       var isSelected = state.boardSelected.has(record.id);
       return `
         <tr data-customer="${escapeHtml(record.customer)}" data-id="${escapeHtml(record.id)}" class="${isSelected ? "board-selected" : ""}">
           <td><input class="board-row-check" type="checkbox" data-id="${escapeHtml(record.id)}" ${isSelected ? "checked" : ""} /></td>
           <td><strong>${escapeHtml(record.customer)}</strong></td>
+          <td>${escapeHtml(record.customerCode || getCustomerCode(record.customer))}</td>
           <td>${escapeHtml(record.salesperson)}</td>
-          <td><span class="customer-status-badge ${(record.customerStatus || "合作中") === "不再合作" ? "inactive" : ""}">${escapeHtml(record.customerStatus || "合作中")}</span></td>
+          <td>${escapeHtml(formatVolume(stockVolume.regular + stockVolume.temporary))}</td>
+          <td><span class="customer-status-badge ${customerStatus === "暂停合作" ? "paused" : ""} ${customerStatus === "终止合作" ? "inactive" : ""}">${escapeHtml(customerStatus)}</span></td>
           <td><span class="warehouse-time ${record.codeCreateTime ? "" : "empty"}">${escapeHtml(formatWarehouseTime(record.codeCreateTime))}</span></td>
           <td><span class="warehouse-time ${latestPreorderTime ? "" : "empty"}" title="${escapeHtml(latestPreorderTime || "无预报")}">${escapeHtml(formatWarehouseTime(latestPreorderTime))}</span></td>
+          <td><span class="warehouse-time ${latestPreorderWarehouse ? "" : "empty"}" title="${escapeHtml(latestPreorderWarehouse || "无预报")}">${escapeHtml(latestPreorderWarehouse || "--")}</span></td>
+          <td><span class="warehouse-time ${unreportedDays === "" ? "empty" : ""}">${escapeHtml(unreportedDays === "" ? "--" : String(unreportedDays))}</span></td>
           ${warehouseCells}
         </tr>
       `;
@@ -1038,17 +1239,39 @@ function renderBoard() {
     .join("");
 
   els.overviewEmptyState.hidden = visibleRows.length > 0;
+  renderBoardStatusTabs();
   updateBoardSelectAll(visibleRows);
   updateBoardListToolbar();
+}
+
+function renderBoardStatusTabs() {
+  const baseRows = getBoardBaseRows();
+  const counts = baseRows.reduce((map, record) => {
+    const status = normalizeCustomerStatus(record.customerStatus);
+    map[status] = (map[status] || 0) + 1;
+    return map;
+  }, {});
+
+  els.boardStatusTabs.forEach((tab) => {
+    const status = tab.dataset.status || "";
+    const label = tab.dataset.label || tab.textContent.replace(/\(\d+\)$/, "");
+    const count = status ? (counts[status] || 0) : baseRows.length;
+    tab.dataset.label = label;
+    tab.textContent = `${label}(${count})`;
+    tab.classList.toggle("active", status === state.boardStatusTab);
+  });
 }
 
 function resetBoardFilters() {
   state.boardCustomerFilter = "";
   state.boardSalespersonFilter = "";
+  state.boardCustomerStatusFilter = "";
+  state.boardStatusTab = "";
   state.boardLatestTimeFrom = "";
   state.boardLatestTimeTo = "";
   els.overviewCustomerSearch.value = "";
   els.overviewSalespersonSearch.value = "";
+  els.overviewCustomerStatusSearch.value = "";
   els.overviewLatestTimeFrom.value = "";
   els.overviewLatestTimeTo.value = "";
   els.latestTimeDisplay.value = "";
@@ -1169,6 +1392,20 @@ function setupRangeBox(boxEl, displayEl, dropEl, fromEl, toEl, clearBtn, onChang
 }
 
 function updateBoardListToolbar() {
+  if (els.boardUpdateTime) {
+    els.boardUpdateTime.textContent = "最近更新 " + getLatestDataUpdateTime();
+  }
+}
+
+function getLatestDataUpdateTime() {
+  const visibleRows = getBoardRows();
+  if (!visibleRows.length) { return "--"; }
+  let latest = "";
+  visibleRows.forEach(function (record) {
+    var t = getLatestPreorderTime(record.latestByWarehouse);
+    if (t && (!latest || t > latest)) { latest = t; }
+  });
+  return latest ? formatMinute(latest) : "--";
 }
 
 function exportBoardCSV() {
@@ -1176,20 +1413,37 @@ function exportBoardCSV() {
   if (!visibleRows.length) { return; }
 
   const headerColumns = [
-    "客户简称", "业务员", "客户状态", "建code时间", "最新预报时间",
-    "洛杉矶仓", "芝加哥仓", "新泽西仓", "萨凡纳仓", "休斯顿仓", "奥克兰仓"
+    "客户简称", "客户编码", "业务员", "当前在库总方数", "客户状态", "开户时间", "最近预报时间", "最近预报仓库", "未循环天数",
+    ...warehouseOptions.flatMap((warehouse) => {
+      const label = getWarehouseLabel(warehouse);
+      return [`${label}最近预报时间`, `${label}在库常规方数`, `${label}在库暂存方数`];
+    })
   ];
 
   const header = headerColumns.map(csvCell).join(",");
   const body = visibleRows.map((record) => {
     const latestPreorderTime = getLatestPreorderTime(record.latestByWarehouse);
-    const warehouseCells = warehouseOptions.map((wh) => csvCell(formatWarehouseTime(record.latestByWarehouse[wh])));
+    const latestPreorderWarehouse = getLatestPreorderWarehouse(record.latestByWarehouse);
+    const unreportedDays = getUnreportedDayCount(record, latestPreorderTime);
+    const stockVolume = getCustomerStockVolume(record.customer);
+    const warehouseCells = warehouseOptions.flatMap((wh) => {
+      const whSplit = getWarehouseStockVolumeSplit(record.customer, wh);
+      return [
+        csvCell(formatWarehouseTime(getWarehouseDisplayTime(record, wh))),
+        csvCell(formatVolume(whSplit.regular)),
+        csvCell(formatVolume(whSplit.temporary))
+      ];
+    });
     return [
       csvCell(record.customer),
+      csvCell(record.customerCode || getCustomerCode(record.customer)),
       csvCell(record.salesperson),
-      csvCell(record.customerStatus || "合作中"),
+      csvCell(formatVolume(stockVolume.regular + stockVolume.temporary)),
+      csvCell(normalizeCustomerStatus(record.customerStatus)),
       csvCell(formatWarehouseTime(record.codeCreateTime || "")),
       csvCell(formatWarehouseTime(latestPreorderTime)),
+      csvCell(latestPreorderWarehouse || ""),
+      csvCell(unreportedDays === "" ? "" : unreportedDays),
       ...warehouseCells
     ].join(",");
   });
@@ -1254,7 +1508,7 @@ function updateDetailsBatchUI() {
 function readFilters() {
   state.filters.customer = els.customerInput.value.trim().toLowerCase();
   state.filters.salesperson = els.salespersonInput.value.trim().toLowerCase();
-  state.filters.orderType = els.orderTypeSelect.value;
+  state.filters.orderType = els.orderTypeSelect ? els.orderTypeSelect.value : "";
   state.filters.status = els.statusSelect.value;
   state.filters.createdAt = els.createdAtInput.value.trim().toLowerCase();
   state.filters.carrierCode = els.carrierCodeInput.value.trim().toLowerCase();
@@ -1518,7 +1772,9 @@ function exportRows() {
 function resetSearch() {
   els.customerInput.value = "";
   els.salespersonInput.value = "";
-  els.orderTypeSelect.value = "";
+  if (els.orderTypeSelect) {
+    els.orderTypeSelect.value = "";
+  }
   els.statusSelect.value = "";
   els.createdAtInput.value = "";
   els.carrierCodeInput.value = "";
@@ -1619,6 +1875,14 @@ function bindEvents() {
     });
   });
 
+  els.boardStatusTabs.forEach(function (tab) {
+    tab.addEventListener("click", function () {
+      state.boardStatusTab = tab.dataset.status || "";
+      state.boardSelected.clear();
+      renderBoard();
+    });
+  });
+
   if (els.boardSelectAll) {
     els.boardSelectAll.addEventListener("change", () => {
       const visibleRows = getBoardRows();
@@ -1643,6 +1907,7 @@ function bindEvents() {
   function applyBoardSearch() {
     state.boardCustomerFilter = els.overviewCustomerSearch.value.trim();
     state.boardSalespersonFilter = els.overviewSalespersonSearch.value.trim();
+    state.boardCustomerStatusFilter = els.overviewCustomerStatusSearch.value.trim();
     state.boardLatestTimeFrom = els.overviewLatestTimeFrom.value;
     state.boardLatestTimeTo = els.overviewLatestTimeTo.value;
     syncRangeBox(els.latestTimeDisplay, els.latestTimeBox, els.overviewLatestTimeFrom, els.overviewLatestTimeTo);
@@ -1829,7 +2094,7 @@ function bindEvents() {
     });
   });
 
-  [els.orderTypeSelect, els.statusSelect].forEach((select) => {
+  [els.orderTypeSelect, els.statusSelect].filter(Boolean).forEach((select) => {
     select.addEventListener("change", applySearch);
   });
 
@@ -1940,10 +2205,13 @@ function init() {
   renderRoleOptions();
   fillSelect(els.overviewCustomerSearch, uniqueValues("customer"));
   fillSelect(els.overviewSalespersonSearch, uniqueValues("salesperson"));
+  fillSelect(els.overviewCustomerStatusSearch, customerStatusOptions);
   if (els.overviewOperatorSearch) {
     fillSelect(els.overviewOperatorSearch, ["system"].concat(uniqueValues("salesperson")));
   }
-  fillSelect(els.orderTypeSelect, uniqueValues("orderType"));
+  if (els.orderTypeSelect) {
+    fillSelect(els.orderTypeSelect, uniqueValues("orderType"));
+  }
   fillSelect(els.statusSelect, statusOptions);
   bindEvents();
   renderBoard();
