@@ -7,7 +7,7 @@
     <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
     <meta http-equiv="Pragma" content="no-cache" />
     <meta http-equiv="Expires" content="0" />
-    <link rel="stylesheet" href="styles.css?v=20260706-status-tabs" />
+    <link rel="stylesheet" href="styles.css?v=20260706-update-time" />
     <style>
       .customer-status-badge { display: inline-flex; align-items: center; justify-content: center; min-width: 64px; height: 22px; padding: 0 8px; border-radius: 3px; font-weight: 700; font-size: 11px; background: #e6f7e6; color: #2d8a2d; }
       .customer-status-badge.paused { background: #fff4d6; color: #9a6a00; }
@@ -169,6 +169,7 @@
               <button class="btn tiny" id="boardListExportBtn" type="button">导出</button>
               <button class="btn tiny primary" id="boardListCsBtn" type="button">修改客户状态</button>
             </div>
+            <span class="toolbar-update-time" id="boardUpdateTime"></span>
           </div>
 
           <div class="alert-table-wrap">
@@ -179,17 +180,24 @@
                   <th>客户简称</th>
                   <th>客户编码</th>
                   <th>业务员</th>
+                  <th>当前在库总方数</th>
                   <th>客户状态</th>
                   <th>开户时间</th>
                   <th>最近预报时间</th>
                   <th>最近预报仓库</th>
                   <th>未循环天数</th>
-                  <th>洛杉矶仓</th>
-                  <th>芝加哥仓</th>
-                  <th>新泽西仓</th>
-                  <th>萨凡纳仓</th>
-                  <th>休斯顿仓</th>
-                  <th>奥克兰仓</th>
+                  <th>洛杉矶仓最近预报时间</th>
+                  <th>洛杉矶仓在库方数</th>
+                  <th>芝加哥仓最近预报时间</th>
+                  <th>芝加哥仓在库方数</th>
+                  <th>新泽西仓最近预报时间</th>
+                  <th>新泽西仓在库方数</th>
+                  <th>萨凡纳仓最近预报时间</th>
+                  <th>萨凡纳仓在库方数</th>
+                  <th>休斯顿仓最近预报时间</th>
+                  <th>休斯顿仓在库方数</th>
+                  <th>奥克兰仓最近预报时间</th>
+                  <th>奥克兰仓在库方数</th>
                 </tr>
               </thead>
               <tbody id="alertBody"></tbody>
@@ -381,10 +389,10 @@
       </div>
     </div>
 
-    <script src="script.js?v=20260706-status-tabs"></script>
+    <script src="script.js?v=20260706-update-time"></script>
     <script>
       window.addEventListener('error', function(e) {
-        document.querySelector('#alertBody') && (document.querySelector('#alertBody').innerHTML = '<tr><td colspan="15" style="color:red;padding:20px;text-align:center;">JS 错误: ' + e.message + ' (行 ' + e.lineno + ':' + e.colno + ')</td></tr>');
+        document.querySelector('#alertBody') && (document.querySelector('#alertBody').innerHTML = '<tr><td colspan="22" style="color:red;padding:20px;text-align:center;">JS 错误: ' + e.message + ' (行 ' + e.lineno + ':' + e.colno + ')</td></tr>');
         document.querySelector('#monitorWindowText') && (document.querySelector('#monitorWindowText').textContent = '脚本加载异常');
       });
     </script>

@@ -77,6 +77,7 @@ const rows = [
 ];
 
 const warehouseOptions = ["洛杉矶仓", "芝加哥仓", "新泽西仓", "萨凡纳仓", "休斯顿仓", "奥克兰仓"];
+const warehouseColumnLabels = {};
 const statusOptions = ["预报", "接受", "运输中", "预约池", "提柜", "入库处理中"];
 
 function formatOffsetDate(value, dayOffset) {
@@ -307,6 +308,7 @@ const els = {
   boardListToolbar: document.querySelector("#boardListToolbar"),
   boardListExportBtn: document.querySelector("#boardListExportBtn"),
   boardListCsBtn: document.querySelector("#boardListCsBtn"),
+  boardUpdateTime: document.querySelector("#boardUpdateTime"),
   toast: document.querySelector("#toast"),
   csModal: document.querySelector("#customerStatusModal"),
   csModalClose: document.querySelector("#customerStatusModalClose"),
@@ -334,6 +336,79 @@ function formatMinute(value) {
 
 function formatWarehouseTime(value) {
   return value || "--";
+}
+
+function getWarehouseDisplayTime(record, warehouse) {
+  return record.latestByWarehouse[warehouse] || getLatestPreorderTime(record.latestByWarehouse) || record.codeCreateTime || "";
+}
+
+function getWarehouseLabel(warehouse) {
+  return warehouseColumnLabels[warehouse] || warehouse;
+}
+
+function isEmptyValue(value) {
+  return value === "" || value === null || value === undefined;
+}
+
+function getExplicitWarehouseStockVolume(record, warehouse) {
+  const label = getWarehouseLabel(warehouse);
+  const fieldNames = [
+    `${warehouse}在库方数`,
+    `${label}在库方数`,
+    `${warehouse}库存体积`,
+    `${label}库存体积`,
+    `${warehouse}方数`,
+    `${label}方数`
+  ];
+
+  for (const fieldName of fieldNames) {
+    if (Object.prototype.hasOwnProperty.call(record, fieldName) && !isEmptyValue(record[fieldName])) {
+      return record[fieldName];
+    }
+  }
+
+  const nestedValues = [
+    record.warehouseStockVolumes?.[warehouse],
+    record.warehouseStockVolumes?.[label],
+    record.stockVolumesByWarehouse?.[warehouse],
+    record.stockVolumesByWarehouse?.[label],
+    record.inventoryVolumeByWarehouse?.[warehouse],
+    record.inventoryVolumeByWarehouse?.[label]
+  ];
+
+  for (const value of nestedValues) {
+    if (!isEmptyValue(value)) {
+      return value;
+    }
+  }
+
+  return undefined;
+}
+
+function getWarehouseStockVolume(record, warehouse) {
+  const explicitValue = getExplicitWarehouseStockVolume(record, warehouse);
+  if (!isEmptyValue(explicitValue)) {
+    return explicitValue;
+  }
+
+  const total = rows
+    .filter((row) => row.customer === record.customer && row.warehouse === warehouse)
+    .reduce((sum, row) => sum + (Number(row.volume) || 0), 0);
+
+  return total;
+}
+
+function formatStockVolume(value) {
+  if (isEmptyValue(value)) {
+    return "0";
+  }
+
+  const number = Number(value);
+  if (!Number.isFinite(number)) {
+    return String(value);
+  }
+
+  return number.toFixed(2).replace(/\.?0+$/, "");
 }
 
 function uniqueValues(key) {
@@ -381,6 +456,33 @@ function getCodeCreateTime(customer) {
 function getCustomerCode(customer) {
   const customerRows = rows.filter(function (r) { return r.customer === customer; });
   return customerRows[0]?.customerCode || customerRows[0]?.customer_code || `CUS-${customer}`;
+}
+
+function getCustomerStockVolume(customer) {
+  return rows
+    .filter((row) => row.customer === customer)
+    .reduce((totals, row) => {
+      const volume = Number(row.volume) || 0;
+      const bucket = ["预报", "接受", "运输中", "预约池"].includes(row.status) ? "temporary" : "regular";
+      totals[bucket] += volume;
+      return totals;
+    }, { regular: 0, temporary: 0 });
+}
+
+function getWarehouseStockVolumeSplit(customer, warehouse) {
+  return rows
+    .filter((row) => row.customer === customer && row.warehouse === warehouse)
+    .reduce((totals, row) => {
+      const volume = Number(row.volume) || 0;
+      const bucket = ["预报", "接受", "运输中", "预约池"].includes(row.status) ? "temporary" : "regular";
+      totals[bucket] += volume;
+      return totals;
+    }, { regular: 0, temporary: 0 });
+}
+
+function formatVolume(value) {
+  const number = Number(value) || 0;
+  return Number.isInteger(number) ? String(number) : number.toFixed(3).replace(/0+$/, "").replace(/\.$/, "");
 }
 
 function getLatestPreorderTime(latestByWarehouse) {
@@ -1098,15 +1200,24 @@ function renderBoard() {
     .map((record) => {
       const warehouseCells = warehouseOptions
         .map((warehouse) => {
-          const time = record.latestByWarehouse[warehouse];
-          const empty = !time;
-          return `<td><span class="warehouse-time ${empty ? "empty" : ""}" title="${escapeHtml(time || "无预报")}">${escapeHtml(formatWarehouseTime(time))}</span></td>`;
+          const time = getWarehouseDisplayTime(record, warehouse);
+          const stockSplit = getWarehouseStockVolumeSplit(record.customer, warehouse);
+          return `
+            <td><span class="warehouse-time" title="${escapeHtml(time)}">${escapeHtml(formatWarehouseTime(time))}</span></td>
+            <td>
+              <div class="stock-volume-cell">
+                <span>常规 ${escapeHtml(formatVolume(stockSplit.regular))}</span>
+                <span>暂存 ${escapeHtml(formatVolume(stockSplit.temporary))}</span>
+              </div>
+            </td>
+          `;
         })
         .join("");
       const latestPreorderTime = getLatestPreorderTime(record.latestByWarehouse);
       const latestPreorderWarehouse = getLatestPreorderWarehouse(record.latestByWarehouse);
       const unreportedDays = getUnreportedDayCount(record, latestPreorderTime);
       const customerStatus = normalizeCustomerStatus(record.customerStatus);
+      const stockVolume = getCustomerStockVolume(record.customer);
 
       var isSelected = state.boardSelected.has(record.id);
       return `
@@ -1115,6 +1226,7 @@ function renderBoard() {
           <td><strong>${escapeHtml(record.customer)}</strong></td>
           <td>${escapeHtml(record.customerCode || getCustomerCode(record.customer))}</td>
           <td>${escapeHtml(record.salesperson)}</td>
+          <td>${escapeHtml(formatVolume(stockVolume.regular + stockVolume.temporary))}</td>
           <td><span class="customer-status-badge ${customerStatus === "暂停合作" ? "paused" : ""} ${customerStatus === "终止合作" ? "inactive" : ""}">${escapeHtml(customerStatus)}</span></td>
           <td><span class="warehouse-time ${record.codeCreateTime ? "" : "empty"}">${escapeHtml(formatWarehouseTime(record.codeCreateTime))}</span></td>
           <td><span class="warehouse-time ${latestPreorderTime ? "" : "empty"}" title="${escapeHtml(latestPreorderTime || "无预报")}">${escapeHtml(formatWarehouseTime(latestPreorderTime))}</span></td>
@@ -1280,6 +1392,20 @@ function setupRangeBox(boxEl, displayEl, dropEl, fromEl, toEl, clearBtn, onChang
 }
 
 function updateBoardListToolbar() {
+  if (els.boardUpdateTime) {
+    els.boardUpdateTime.textContent = "最近更新 " + getLatestDataUpdateTime();
+  }
+}
+
+function getLatestDataUpdateTime() {
+  const visibleRows = getBoardRows();
+  if (!visibleRows.length) { return "--"; }
+  let latest = "";
+  visibleRows.forEach(function (record) {
+    var t = getLatestPreorderTime(record.latestByWarehouse);
+    if (t && (!latest || t > latest)) { latest = t; }
+  });
+  return latest ? formatMinute(latest) : "--";
 }
 
 function exportBoardCSV() {
@@ -1287,8 +1413,11 @@ function exportBoardCSV() {
   if (!visibleRows.length) { return; }
 
   const headerColumns = [
-    "客户简称", "客户编码", "业务员", "客户状态", "开户时间", "最近预报时间", "最近预报仓库", "未循环天数",
-    "洛杉矶仓", "芝加哥仓", "新泽西仓", "萨凡纳仓", "休斯顿仓", "奥克兰仓"
+    "客户简称", "客户编码", "业务员", "当前在库总方数", "客户状态", "开户时间", "最近预报时间", "最近预报仓库", "未循环天数",
+    ...warehouseOptions.flatMap((warehouse) => {
+      const label = getWarehouseLabel(warehouse);
+      return [`${label}最近预报时间`, `${label}在库常规方数`, `${label}在库暂存方数`];
+    })
   ];
 
   const header = headerColumns.map(csvCell).join(",");
@@ -1296,11 +1425,20 @@ function exportBoardCSV() {
     const latestPreorderTime = getLatestPreorderTime(record.latestByWarehouse);
     const latestPreorderWarehouse = getLatestPreorderWarehouse(record.latestByWarehouse);
     const unreportedDays = getUnreportedDayCount(record, latestPreorderTime);
-    const warehouseCells = warehouseOptions.map((wh) => csvCell(formatWarehouseTime(record.latestByWarehouse[wh])));
+    const stockVolume = getCustomerStockVolume(record.customer);
+    const warehouseCells = warehouseOptions.flatMap((wh) => {
+      const whSplit = getWarehouseStockVolumeSplit(record.customer, wh);
+      return [
+        csvCell(formatWarehouseTime(getWarehouseDisplayTime(record, wh))),
+        csvCell(formatVolume(whSplit.regular)),
+        csvCell(formatVolume(whSplit.temporary))
+      ];
+    });
     return [
       csvCell(record.customer),
       csvCell(record.customerCode || getCustomerCode(record.customer)),
       csvCell(record.salesperson),
+      csvCell(formatVolume(stockVolume.regular + stockVolume.temporary)),
       csvCell(normalizeCustomerStatus(record.customerStatus)),
       csvCell(formatWarehouseTime(record.codeCreateTime || "")),
       csvCell(formatWarehouseTime(latestPreorderTime)),

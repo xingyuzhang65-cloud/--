@@ -347,7 +347,7 @@ body.details-open::after {
 
 .alert-table {
   width: 100%;
-  min-width: 1970px;
+  min-width: 3060px;
   border-collapse: collapse;
   table-layout: fixed;
 }
@@ -396,33 +396,38 @@ body.details-open::after {
 
 .alert-table th:nth-child(5),
 .alert-table td:nth-child(5) {
-  width: 92px;
+  width: 132px;
 }
 
 .alert-table th:nth-child(6),
 .alert-table td:nth-child(6) {
-  width: 140px;
+  width: 92px;
 }
 
 .alert-table th:nth-child(7),
 .alert-table td:nth-child(7) {
-  width: 156px;
+  width: 140px;
 }
 
 .alert-table th:nth-child(8),
 .alert-table td:nth-child(8) {
-  width: 126px;
+  width: 156px;
 }
 
 .alert-table th:nth-child(9),
 .alert-table td:nth-child(9) {
+  width: 126px;
+}
+
+.alert-table th:nth-child(10),
+.alert-table td:nth-child(10) {
   width: 96px;
 }
 
-/* 仓库列 10-15 */
-.alert-table th:nth-child(n + 10):nth-child(-n + 15),
-.alert-table td:nth-child(n + 10):nth-child(-n + 15) {
-  width: 116px;
+/* 仓库时间/在库方数列 11-22 */
+.alert-table th:nth-child(n + 11):nth-child(-n + 22),
+.alert-table td:nth-child(n + 11):nth-child(-n + 22) {
+  width: 136px;
 }
 
 
@@ -557,6 +562,29 @@ tbody tr.is-selected {
 
 .warehouse-time.empty {
   color: #8b98a9;
+}
+
+.warehouse-volume {
+  display: block;
+  width: 100%;
+  color: #334a66;
+  font-size: 12px;
+  font-weight: 600;
+  text-align: center;
+}
+
+.warehouse-volume.empty {
+  color: #8b98a9;
+  font-weight: 400;
+}
+
+.stock-volume-cell {
+  display: grid;
+  gap: 2px;
+  color: #334a66;
+  font-size: 12px;
+  line-height: 1.25;
+  text-align: center;
 }
 
 
@@ -1538,6 +1566,12 @@ input[type="checkbox"] {
 .toolbar-actions {
   display: flex;
   gap: 8px;
+}
+
+.toolbar-update-time {
+  color: var(--muted);
+  font-size: 12px;
+  margin-left: auto;
 }
 
 .empty-state {
