@@ -340,6 +340,16 @@ function formatMinute(value) {
   return value ? value.slice(0, 16) : "--";
 }
 
+function formatRealtimeUpdateTime(date = new Date()) {
+  const year = date.getFullYear();
+  const month = String(date.getMonth() + 1).padStart(2, "0");
+  const day = String(date.getDate()).padStart(2, "0");
+  const hour = String(date.getHours()).padStart(2, "0");
+  const minute = String(date.getMinutes()).padStart(2, "0");
+  const second = String(date.getSeconds()).padStart(2, "0");
+  return `${year}-${month}-${day} ${hour}:${minute}:${second}`;
+}
+
 function formatWarehouseTime(value) {
   return value || "--";
 }
@@ -1446,19 +1456,8 @@ function updateBoardListToolbar() {
     els.boardListCsBtn.hidden = Boolean(state.boardStatusTab);
   }
   if (els.boardUpdateTime) {
-    els.boardUpdateTime.textContent = "最近更新 " + getLatestDataUpdateTime();
+    els.boardUpdateTime.textContent = "更新时间 " + formatRealtimeUpdateTime();
   }
-}
-
-function getLatestDataUpdateTime() {
-  const visibleRows = getBoardRows();
-  if (!visibleRows.length) { return "--"; }
-  let latest = "";
-  visibleRows.forEach(function (record) {
-    var t = getLatestPreorderTime(record.latestByWarehouse);
-    if (t && (!latest || t > latest)) { latest = t; }
-  });
-  return latest ? formatMinute(latest) : "--";
 }
 
 function exportBoardCSV() {
@@ -2267,6 +2266,7 @@ function init() {
   fillSelect(els.statusSelect, statusOptions);
   bindEvents();
   renderBoard();
+  window.setInterval(updateBoardListToolbar, 1000);
   renderWarningDashboard();
   applySearch();
   applyIncomingFilter();
