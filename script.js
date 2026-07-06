@@ -123,6 +123,11 @@ const auditWindow = {
 };
 
 const customerStatusOptions = ["合作中", "暂停合作", "终止合作"];
+const customerStatusRuleDefaults = {
+  pauseMinDays: 14,
+  terminateMinDays: 28
+};
+const customerStatusRules = loadCustomerStatusRules();
 
 const state = {
   filters: {
@@ -312,8 +317,9 @@ const els = {
   toast: document.querySelector("#toast"),
   csModal: document.querySelector("#customerStatusModal"),
   csModalClose: document.querySelector("#customerStatusModalClose"),
-  csCustomerList: document.querySelector("#csCustomerList"),
-  csNewStatus: document.querySelector("#csNewStatus"),
+  csPauseDays: document.querySelector("#csPauseDays"),
+  csTerminateDays: document.querySelector("#csTerminateDays"),
+  csConfigSummary: document.querySelector("#csConfigSummary"),
   csCancelBtn: document.querySelector("#csCancelBtn"),
   csConfirmBtn: document.querySelector("#csConfirmBtn"),
 };
@@ -937,14 +943,58 @@ function getRoleScopedWarnings() {
   return warningStore.filter((record) => role.isAdmin || record.salesperson === role.value);
 }
 
+function loadCustomerStatusRules() {
+  try {
+    const saved = JSON.parse(localStorage.getItem("cycle-warning-status-rules") || "{}");
+    const pauseMinDays = Number(saved.pauseMinDays);
+    const terminateMinDays = Number(saved.terminateMinDays);
+    if (
+      Number.isFinite(pauseMinDays) &&
+      Number.isFinite(terminateMinDays) &&
+      pauseMinDays >= 0 &&
+      terminateMinDays > pauseMinDays
+    ) {
+      return {
+        pauseMinDays: Math.floor(pauseMinDays),
+        terminateMinDays: Math.floor(terminateMinDays)
+      };
+    }
+  } catch (_error) {
+    // Ignore invalid local configuration and fall back to defaults.
+  }
+  return { ...customerStatusRuleDefaults };
+}
+
+function persistCustomerStatusRules() {
+  localStorage.setItem("cycle-warning-status-rules", JSON.stringify(customerStatusRules));
+}
+
 function normalizeCustomerStatus(status) {
   return status === "不再合作" ? "终止合作" : (status || "合作中");
 }
 
+function getRecordUnreportedDays(record) {
+  return getUnreportedDayCount(record, getLatestPreorderTime(record.latestByWarehouse));
+}
+
+function getCustomerStatusByDays(unreportedDays) {
+  if (unreportedDays !== "" && Number(unreportedDays) >= customerStatusRules.terminateMinDays) {
+    return "终止合作";
+  }
+  if (unreportedDays !== "" && Number(unreportedDays) >= customerStatusRules.pauseMinDays) {
+    return "暂停合作";
+  }
+  return "合作中";
+}
+
+function getRecordCustomerStatus(record) {
+  return getCustomerStatusByDays(getRecordUnreportedDays(record));
+}
+
 function sortBoardRows(records) {
   return records.slice().sort((a, b) => {
-    const aInactive = normalizeCustomerStatus(a.customerStatus) === "终止合作" ? 1 : 0;
-    const bInactive = normalizeCustomerStatus(b.customerStatus) === "终止合作" ? 1 : 0;
+    const aInactive = getRecordCustomerStatus(a) === "终止合作" ? 1 : 0;
+    const bInactive = getRecordCustomerStatus(b) === "终止合作" ? 1 : 0;
     if (aInactive !== bInactive) { return aInactive - bInactive; }
     const weekWeight = getUnreportedWeekSortValue(b) - getUnreportedWeekSortValue(a);
     if (weekWeight) { return weekWeight; }
@@ -957,7 +1007,7 @@ function getBoardBaseRows() {
     .filter((record) => record.status !== "overdue")
     .filter((record) => !state.boardCustomerFilter || record.customer === state.boardCustomerFilter)
     .filter((record) => !state.boardSalespersonFilter || record.salesperson === state.boardSalespersonFilter)
-    .filter((record) => !state.boardCustomerStatusFilter || normalizeCustomerStatus(record.customerStatus) === state.boardCustomerStatusFilter)
+    .filter((record) => !state.boardCustomerStatusFilter || getRecordCustomerStatus(record) === state.boardCustomerStatusFilter)
     .filter((record) => {
       const from = datetimeLocalToComparable(state.boardLatestTimeFrom);
       const to = datetimeLocalToComparable(state.boardLatestTimeTo);
@@ -971,7 +1021,7 @@ function getBoardBaseRows() {
 
 function getBoardRows() {
   return sortBoardRows(
-    getBoardBaseRows().filter((record) => !state.boardStatusTab || normalizeCustomerStatus(record.customerStatus) === state.boardStatusTab)
+    getBoardBaseRows().filter((record) => !state.boardStatusTab || getRecordCustomerStatus(record) === state.boardStatusTab)
   );
 }
 
@@ -1216,7 +1266,7 @@ function renderBoard() {
       const latestPreorderTime = getLatestPreorderTime(record.latestByWarehouse);
       const latestPreorderWarehouse = getLatestPreorderWarehouse(record.latestByWarehouse);
       const unreportedDays = getUnreportedDayCount(record, latestPreorderTime);
-      const customerStatus = normalizeCustomerStatus(record.customerStatus);
+      const customerStatus = getCustomerStatusByDays(unreportedDays);
       const stockVolume = getCustomerStockVolume(record.customer);
 
       var isSelected = state.boardSelected.has(record.id);
@@ -1247,7 +1297,7 @@ function renderBoard() {
 function renderBoardStatusTabs() {
   const baseRows = getBoardBaseRows();
   const counts = baseRows.reduce((map, record) => {
-    const status = normalizeCustomerStatus(record.customerStatus);
+    const status = getRecordCustomerStatus(record);
     map[status] = (map[status] || 0) + 1;
     return map;
   }, {});
@@ -1392,6 +1442,9 @@ function setupRangeBox(boxEl, displayEl, dropEl, fromEl, toEl, clearBtn, onChang
 }
 
 function updateBoardListToolbar() {
+  if (els.boardListCsBtn) {
+    els.boardListCsBtn.hidden = Boolean(state.boardStatusTab);
+  }
   if (els.boardUpdateTime) {
     els.boardUpdateTime.textContent = "最近更新 " + getLatestDataUpdateTime();
   }
@@ -1439,7 +1492,7 @@ function exportBoardCSV() {
       csvCell(record.customerCode || getCustomerCode(record.customer)),
       csvCell(record.salesperson),
       csvCell(formatVolume(stockVolume.regular + stockVolume.temporary)),
-      csvCell(normalizeCustomerStatus(record.customerStatus)),
+      csvCell(getCustomerStatusByDays(unreportedDays)),
       csvCell(formatWarehouseTime(record.codeCreateTime || "")),
       csvCell(formatWarehouseTime(latestPreorderTime)),
       csvCell(latestPreorderWarehouse || ""),
@@ -1826,41 +1879,57 @@ function closeDetailsDrawer() {
   renderProgress();
 }
 
-// ── 修改客户状态 Modal ──
+// ── 客户状态配置 Modal ──
 
-function openCustomerStatusModal(customers) {
+function renderCustomerStatusConfigSummary() {
+  if (!els.csConfigSummary) { return; }
+  els.csConfigSummary.textContent =
+    `合作中：未循环天数 < ${customerStatusRules.pauseMinDays} 天；` +
+    `暂停合作：未循环天数 >= ${customerStatusRules.pauseMinDays} 天；` +
+    `终止合作：未循环天数 >= ${customerStatusRules.terminateMinDays} 天`;
+}
+
+function openCustomerStatusConfigModal() {
   if (!els.csModal) { return; }
-  var list = Array.isArray(customers) ? customers : [customers];
-  els.csModal._customers = list;
-  els.csCustomerList.innerHTML = list.map(function (c) { return escapeHtml(c); }).join("、");
-  els.csNewStatus.value = "合作中";
+  if (els.csPauseDays) {
+    els.csPauseDays.value = String(customerStatusRules.pauseMinDays);
+  }
+  if (els.csTerminateDays) {
+    els.csTerminateDays.value = String(customerStatusRules.terminateMinDays);
+  }
+  renderCustomerStatusConfigSummary();
   els.csModal.hidden = false;
 }
 
-function closeCustomerStatusModal() {
+function closeCustomerStatusConfigModal() {
   if (!els.csModal) { return; }
   els.csModal.hidden = true;
 }
 
-function confirmCustomerStatus() {
+function confirmCustomerStatusConfig() {
   if (!els.csModal) { return; }
-  var customers = els.csModal._customers || [];
-  var newStatus = els.csNewStatus.value;
-  var changed = 0;
-  customers.forEach(function (customer) {
-    var records = warningStore.filter(function (r) { return r.customer === customer; });
-    records.forEach(function (record) {
-      if (record.customerStatus !== newStatus) {
-        record.customerStatus = newStatus;
-        changed++;
-      }
-    });
-  });
-  if (changed > 0) {
-    persistWarningStore();
-    showToast(customers.length + " 个客户状态已调整为 " + newStatus, "success");
+  var pauseMinDays = Number(els.csPauseDays ? els.csPauseDays.value : customerStatusRules.pauseMinDays);
+  var terminateMinDays = Number(els.csTerminateDays ? els.csTerminateDays.value : customerStatusRules.terminateMinDays);
+  if (!Number.isFinite(pauseMinDays) || !Number.isFinite(terminateMinDays)) {
+    showToast("请输入有效天数", "warning");
+    return;
   }
-  closeCustomerStatusModal();
+  pauseMinDays = Math.floor(pauseMinDays);
+  terminateMinDays = Math.floor(terminateMinDays);
+  if (pauseMinDays < 0) {
+    showToast("暂停合作天数不能小于 0", "warning");
+    return;
+  }
+  if (terminateMinDays <= pauseMinDays) {
+    showToast("终止合作天数必须大于暂停合作天数", "warning");
+    return;
+  }
+
+  customerStatusRules.pauseMinDays = pauseMinDays;
+  customerStatusRules.terminateMinDays = terminateMinDays;
+  persistCustomerStatusRules();
+  showToast("客户状态配置已保存", "success");
+  closeCustomerStatusConfigModal();
   renderBoard();
 }
 
@@ -1951,7 +2020,9 @@ function bindEvents() {
     if (!badge) { return; }
     var row = badge.closest("tr[data-customer]");
     if (!row) { return; }
-    openCustomerStatusModal([row.dataset.customer]);
+    if (!state.boardStatusTab) {
+      openCustomerStatusConfigModal();
+    }
   });
 
   els.alertBody.addEventListener("change", (event) => {
@@ -1977,20 +2048,20 @@ function bindEvents() {
   els.fieldSettingsMask.addEventListener("click", closeFieldSettings);
   els.fieldSettingsApply.addEventListener("click", applyFieldSettings);
 
-  // ── 修改客户状态 Modal 事件 ──
+  // ── 客户状态配置 Modal 事件 ──
   if (els.csConfirmBtn) {
-    els.csConfirmBtn.addEventListener("click", confirmCustomerStatus);
+    els.csConfirmBtn.addEventListener("click", confirmCustomerStatusConfig);
   }
   if (els.csCancelBtn) {
-    els.csCancelBtn.addEventListener("click", closeCustomerStatusModal);
+    els.csCancelBtn.addEventListener("click", closeCustomerStatusConfigModal);
   }
   if (els.csModalClose) {
-    els.csModalClose.addEventListener("click", closeCustomerStatusModal);
+    els.csModalClose.addEventListener("click", closeCustomerStatusConfigModal);
   }
   if (els.csModal) {
     els.csModal.addEventListener("click", function (event) {
       if (event.target === els.csModal) {
-        closeCustomerStatusModal();
+        closeCustomerStatusConfigModal();
       }
     });
   }
@@ -2156,26 +2227,7 @@ function bindEvents() {
 
   if (els.boardListCsBtn) {
     els.boardListCsBtn.addEventListener("click", function () {
-      var ids = [...state.boardSelected];
-      var customers = [];
-      if (ids.length > 0) {
-        customers = ids.map(function (id) {
-          var r = warningStore.find(function (w) { return w.id === id; });
-          return r ? r.customer : null;
-        }).filter(Boolean);
-      }
-      // 去重
-      customers = [...new Set(customers)];
-      if (customers.length === 0) {
-        var visibleRows = getBoardRows();
-        customers = visibleRows.map(function (r) { return r.customer; });
-        customers = [...new Set(customers)];
-      }
-      if (customers.length > 0) {
-        openCustomerStatusModal(customers);
-      } else {
-        showToast("暂无客户数据", "warning");
-      }
+      openCustomerStatusConfigModal();
     });
   }
 
