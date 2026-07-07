@@ -1282,8 +1282,8 @@ function renderBoard() {
             <td><span class="warehouse-time" title="${escapeHtml(time)}">${escapeHtml(formatWarehouseTime(time))}</span></td>
             <td>
               <div class="stock-volume-cell">
-                <span>常规 ${renderVolumeValue(stockSplit.regular)}</span>
-                <span>暂存 ${renderVolumeValue(stockSplit.temporary)}</span>
+                <span>常规 ${escapeHtml(formatVolume(stockSplit.regular))}</span>
+                <span>暂存 ${escapeHtml(formatVolume(stockSplit.temporary))}</span>
               </div>
             </td>
           `;
