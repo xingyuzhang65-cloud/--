@@ -657,19 +657,6 @@ tbody tr.is-selected {
   width: 100%;
 }
 
-.field-multi-filter {
-  min-width: 180px;
-}
-
-.field-multi-filter select {
-  height: 72px;
-  padding: 4px 8px;
-}
-
-.field-multi-filter option {
-  padding: 2px 0;
-}
-
 .field-week-filter {
   min-width: 150px;
 }
@@ -763,6 +750,36 @@ tbody tr.is-selected {
   border-radius: 4px;
   box-shadow: 0 6px 20px rgba(31, 45, 64, 0.14);
   padding: 10px;
+}
+
+.multi-select-box {
+  min-width: 150px;
+}
+
+.multi-select-drop {
+  display: grid;
+  gap: 2px;
+  padding: 6px;
+}
+
+.multi-select-option {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  height: 28px;
+  padding: 0 6px;
+  border-radius: 4px;
+  color: #334a66;
+  font-size: 12px;
+  cursor: pointer;
+}
+
+.multi-select-option:hover {
+  background: #f3f7fb;
+}
+
+.multi-select-option input {
+  margin: 0;
 }
 
 .range-drop[hidden] {

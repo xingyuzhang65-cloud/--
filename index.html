@@ -174,9 +174,13 @@
                 </div>
               </div>
             </label>
-            <label class="field field-filter field-multi-filter">
+            <label class="field field-range">
               <span>最近预报仓库</span>
-              <select id="overviewLatestWarehouseSearch" multiple size="3"></select>
+              <div class="range-box multi-select-box" id="latestWarehouseBox">
+                <input class="range-display" id="latestWarehouseDisplay" type="text" placeholder="全部" readonly autocomplete="off" />
+                <button class="range-clear" id="latestWarehouseClear" type="button" title="清除">✕</button>
+                <div class="range-drop multi-select-drop" id="latestWarehouseDrop" hidden></div>
+              </div>
             </label>
             <label class="field field-range">
               <span>未循环天数</span>
@@ -434,7 +438,7 @@
       </div>
     </div>
 
-    <script src="script.js?v=20260707-board-filter-split-volume"></script>
+    <script src="script.js?v=20260707-warehouse-dropdown-total"></script>
     <script>
       window.addEventListener('error', function(e) {
         document.querySelector('#alertBody') && (document.querySelector('#alertBody').innerHTML = '<tr><td colspan="22" style="color:red;padding:20px;text-align:center;">JS 错误: ' + e.message + ' (行 ' + e.lineno + ':' + e.colno + ')</td></tr>');

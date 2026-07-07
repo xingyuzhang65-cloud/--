@@ -288,7 +288,10 @@ const els = {
   latestTimeDisplay: document.querySelector("#latestTimeDisplay"),
   latestTimeBox: document.querySelector("#latestTimeBox"),
   latestTimeClear: document.querySelector("#latestTimeClear"),
-  overviewLatestWarehouseSearch: document.querySelector("#overviewLatestWarehouseSearch"),
+  latestWarehouseBox: document.querySelector("#latestWarehouseBox"),
+  latestWarehouseDisplay: document.querySelector("#latestWarehouseDisplay"),
+  latestWarehouseClear: document.querySelector("#latestWarehouseClear"),
+  latestWarehouseDrop: document.querySelector("#latestWarehouseDrop"),
   overviewUnreportedDaysFrom: document.querySelector("#unreportedDaysFrom"),
   overviewUnreportedDaysTo: document.querySelector("#unreportedDaysTo"),
   unreportedDaysDisplay: document.querySelector("#unreportedDaysDisplay"),
@@ -1354,6 +1357,7 @@ function renderBoard() {
             <div class="stock-volume-cell total-stock-volume-cell${stockVolumeClass}" title="总计 ${escapeHtml(formatVolume(stockTotalVolume))}">
               <span>常规 ${escapeHtml(formatVolume(stockVolume.regular))}</span>
               <span>暂存 ${escapeHtml(formatVolume(stockVolume.temporary))}</span>
+              <span>总计 ${escapeHtml(formatVolume(stockTotalVolume))}</span>
             </div>
           </td>
           <td><span class="customer-status-badge ${customerStatus === "暂停合作" ? "paused" : ""} ${customerStatus === "终止合作" ? "inactive" : ""}">${escapeHtml(customerStatus)}</span></td>
@@ -1403,6 +1407,45 @@ function clearSelectedValues(selectEl) {
   });
 }
 
+function getSelectedLatestWarehouses() {
+  if (!els.latestWarehouseDrop) { return []; }
+  return Array.from(els.latestWarehouseDrop.querySelectorAll(".multi-select-check:checked"))
+    .map((input) => input.value)
+    .filter(Boolean);
+}
+
+function syncLatestWarehouseBox() {
+  if (!els.latestWarehouseDisplay || !els.latestWarehouseBox) { return; }
+  const selected = getSelectedLatestWarehouses();
+  if (!selected.length) {
+    els.latestWarehouseDisplay.value = "";
+    els.latestWarehouseBox.classList.remove("has-value");
+    return;
+  }
+  els.latestWarehouseDisplay.value = selected.length === 1 ? selected[0] : `已选 ${selected.length} 项`;
+  els.latestWarehouseBox.classList.add("has-value");
+}
+
+function clearLatestWarehouseSelection() {
+  if (!els.latestWarehouseDrop) { return; }
+  els.latestWarehouseDrop.querySelectorAll(".multi-select-check").forEach((input) => {
+    input.checked = false;
+  });
+  syncLatestWarehouseBox();
+}
+
+function renderLatestWarehouseOptions() {
+  if (!els.latestWarehouseDrop) { return; }
+  els.latestWarehouseDrop.innerHTML = warehouseOptions
+    .map((warehouse) => `
+      <label class="multi-select-option">
+        <input class="multi-select-check" type="checkbox" value="${escapeHtml(warehouse)}" />
+        <span>${escapeHtml(warehouse)}</span>
+      </label>
+    `)
+    .join("");
+}
+
 function resetBoardFilters() {
   state.boardCustomerFilter = "";
   state.boardSalespersonFilter = "";
@@ -1426,7 +1469,7 @@ function resetBoardFilters() {
   els.overviewLatestTimeTo.value = "";
   els.latestTimeDisplay.value = "";
   els.latestTimeBox.classList.remove("has-value");
-  clearSelectedValues(els.overviewLatestWarehouseSearch);
+  clearLatestWarehouseSelection();
   els.overviewUnreportedDaysFrom.value = "";
   els.overviewUnreportedDaysTo.value = "";
   els.unreportedDaysDisplay.value = "";
@@ -2145,7 +2188,7 @@ function bindEvents() {
     state.boardCodeCreateTimeTo = els.overviewCodeCreateTimeTo.value;
     state.boardLatestTimeFrom = els.overviewLatestTimeFrom.value;
     state.boardLatestTimeTo = els.overviewLatestTimeTo.value;
-    state.boardLatestWarehouseFilter = getSelectedValues(els.overviewLatestWarehouseSearch);
+    state.boardLatestWarehouseFilter = getSelectedLatestWarehouses();
     state.boardUnreportedDaysFrom = els.overviewUnreportedDaysFrom.value;
     state.boardUnreportedDaysTo = els.overviewUnreportedDaysTo.value;
     syncRangeBox(els.codeCreateTimeDisplay, els.codeCreateTimeBox, els.overviewCodeCreateTimeFrom, els.overviewCodeCreateTimeTo);
@@ -2163,10 +2206,29 @@ function bindEvents() {
   setupRangeBox(els.codeCreateTimeBox, els.codeCreateTimeDisplay, els.codeCreateTimeBox.querySelector(".range-drop"), els.overviewCodeCreateTimeFrom, els.overviewCodeCreateTimeTo, els.codeCreateTimeClear, applyBoardSearch);
   setupRangeBox(els.latestTimeBox, els.latestTimeDisplay, els.latestTimeBox.querySelector(".range-drop"), els.overviewLatestTimeFrom, els.overviewLatestTimeTo, els.latestTimeClear, applyBoardSearch);
   setupNumberRangeBox(els.unreportedDaysBox, els.unreportedDaysDisplay, els.unreportedDaysBox.querySelector(".range-drop"), els.overviewUnreportedDaysFrom, els.overviewUnreportedDaysTo, els.unreportedDaysClear, applyBoardSearch);
+  if (els.latestWarehouseBox && els.latestWarehouseDisplay && els.latestWarehouseDrop) {
+    els.latestWarehouseDisplay.addEventListener("click", (event) => {
+      event.stopPropagation();
+      els.latestWarehouseDrop.hidden = !els.latestWarehouseDrop.hidden;
+    });
+    els.latestWarehouseDrop.addEventListener("change", (event) => {
+      if (!event.target.matches(".multi-select-check")) { return; }
+      syncLatestWarehouseBox();
+      applyBoardSearch();
+    });
+  }
+  if (els.latestWarehouseClear) {
+    els.latestWarehouseClear.addEventListener("click", (event) => {
+      event.stopPropagation();
+      clearLatestWarehouseSelection();
+      if (els.latestWarehouseDrop) { els.latestWarehouseDrop.hidden = true; }
+      applyBoardSearch();
+    });
+  }
 
   // Click outside to dismiss dropdowns
   document.addEventListener("click", (event) => {
-    [els.codeCreateTimeBox, els.latestTimeBox, els.unreportedDaysBox].forEach((box) => {
+    [els.codeCreateTimeBox, els.latestTimeBox, els.latestWarehouseBox, els.unreportedDaysBox].forEach((box) => {
       if (!box) { return; }
       if (!box.contains(event.target)) {
         var drop = box.querySelector(".range-drop");
@@ -2431,7 +2493,7 @@ function init() {
   fillSelect(els.overviewCustomerSearch, uniqueValues("customer"));
   fillSelect(els.overviewSalespersonSearch, uniqueValues("salesperson"));
   fillSelect(els.overviewCustomerStatusSearch, customerStatusOptions);
-  fillSelect(els.overviewLatestWarehouseSearch, warehouseOptions);
+  renderLatestWarehouseOptions();
   if (els.overviewOperatorSearch) {
     fillSelect(els.overviewOperatorSearch, ["system"].concat(uniqueValues("salesperson")));
   }
