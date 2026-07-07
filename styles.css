@@ -592,6 +592,11 @@ tbody tr.is-selected {
   font-weight: 800;
 }
 
+.total-stock-volume-cell.stock-volume-low {
+  color: #d93025;
+  font-weight: 800;
+}
+
 
 
 .status-badge {
@@ -650,6 +655,19 @@ tbody tr.is-selected {
 
 .field-filter select {
   width: 100%;
+}
+
+.field-multi-filter {
+  min-width: 180px;
+}
+
+.field-multi-filter select {
+  height: 72px;
+  padding: 4px 8px;
+}
+
+.field-multi-filter option {
+  padding: 2px 0;
 }
 
 .field-week-filter {

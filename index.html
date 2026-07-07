@@ -147,6 +147,20 @@
               </select>
             </label>
             <label class="field field-range">
+              <span>开户时间</span>
+              <div class="range-box" id="codeCreateTimeBox">
+                <input class="range-display" id="codeCreateTimeDisplay" type="text" placeholder="全部" readonly autocomplete="off" />
+                <button class="range-clear" id="codeCreateTimeClear" type="button" title="清除">✕</button>
+                <div class="range-drop" hidden>
+                  <div class="range-drop-row">
+                    <input id="codeCreateTimeFrom" type="datetime-local" />
+                    <span>—</span>
+                    <input id="codeCreateTimeTo" type="datetime-local" />
+                  </div>
+                </div>
+              </div>
+            </label>
+            <label class="field field-range">
               <span>最近预报时间</span>
               <div class="range-box" id="latestTimeBox">
                 <input class="range-display" id="latestTimeDisplay" type="text" placeholder="全部" readonly autocomplete="off" />
@@ -156,6 +170,24 @@
                     <input id="latestTimeFrom" type="datetime-local" />
                     <span>—</span>
                     <input id="latestTimeTo" type="datetime-local" />
+                  </div>
+                </div>
+              </div>
+            </label>
+            <label class="field field-filter field-multi-filter">
+              <span>最近预报仓库</span>
+              <select id="overviewLatestWarehouseSearch" multiple size="3"></select>
+            </label>
+            <label class="field field-range">
+              <span>未循环天数</span>
+              <div class="range-box" id="unreportedDaysBox">
+                <input class="range-display" id="unreportedDaysDisplay" type="text" placeholder="全部" readonly autocomplete="off" />
+                <button class="range-clear" id="unreportedDaysClear" type="button" title="清除">✕</button>
+                <div class="range-drop" hidden>
+                  <div class="range-drop-row">
+                    <input id="unreportedDaysFrom" type="number" min="0" step="1" placeholder="最小" />
+                    <span>—</span>
+                    <input id="unreportedDaysTo" type="number" min="0" step="1" placeholder="最大" />
                   </div>
                 </div>
               </div>
@@ -402,7 +434,7 @@
       </div>
     </div>
 
-    <script src="script.js?v=20260707-status-config-name"></script>
+    <script src="script.js?v=20260707-board-filter-split-volume"></script>
     <script>
       window.addEventListener('error', function(e) {
         document.querySelector('#alertBody') && (document.querySelector('#alertBody').innerHTML = '<tr><td colspan="22" style="color:red;padding:20px;text-align:center;">JS 错误: ' + e.message + ' (行 ' + e.lineno + ':' + e.colno + ')</td></tr>');

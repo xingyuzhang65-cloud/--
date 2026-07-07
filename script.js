@@ -149,8 +149,13 @@ const state = {
   boardSalespersonFilter: "",
   boardCustomerStatusFilter: "",
   boardStatusTab: "",
+  boardCodeCreateTimeFrom: "",
+  boardCodeCreateTimeTo: "",
   boardLatestTimeFrom: "",
   boardLatestTimeTo: "",
+  boardLatestWarehouseFilter: [],
+  boardUnreportedDaysFrom: "",
+  boardUnreportedDaysTo: "",
   dashboardWeekRange: "8",
   role: "admin",
   sortKey: "",
@@ -272,12 +277,23 @@ const els = {
   overviewCustomerSearch: document.querySelector("#overviewCustomerSearch"),
   overviewSalespersonSearch: document.querySelector("#overviewSalespersonSearch"),
   overviewCustomerStatusSearch: document.querySelector("#overviewCustomerStatusSearch"),
+  overviewCodeCreateTimeFrom: document.querySelector("#codeCreateTimeFrom"),
+  overviewCodeCreateTimeTo: document.querySelector("#codeCreateTimeTo"),
+  codeCreateTimeDisplay: document.querySelector("#codeCreateTimeDisplay"),
+  codeCreateTimeBox: document.querySelector("#codeCreateTimeBox"),
+  codeCreateTimeClear: document.querySelector("#codeCreateTimeClear"),
   boardStatusTabs: document.querySelectorAll(".board-status-tab"),
   overviewLatestTimeFrom: document.querySelector("#latestTimeFrom"),
   overviewLatestTimeTo: document.querySelector("#latestTimeTo"),
   latestTimeDisplay: document.querySelector("#latestTimeDisplay"),
   latestTimeBox: document.querySelector("#latestTimeBox"),
   latestTimeClear: document.querySelector("#latestTimeClear"),
+  overviewLatestWarehouseSearch: document.querySelector("#overviewLatestWarehouseSearch"),
+  overviewUnreportedDaysFrom: document.querySelector("#unreportedDaysFrom"),
+  overviewUnreportedDaysTo: document.querySelector("#unreportedDaysTo"),
+  unreportedDaysDisplay: document.querySelector("#unreportedDaysDisplay"),
+  unreportedDaysBox: document.querySelector("#unreportedDaysBox"),
+  unreportedDaysClear: document.querySelector("#unreportedDaysClear"),
   boardSearchButton: document.querySelector("#boardSearchButton"),
   resetBoardButton: document.querySelector("#resetBoardButton"),
   alertBody: document.querySelector("#alertBody"),
@@ -520,15 +536,18 @@ function getLatestPreorderTime(latestByWarehouse) {
 }
 
 function getLatestPreorderWarehouse(latestByWarehouse) {
+  return getLatestPreorderWarehouses(latestByWarehouse).join("、");
+}
+
+function getLatestPreorderWarehouses(latestByWarehouse) {
   const latestTime = getLatestPreorderTime(latestByWarehouse);
   if (!latestTime) {
-    return "";
+    return [];
   }
 
   return Object.entries(latestByWarehouse)
     .filter(([, time]) => time === latestTime)
-    .map(([warehouse]) => warehouse)
-    .join("、");
+    .map(([warehouse]) => warehouse);
 }
 
 function getUnreportedWeekText(latestPreorderTime, triggeredAt) {
@@ -1035,6 +1054,16 @@ function getBoardBaseRows() {
     .filter((record) => !state.boardSalespersonFilter || record.salesperson === state.boardSalespersonFilter)
     .filter((record) => !state.boardCustomerStatusFilter || getRecordCustomerStatus(record) === state.boardCustomerStatusFilter)
     .filter((record) => {
+      const from = datetimeLocalToComparable(state.boardCodeCreateTimeFrom);
+      const to = datetimeLocalToComparable(state.boardCodeCreateTimeTo);
+      if (!from && !to) { return true; }
+      const codeCreateTime = record.codeCreateTime || "";
+      if (!codeCreateTime) { return false; }
+      if (from && to) { return codeCreateTime >= from && codeCreateTime <= to; }
+      if (from) { return codeCreateTime >= from; }
+      return codeCreateTime <= to;
+    })
+    .filter((record) => {
       const from = datetimeLocalToComparable(state.boardLatestTimeFrom);
       const to = datetimeLocalToComparable(state.boardLatestTimeTo);
       if (!from && !to) { return true; }
@@ -1042,6 +1071,23 @@ function getBoardBaseRows() {
       if (from && to) { return latestTime >= from && latestTime <= to; }
       if (from) { return latestTime >= from; }
       return latestTime <= to;
+    })
+    .filter((record) => {
+      if (!state.boardLatestWarehouseFilter.length) { return true; }
+      const latestWarehouses = getLatestPreorderWarehouses(record.latestByWarehouse);
+      return state.boardLatestWarehouseFilter.some((warehouse) => latestWarehouses.includes(warehouse));
+    })
+    .filter((record) => {
+      const from = state.boardUnreportedDaysFrom === "" ? "" : Number(state.boardUnreportedDaysFrom);
+      const to = state.boardUnreportedDaysTo === "" ? "" : Number(state.boardUnreportedDaysTo);
+      if (from === "" && to === "") { return true; }
+      const latestTime = getLatestPreorderTime(record.latestByWarehouse);
+      const unreportedDays = getUnreportedDayCount(record, latestTime);
+      if (unreportedDays === "") { return false; }
+      const value = Number(unreportedDays);
+      if (from !== "" && value < from) { return false; }
+      if (to !== "" && value > to) { return false; }
+      return true;
     });
 }
 
@@ -1294,6 +1340,8 @@ function renderBoard() {
       const unreportedDays = getUnreportedDayCount(record, latestPreorderTime);
       const customerStatus = getCustomerStatusByDays(unreportedDays);
       const stockVolume = getCustomerStockVolume(record.customer);
+      const stockTotalVolume = stockVolume.regular + stockVolume.temporary;
+      const stockVolumeClass = isLowVolume(stockTotalVolume) ? " stock-volume-low" : "";
 
       var isSelected = state.boardSelected.has(record.id);
       return `
@@ -1302,7 +1350,12 @@ function renderBoard() {
           <td><strong>${escapeHtml(record.customer)}</strong></td>
           <td>${escapeHtml(record.customerCode || getCustomerCode(record.customer))}</td>
           <td>${escapeHtml(record.salesperson)}</td>
-          <td>${renderVolumeValue(stockVolume.regular + stockVolume.temporary)}</td>
+          <td>
+            <div class="stock-volume-cell total-stock-volume-cell${stockVolumeClass}" title="总计 ${escapeHtml(formatVolume(stockTotalVolume))}">
+              <span>常规 ${escapeHtml(formatVolume(stockVolume.regular))}</span>
+              <span>暂存 ${escapeHtml(formatVolume(stockVolume.temporary))}</span>
+            </div>
+          </td>
           <td><span class="customer-status-badge ${customerStatus === "暂停合作" ? "paused" : ""} ${customerStatus === "终止合作" ? "inactive" : ""}">${escapeHtml(customerStatus)}</span></td>
           <td><span class="warehouse-time ${record.codeCreateTime ? "" : "empty"}">${escapeHtml(formatWarehouseTime(record.codeCreateTime))}</span></td>
           <td><span class="warehouse-time ${latestPreorderTime ? "" : "empty"}" title="${escapeHtml(latestPreorderTime || "无预报")}">${escapeHtml(formatWarehouseTime(latestPreorderTime))}</span></td>
@@ -1338,20 +1391,46 @@ function renderBoardStatusTabs() {
   });
 }
 
+function getSelectedValues(selectEl) {
+  if (!selectEl) { return []; }
+  return Array.from(selectEl.selectedOptions).map((option) => option.value).filter(Boolean);
+}
+
+function clearSelectedValues(selectEl) {
+  if (!selectEl) { return; }
+  Array.from(selectEl.options).forEach((option) => {
+    option.selected = false;
+  });
+}
+
 function resetBoardFilters() {
   state.boardCustomerFilter = "";
   state.boardSalespersonFilter = "";
   state.boardCustomerStatusFilter = "";
   state.boardStatusTab = "";
+  state.boardCodeCreateTimeFrom = "";
+  state.boardCodeCreateTimeTo = "";
   state.boardLatestTimeFrom = "";
   state.boardLatestTimeTo = "";
+  state.boardLatestWarehouseFilter = [];
+  state.boardUnreportedDaysFrom = "";
+  state.boardUnreportedDaysTo = "";
   els.overviewCustomerSearch.value = "";
   els.overviewSalespersonSearch.value = "";
   els.overviewCustomerStatusSearch.value = "";
+  els.overviewCodeCreateTimeFrom.value = "";
+  els.overviewCodeCreateTimeTo.value = "";
+  els.codeCreateTimeDisplay.value = "";
+  els.codeCreateTimeBox.classList.remove("has-value");
   els.overviewLatestTimeFrom.value = "";
   els.overviewLatestTimeTo.value = "";
   els.latestTimeDisplay.value = "";
   els.latestTimeBox.classList.remove("has-value");
+  clearSelectedValues(els.overviewLatestWarehouseSearch);
+  els.overviewUnreportedDaysFrom.value = "";
+  els.overviewUnreportedDaysTo.value = "";
+  els.unreportedDaysDisplay.value = "";
+  els.unreportedDaysBox.classList.remove("has-value");
   state.boardSelected.clear();
   renderBoard();
 }
@@ -1421,6 +1500,24 @@ function syncRangeBox(displayEl, boxEl, fromEl, toEl) {
     boxEl.classList.add("has-value");
   } else if (to) {
     displayEl.value = `截至 ${toText}`;
+    boxEl.classList.add("has-value");
+  } else {
+    displayEl.value = "";
+    boxEl.classList.remove("has-value");
+  }
+}
+
+function syncNumberRangeBox(displayEl, boxEl, fromEl, toEl) {
+  const from = fromEl ? fromEl.value : "";
+  const to = toEl ? toEl.value : "";
+  if (from && to) {
+    displayEl.value = `${from}  —  ${to}`;
+    boxEl.classList.add("has-value");
+  } else if (from) {
+    displayEl.value = `${from} 起`;
+    boxEl.classList.add("has-value");
+  } else if (to) {
+    displayEl.value = `截至 ${to}`;
     boxEl.classList.add("has-value");
   } else {
     displayEl.value = "";
@@ -1715,6 +1812,34 @@ function renderWarehouseTabs() {
     tab.dataset.label = label;
     tab.textContent = `${label}(${count})`;
     tab.classList.toggle("active", warehouse === state.activeWarehouseTab);
+  });
+}
+
+function setupNumberRangeBox(boxEl, displayEl, dropEl, fromEl, toEl, clearBtn, onChange) {
+  displayEl.addEventListener("click", (e) => {
+    e.stopPropagation();
+    dropEl.hidden = !dropEl.hidden;
+  });
+
+  [fromEl, toEl].forEach((input) => {
+    input.addEventListener("change", () => {
+      syncNumberRangeBox(displayEl, boxEl, fromEl, toEl);
+      if (onChange) {
+        onChange();
+      } else {
+        renderBoard();
+      }
+    });
+  });
+
+  clearBtn.addEventListener("click", (e) => {
+    e.stopPropagation();
+    clearRangeBox(boxEl, displayEl, fromEl, toEl, dropEl);
+    if (onChange) {
+      onChange();
+    } else {
+      renderBoard();
+    }
   });
 }
 
@@ -2016,9 +2141,16 @@ function bindEvents() {
     state.boardCustomerFilter = els.overviewCustomerSearch.value.trim();
     state.boardSalespersonFilter = els.overviewSalespersonSearch.value.trim();
     state.boardCustomerStatusFilter = els.overviewCustomerStatusSearch.value.trim();
+    state.boardCodeCreateTimeFrom = els.overviewCodeCreateTimeFrom.value;
+    state.boardCodeCreateTimeTo = els.overviewCodeCreateTimeTo.value;
     state.boardLatestTimeFrom = els.overviewLatestTimeFrom.value;
     state.boardLatestTimeTo = els.overviewLatestTimeTo.value;
+    state.boardLatestWarehouseFilter = getSelectedValues(els.overviewLatestWarehouseSearch);
+    state.boardUnreportedDaysFrom = els.overviewUnreportedDaysFrom.value;
+    state.boardUnreportedDaysTo = els.overviewUnreportedDaysTo.value;
+    syncRangeBox(els.codeCreateTimeDisplay, els.codeCreateTimeBox, els.overviewCodeCreateTimeFrom, els.overviewCodeCreateTimeTo);
     syncRangeBox(els.latestTimeDisplay, els.latestTimeBox, els.overviewLatestTimeFrom, els.overviewLatestTimeTo);
+    syncNumberRangeBox(els.unreportedDaysDisplay, els.unreportedDaysBox, els.overviewUnreportedDaysFrom, els.overviewUnreportedDaysTo);
     renderBoard();
   }
 
@@ -2028,11 +2160,13 @@ function bindEvents() {
 
   // ── Range picker events ──
 
-  setupRangeBox(els.latestTimeBox, els.latestTimeDisplay, els.latestTimeBox.querySelector(".range-drop"), els.overviewLatestTimeFrom, els.overviewLatestTimeTo, els.latestTimeClear);
+  setupRangeBox(els.codeCreateTimeBox, els.codeCreateTimeDisplay, els.codeCreateTimeBox.querySelector(".range-drop"), els.overviewCodeCreateTimeFrom, els.overviewCodeCreateTimeTo, els.codeCreateTimeClear, applyBoardSearch);
+  setupRangeBox(els.latestTimeBox, els.latestTimeDisplay, els.latestTimeBox.querySelector(".range-drop"), els.overviewLatestTimeFrom, els.overviewLatestTimeTo, els.latestTimeClear, applyBoardSearch);
+  setupNumberRangeBox(els.unreportedDaysBox, els.unreportedDaysDisplay, els.unreportedDaysBox.querySelector(".range-drop"), els.overviewUnreportedDaysFrom, els.overviewUnreportedDaysTo, els.unreportedDaysClear, applyBoardSearch);
 
   // Click outside to dismiss dropdowns
   document.addEventListener("click", (event) => {
-    [els.latestTimeBox].forEach((box) => {
+    [els.codeCreateTimeBox, els.latestTimeBox, els.unreportedDaysBox].forEach((box) => {
       if (!box) { return; }
       if (!box.contains(event.target)) {
         var drop = box.querySelector(".range-drop");
@@ -2297,6 +2431,7 @@ function init() {
   fillSelect(els.overviewCustomerSearch, uniqueValues("customer"));
   fillSelect(els.overviewSalespersonSearch, uniqueValues("salesperson"));
   fillSelect(els.overviewCustomerStatusSearch, customerStatusOptions);
+  fillSelect(els.overviewLatestWarehouseSearch, warehouseOptions);
   if (els.overviewOperatorSearch) {
     fillSelect(els.overviewOperatorSearch, ["system"].concat(uniqueValues("salesperson")));
   }
