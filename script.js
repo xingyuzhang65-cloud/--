@@ -1567,8 +1567,9 @@ function readFilters() {
   state.filters.warehouse = state.activeWarehouseTab;
 }
 
-function getFilteredRows() {
-  const { customer, salesperson, orderType, status, createdAt, carrierCode, warehouse } = state.filters;
+function getFilteredRows(warehouseOverride = state.filters.warehouse) {
+  const { customer, salesperson, orderType, status, createdAt, carrierCode } = state.filters;
+  const warehouse = warehouseOverride;
   const role = getRole();
 
   return rows
@@ -1687,6 +1688,18 @@ function renderTable() {
   els.emptyState.hidden = visibleRows.length > 0;
   updateSelectAll(visibleRows);
   updateDetailsBatchUI();
+  renderWarehouseTabs();
+}
+
+function renderWarehouseTabs() {
+  els.warehouseTabs.forEach((tab) => {
+    const warehouse = tab.dataset.warehouse || "";
+    const label = tab.dataset.label || tab.textContent.replace(/\(\d+\)$/, "").trim();
+    const count = getFilteredRows(warehouse).length;
+    tab.dataset.label = label;
+    tab.textContent = `${label}(${count})`;
+    tab.classList.toggle("active", warehouse === state.activeWarehouseTab);
+  });
 }
 
 function updateDetailsTableWidth(visibleFields) {
