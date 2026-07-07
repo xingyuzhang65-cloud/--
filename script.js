@@ -1907,7 +1907,7 @@ function closeDetailsDrawer() {
   renderProgress();
 }
 
-// ── 客户状态配置 Modal ──
+// ── 状态配置 Modal ──
 
 function renderCustomerStatusConfigSummary() {
   if (!els.csConfigSummary) { return; }
@@ -1967,7 +1967,7 @@ function confirmCustomerStatusConfig() {
   customerStatusRules.terminateMinDays = terminateMinDays;
   customerStatusRules.lowVolumeThreshold = lowVolumeThreshold;
   persistCustomerStatusRules();
-  showToast("客户状态配置已保存", "success");
+  showToast("状态配置已保存", "success");
   closeCustomerStatusConfigModal();
   renderBoard();
 }
@@ -2087,7 +2087,7 @@ function bindEvents() {
   els.fieldSettingsMask.addEventListener("click", closeFieldSettings);
   els.fieldSettingsApply.addEventListener("click", applyFieldSettings);
 
-  // ── 客户状态配置 Modal 事件 ──
+  // ── 状态配置 Modal 事件 ──
   if (els.csConfirmBtn) {
     els.csConfirmBtn.addEventListener("click", confirmCustomerStatusConfig);
   }

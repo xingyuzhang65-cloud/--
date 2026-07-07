@@ -174,7 +174,7 @@
           <div class="board-list-toolbar" id="boardListToolbar">
             <div class="toolbar-actions">
               <button class="btn tiny" id="boardListExportBtn" type="button">导出</button>
-              <button class="btn tiny primary" id="boardListCsBtn" type="button">客户状态配置</button>
+              <button class="btn tiny primary" id="boardListCsBtn" type="button">状态配置</button>
             </div>
             <span class="toolbar-update-time" id="boardUpdateTime"></span>
           </div>
@@ -368,7 +368,7 @@
     <div class="modal-overlay" id="customerStatusModal" hidden>
       <div class="modal-panel" style="width:480px;">
         <div class="modal-header">
-          <h2>客户状态配置</h2>
+          <h2>状态配置</h2>
           <button class="modal-close-btn" id="customerStatusModalClose" type="button" aria-label="关闭">✕</button>
         </div>
         <div class="progress-modal-body" style="padding:20px 24px;">
@@ -402,7 +402,7 @@
       </div>
     </div>
 
-    <script src="script.js?v=20260707-low-volume-threshold"></script>
+    <script src="script.js?v=20260707-status-config-name"></script>
     <script>
       window.addEventListener('error', function(e) {
         document.querySelector('#alertBody') && (document.querySelector('#alertBody').innerHTML = '<tr><td colspan="22" style="color:red;padding:20px;text-align:center;">JS 错误: ' + e.message + ' (行 ' + e.lineno + ':' + e.colno + ')</td></tr>');
