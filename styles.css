@@ -587,6 +587,11 @@ tbody tr.is-selected {
   text-align: center;
 }
 
+.volume-low {
+  color: #d93025;
+  font-weight: 800;
+}
+
 
 
 .status-badge {

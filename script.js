@@ -125,7 +125,8 @@ const auditWindow = {
 const customerStatusOptions = ["合作中", "暂停合作", "终止合作"];
 const customerStatusRuleDefaults = {
   pauseMinDays: 14,
-  terminateMinDays: 28
+  terminateMinDays: 28,
+  lowVolumeThreshold: 70
 };
 const customerStatusRules = loadCustomerStatusRules();
 
@@ -319,6 +320,7 @@ const els = {
   csModalClose: document.querySelector("#customerStatusModalClose"),
   csPauseDays: document.querySelector("#csPauseDays"),
   csTerminateDays: document.querySelector("#csTerminateDays"),
+  csLowVolumeThreshold: document.querySelector("#csLowVolumeThreshold"),
   csConfigSummary: document.querySelector("#csConfigSummary"),
   csCancelBtn: document.querySelector("#csCancelBtn"),
   csConfirmBtn: document.querySelector("#csConfirmBtn"),
@@ -499,6 +501,16 @@ function getWarehouseStockVolumeSplit(customer, warehouse) {
 function formatVolume(value) {
   const number = Number(value) || 0;
   return Number.isInteger(number) ? String(number) : number.toFixed(3).replace(/0+$/, "").replace(/\.$/, "");
+}
+
+function isLowVolume(value) {
+  const number = Number(value) || 0;
+  return number < customerStatusRules.lowVolumeThreshold;
+}
+
+function renderVolumeValue(value) {
+  const formatted = escapeHtml(formatVolume(value));
+  return isLowVolume(value) ? `<span class="volume-low">${formatted}</span>` : formatted;
 }
 
 function getLatestPreorderTime(latestByWarehouse) {
@@ -958,6 +970,7 @@ function loadCustomerStatusRules() {
     const saved = JSON.parse(localStorage.getItem("cycle-warning-status-rules") || "{}");
     const pauseMinDays = Number(saved.pauseMinDays);
     const terminateMinDays = Number(saved.terminateMinDays);
+    const lowVolumeThreshold = Number(saved.lowVolumeThreshold);
     if (
       Number.isFinite(pauseMinDays) &&
       Number.isFinite(terminateMinDays) &&
@@ -966,7 +979,10 @@ function loadCustomerStatusRules() {
     ) {
       return {
         pauseMinDays: Math.floor(pauseMinDays),
-        terminateMinDays: Math.floor(terminateMinDays)
+        terminateMinDays: Math.floor(terminateMinDays),
+        lowVolumeThreshold: Number.isFinite(lowVolumeThreshold) && lowVolumeThreshold >= 0
+          ? Math.floor(lowVolumeThreshold)
+          : customerStatusRuleDefaults.lowVolumeThreshold
       };
     }
   } catch (_error) {
@@ -1266,8 +1282,8 @@ function renderBoard() {
             <td><span class="warehouse-time" title="${escapeHtml(time)}">${escapeHtml(formatWarehouseTime(time))}</span></td>
             <td>
               <div class="stock-volume-cell">
-                <span>常规 ${escapeHtml(formatVolume(stockSplit.regular))}</span>
-                <span>暂存 ${escapeHtml(formatVolume(stockSplit.temporary))}</span>
+                <span>常规 ${renderVolumeValue(stockSplit.regular)}</span>
+                <span>暂存 ${renderVolumeValue(stockSplit.temporary)}</span>
               </div>
             </td>
           `;
@@ -1286,7 +1302,7 @@ function renderBoard() {
           <td><strong>${escapeHtml(record.customer)}</strong></td>
           <td>${escapeHtml(record.customerCode || getCustomerCode(record.customer))}</td>
           <td>${escapeHtml(record.salesperson)}</td>
-          <td>${escapeHtml(formatVolume(stockVolume.regular + stockVolume.temporary))}</td>
+          <td>${renderVolumeValue(stockVolume.regular + stockVolume.temporary)}</td>
           <td><span class="customer-status-badge ${customerStatus === "暂停合作" ? "paused" : ""} ${customerStatus === "终止合作" ? "inactive" : ""}">${escapeHtml(customerStatus)}</span></td>
           <td><span class="warehouse-time ${record.codeCreateTime ? "" : "empty"}">${escapeHtml(formatWarehouseTime(record.codeCreateTime))}</span></td>
           <td><span class="warehouse-time ${latestPreorderTime ? "" : "empty"}" title="${escapeHtml(latestPreorderTime || "无预报")}">${escapeHtml(formatWarehouseTime(latestPreorderTime))}</span></td>
@@ -1898,7 +1914,8 @@ function renderCustomerStatusConfigSummary() {
   els.csConfigSummary.textContent =
     `合作中：未循环天数 < ${customerStatusRules.pauseMinDays} 天；` +
     `暂停合作：未循环天数 >= ${customerStatusRules.pauseMinDays} 天；` +
-    `终止合作：未循环天数 >= ${customerStatusRules.terminateMinDays} 天`;
+    `终止合作：未循环天数 >= ${customerStatusRules.terminateMinDays} 天；` +
+    `低方数：在库方数 < ${customerStatusRules.lowVolumeThreshold} 方时标红`;
 }
 
 function openCustomerStatusConfigModal() {
@@ -1908,6 +1925,9 @@ function openCustomerStatusConfigModal() {
   }
   if (els.csTerminateDays) {
     els.csTerminateDays.value = String(customerStatusRules.terminateMinDays);
+  }
+  if (els.csLowVolumeThreshold) {
+    els.csLowVolumeThreshold.value = String(customerStatusRules.lowVolumeThreshold);
   }
   renderCustomerStatusConfigSummary();
   els.csModal.hidden = false;
@@ -1922,14 +1942,20 @@ function confirmCustomerStatusConfig() {
   if (!els.csModal) { return; }
   var pauseMinDays = Number(els.csPauseDays ? els.csPauseDays.value : customerStatusRules.pauseMinDays);
   var terminateMinDays = Number(els.csTerminateDays ? els.csTerminateDays.value : customerStatusRules.terminateMinDays);
-  if (!Number.isFinite(pauseMinDays) || !Number.isFinite(terminateMinDays)) {
-    showToast("请输入有效天数", "warning");
+  var lowVolumeThreshold = Number(els.csLowVolumeThreshold ? els.csLowVolumeThreshold.value : customerStatusRules.lowVolumeThreshold);
+  if (!Number.isFinite(pauseMinDays) || !Number.isFinite(terminateMinDays) || !Number.isFinite(lowVolumeThreshold)) {
+    showToast("请输入有效配置值", "warning");
     return;
   }
   pauseMinDays = Math.floor(pauseMinDays);
   terminateMinDays = Math.floor(terminateMinDays);
+  lowVolumeThreshold = Math.floor(lowVolumeThreshold);
   if (pauseMinDays < 0) {
     showToast("暂停合作天数不能小于 0", "warning");
+    return;
+  }
+  if (lowVolumeThreshold < 0) {
+    showToast("低方数预警阈值不能小于 0", "warning");
     return;
   }
   if (terminateMinDays <= pauseMinDays) {
@@ -1939,6 +1965,7 @@ function confirmCustomerStatusConfig() {
 
   customerStatusRules.pauseMinDays = pauseMinDays;
   customerStatusRules.terminateMinDays = terminateMinDays;
+  customerStatusRules.lowVolumeThreshold = lowVolumeThreshold;
   persistCustomerStatusRules();
   showToast("客户状态配置已保存", "success");
   closeCustomerStatusConfigModal();

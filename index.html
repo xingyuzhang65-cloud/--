@@ -386,6 +386,13 @@
               <p class="progress-form-hint">未循环天数大于等于该值时显示为终止合作。</p>
             </div>
           </div>
+          <div class="progress-form-row">
+            <label class="progress-form-label">低方数预警</label>
+            <div class="progress-form-control">
+              <input id="csLowVolumeThreshold" type="number" min="0" step="1" style="width:100%;height:34px;border:1px solid #d0d7df;border-radius:4px;padding:0 10px;font-size:13px;outline:none;" />
+              <p class="progress-form-hint">在库方数低于该值时标红显示。</p>
+            </div>
+          </div>
           <div id="csConfigSummary" style="margin:0 0 14px 92px;color:#55708e;font-size:12px;line-height:1.6;"></div>
           <div class="progress-modal-actions" style="margin-top:18px;">
             <button class="btn" id="csCancelBtn" type="button">取消</button>
@@ -395,7 +402,7 @@
       </div>
     </div>
 
-    <script src="script.js?v=20260707-warehouse-counts"></script>
+    <script src="script.js?v=20260707-low-volume-threshold"></script>
     <script>
       window.addEventListener('error', function(e) {
         document.querySelector('#alertBody') && (document.querySelector('#alertBody').innerHTML = '<tr><td colspan="22" style="color:red;padding:20px;text-align:center;">JS 错误: ' + e.message + ' (行 ' + e.lineno + ':' + e.colno + ')</td></tr>');
