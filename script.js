@@ -1344,9 +1344,9 @@ function renderBoard() {
           <td>${escapeHtml(record.salesperson)}</td>
           <td>
             <div class="stock-volume-cell total-stock-volume-cell${stockVolumeClass}" title="总计 ${escapeHtml(formatVolume(stockTotalVolume))}">
+              <span>总计 ${escapeHtml(formatVolume(stockTotalVolume))}</span>
               <span>常规 ${escapeHtml(formatVolume(stockVolume.regular))}</span>
               <span>暂存 ${escapeHtml(formatVolume(stockVolume.temporary))}</span>
-              <span>总计 ${escapeHtml(formatVolume(stockTotalVolume))}</span>
             </div>
           </td>
           <td><span class="customer-status-badge ${customerStatus === "暂停合作" ? "paused" : ""} ${customerStatus === "终止合作" ? "inactive" : ""}">${escapeHtml(customerStatus)}</span></td>
