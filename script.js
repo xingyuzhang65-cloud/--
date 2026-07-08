@@ -264,8 +264,6 @@ function getExportColumns() {
 }
 
 const els = {
-  roleSelect: document.querySelector("#roleSelect"),
-  monitorWindowText: document.querySelector("#monitorWindowText"),
   dashboardMeta: document.querySelector("#dashboardMeta"),
   weeklyWarningLineChart: document.querySelector("#weeklyWarningLineChart"),
   weeklyWarningTotal: document.querySelector("#weeklyWarningTotal"),
@@ -1309,15 +1307,6 @@ function resetDashboardFilters() {
   renderWarningDashboard();
 }
 
-function renderRoleOptions() {
-  roleOptions.forEach((role) => {
-    const option = document.createElement("option");
-    option.value = role.value;
-    option.textContent = role.label;
-    els.roleSelect.append(option);
-  });
-}
-
 function renderBoard() {
   const visibleRows = getBoardRows();
 
@@ -2173,13 +2162,6 @@ function bindEvents() {
     });
   }
 
-  els.roleSelect.addEventListener("change", () => {
-    state.role = els.roleSelect.value;
-    resetBoardFilters();
-    resetDashboardFilters();
-    renderTable();
-  });
-
   function applyBoardSearch() {
     state.boardCustomerFilter = els.overviewCustomerSearch.value.trim();
     state.boardSalespersonFilter = els.overviewSalespersonSearch.value.trim();
@@ -2488,8 +2470,6 @@ function bindEvents() {
 
 function init() {
   resetDetailFieldState();
-  els.monitorWindowText.textContent = `检测区间：${auditWindow.weekStart.slice(0, 10)} 周一 00:00 至 ${auditWindow.riskEnd.slice(0, 10)} 周三 23:59`;
-  renderRoleOptions();
   fillSelect(els.overviewCustomerSearch, uniqueValues("customer"));
   fillSelect(els.overviewSalespersonSearch, uniqueValues("salesperson"));
   fillSelect(els.overviewCustomerStatusSearch, customerStatusOptions);
@@ -2512,6 +2492,5 @@ function init() {
 try {
   init();
 } catch (e) {
-  document.getElementById('monitorWindowText') && (document.getElementById('monitorWindowText').textContent = '初始化失败: ' + e.message);
   document.getElementById('alertBody') && (document.getElementById('alertBody').innerHTML = '<tr><td colspan="13" style="color:red;padding:20px;text-align:center;">初始化错误: ' + e.message + '</td></tr>');
 }
