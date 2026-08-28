@@ -1,17 +1,17 @@
 const rawRows = [
-  ["TTTX","WEMA1131231","/","2","是","拆转","ABE2","Truck-Walmart","2-ABE2-1","2024-04-23 15:22:43",0,0,11,0,7,4,"暂存"],
-  ["23","8889990","8889990-250623","88","是","拆转","LG,SZ,GD,123,Tom,123...","Truck-Other","8889990-250623-88-6","2025-07-11 15:29:34",2,2,2,0,1,1,"暂存"],
-  ["23","8889990","8889990-250623","88","是","拆转","LG,SZ,GD,123,Tom,123...","Truck-Other","8889990-250623-88-7","2025-07-11 15:29:34",0,0,0,0,0,0,"暂存"],
-  ["23","8889990","8889990-250623","88","是","拆转","LG,SZ,GD,123,Tom,123...","Truck-Other","8889990-250623-88-9","2025-07-11 15:29:34",0,0,2,0,2,0,"暂存"],
-  ["23","8889990","8889990-250623","88","是","拆转","BWI9","Truck-Walmart","8889990-250623-BWI9-1","2025-07-11 15:29:34",0,0,0,0,0,0,"暂存"],
-  ["23","8889990","8889990-250623","88","是","拆转","BWI9","Truck-Walmart","8889990-250623-BWI9-2","2025-07-11 15:29:34",0,0,0,0,0,0,"暂存"],
-  ["23","8889990","8889990-250623","88","是","拆转","BWI9","Truck-Walmart","8889990-250623-BWI9-3","2025-07-11 15:29:34",0,0,0,0,0,0,"暂存"],
-  ["23","8889990","8889990-250623","88","是","拆转","BWI9","Truck-Walmart","8889990-250623-BWI9-7","2025-07-11 15:29:34",0,0,0,0,0,0,"暂存"],
-  ["23","8889990","8889990-250623","88","是","拆转","BWI9","Truck-Walmart","8889990-250623-BWI9-8","2025-07-11 15:29:34",0,0,0,0,0,0,"暂存"],
-  ["23","8889990","8889990-250623","88","是","拆转","BWI9","Truck-Walmart","8889990-250623-BWI9-9","2025-07-11 15:29:34",0,0,0,0,0,0,"暂存"],
-  ["TTTX","AAAA0000000","AAAA0000000-241109","2","是","拆转","ABE2","Truck-Amazon","AAAA0000000-241109-ABE8-2","2024-11-05 15:18:21",0,0,0,0,0,0,"暂存"],
-  ["TTTX","AAAA0000000","AAAA0000000-2411...","2","是","拆转","ABE8","Truck-Amazon","AAAA0000000-241109-ABE8-3","2024-11-05 15:18:21",0,0,0,0,0,0,"暂存"],
-  ["TTTX","AAAA0000000","AAAA0000000-2411...","2","是","拆转","ABE8","Truck-Amazon","AAAA0000000-241109-ABE8-5","2024-11-05 15:18:21",61.8,4.436,4,0,3,1,"暂存"]
+  ["TTTX","WEMA1131231","/","2","拆柜前拦截","拆转","ABE2","Truck-Walmart","2-ABE2-1","2024-04-23 15:22:43",0,0,11,0,7,4,"暂存"],
+  ["23","8889990","8889990-250623","88","拆柜后拦截，待确认","拆转","LG,SZ,GD,123,Tom,123...","Truck-Other","8889990-250623-88-6","2025-07-11 15:29:34",2,2,2,0,1,1,"暂存"],
+  ["23","8889990","8889990-250623","88","拆柜后拦截成功","拆转","LG,SZ,GD,123,Tom,123...","Truck-Other","8889990-250623-88-7","2025-07-11 15:29:34",0,0,0,0,0,0,"暂存"],
+  ["23","8889990","8889990-250623","88","拆柜后拦截失败","拆转","LG,SZ,GD,123,Tom,123...","Truck-Other","8889990-250623-88-9","2025-07-11 15:29:34",0,0,2,0,2,0,"暂存"],
+  ["23","8889990","8889990-250623","88","暂存","拆转","BWI9","Truck-Walmart","8889990-250623-BWI9-1","2025-07-11 15:29:34",0,0,0,0,0,0,"暂存"],
+  ["23","8889990","8889990-250623","88","暂存","拆转","BWI9","Truck-Walmart","8889990-250623-BWI9-2","2025-07-11 15:29:34",0,0,0,0,0,0,"暂存"],
+  ["23","8889990","8889990-250623","88","暂存","拆转","BWI9","Truck-Walmart","8889990-250623-BWI9-3","2025-07-11 15:29:34",0,0,0,0,0,0,"暂存"],
+  ["23","8889990","8889990-250623","88","暂存","拆转","BWI9","Truck-Walmart","8889990-250623-BWI9-7","2025-07-11 15:29:34",0,0,0,0,0,0,"暂存"],
+  ["23","8889990","8889990-250623","88","暂存","拆转","BWI9","Truck-Walmart","8889990-250623-BWI9-8","2025-07-11 15:29:34",0,0,0,0,0,0,"暂存"],
+  ["23","8889990","8889990-250623","88","暂存","拆转","BWI9","Truck-Walmart","8889990-250623-BWI9-9","2025-07-11 15:29:34",0,0,0,0,0,0,"暂存"],
+  ["TTTX","AAAA0000000","AAAA0000000-241109","2","拆柜前拦截","拆转","ABE2","Truck-Amazon","AAAA0000000-241109-ABE8-2","2024-11-05 15:18:21",0,0,0,0,0,0,"暂存"],
+  ["TTTX","AAAA0000000","AAAA0000000-2411...","2","拆柜后拦截，待确认","拆转","ABE8","Truck-Amazon","AAAA0000000-241109-ABE8-3","2024-11-05 15:18:21",0,0,0,0,0,0,"暂存"],
+  ["TTTX","AAAA0000000","AAAA0000000-2411...","2","拆柜后拦截成功","拆转","ABE8","Truck-Amazon","AAAA0000000-241109-ABE8-5","2024-11-05 15:18:21",61.8,4.436,4,0,3,1,"暂存"]
 ];
 const inventoryRows = rawRows.map((r, index) => ({
   id: index + 1, customer: r[0], container: r[1], system: r[2], inbound: r[3],
@@ -347,7 +347,7 @@ const outboundRows = Array.from({ length: 95 }, (_, index) => {
 const shippedRows = outboundRows.slice(0, 30).map((row) => ({ ...row, status: "已出库" }));
 const destroyedRows = outboundRows.slice(0, 36).map((row, index) => ({
   ...row,
-  // 销毁记录沿用放货申请数据，并补齐销毁列表需要展示的申请及处理信息。
+  // 销毁记录沿用发货申请数据，并补齐销毁列表需要展示的申请及处理信息。
   destination: row.destination || (row.dispatch === "Truck-Amazon" ? "GEU3" : row.dispatch === "USPS" ? "US" : "1420 Tamarind Ave, Rialto"),
   appointmentDeliveryTime: `2026-07-${String(18 + (index % 7)).padStart(2, "0")} ${index % 2 ? "10:27:28" : "15:17:37"}`,
   shippingApplicationAttachment: index % 3 === 2 ? "-" : `发货申请附件-${String(index + 1).padStart(2, "0")}.pdf`,
@@ -375,9 +375,8 @@ const instructionCatalog = [
 ];
 const instructionRowsByInventory = new Map();
 const attachmentRowsByInventory = new Map();
-let instructionDraftCodes = new Set(instructionCatalog.slice(0, 3).map((row) => row.code));
-let instructionExistingCatalogCodes = new Set();
-const instructionDraftValues = new Map();
+let instructionDraftRows = [];
+let instructionDraftRowSequence = 0;
 let editingInstructionCode = "";
 let editingRemarkInstructionCode = "";
 let deletingInstructionCode = "";
@@ -396,10 +395,15 @@ const instructionWorkflowRows = [
   rejectedRows
 ];
 
+const blockedStatusOptions = ["拆柜前拦截", "拆柜后拦截，待确认", "拆柜后拦截成功", "拆柜后拦截失败", "暂存"];
+
 instructionWorkflowRows.forEach((rows) => {
   rows.forEach((row, index) => {
-    if (!["放货", "不放货", "销毁"].includes(row.releaseType)) {
-      row.releaseType = row.shippingEnabled === false || index % 3 === 2 ? "不放货" : index % 5 === 4 ? "销毁" : "放货";
+    if (!blockedStatusOptions.includes(row.blocked)) row.blocked = blockedStatusOptions[index % blockedStatusOptions.length];
+    if (row.releaseType === "放货") row.releaseType = "发货";
+    if (row.releaseType === "不放货") row.releaseType = "增值服务";
+    if (!["发货", "增值服务", "销毁"].includes(row.releaseType)) {
+      row.releaseType = row.shippingEnabled === false || index % 3 === 2 ? "增值服务" : index % 5 === 4 ? "销毁" : "发货";
     }
   });
 });
@@ -461,10 +465,12 @@ function ensureInstructionDetailRows(row) {
         catalogCode: template.code,
         code: `${key}-ZL-${String(index + 1).padStart(2, "0")}`,
         rawText: instruction.text,
+        chargeDate: row.inboundTime || "2026-07-08 18:30:00",
         addedAt: row.inboundTime || "2026-07-08 18:30:00",
         addedBy: "天朗（付豪）",
         remark: "",
         images: [],
+        exchangeRate: "1",
         status: instruction.completed ? "已处理" : "待处理"
       };
     });
@@ -603,15 +609,15 @@ function renderFinancialAudit(status) {
 
 function getReleaseType(row) {
   if (row.status === "销毁") return "销毁";
-  if (["放货", "不放货", "销毁"].includes(row.releaseType)) return row.releaseType;
-  if (row.releaseType === "下单") return "放货";
-  if (row.releaseType === "不下单") return "不放货";
-  return row.shippingEnabled === false ? "不放货" : "放货";
+  if (["发货", "增值服务", "销毁"].includes(row.releaseType)) return row.releaseType;
+  if (["放货", "下单"].includes(row.releaseType)) return "发货";
+  if (["不放货", "不下单"].includes(row.releaseType)) return "增值服务";
+  return row.shippingEnabled === false ? "增值服务" : "发货";
 }
 
 function renderReleaseType(row) {
   const releaseType = getReleaseType(row);
-  return `<span class="release-type-tag ${releaseType === "放货" ? "is-release" : "is-no-release"}">${releaseType}</span>`;
+  return `<span class="release-type-tag ${releaseType === "发货" ? "is-release" : "is-no-release"}">${releaseType}</span>`;
 }
 
 const instructionAuditTone = {
@@ -622,6 +628,18 @@ const instructionAuditTone = {
 
 function renderInstructionAudit(status) {
   return `<span class="workflow-status ${instructionAuditTone[status] || "status-neutral"}">${status || "-"}</span>`;
+}
+
+function renderBlockedStatus(status) {
+  const normalized = blockedStatusOptions.includes(status) ? status : "暂存";
+  const tone = {
+    "拆柜前拦截": "is-before",
+    "拆柜后拦截，待确认": "is-pending",
+    "拆柜后拦截成功": "is-success",
+    "拆柜后拦截失败": "is-failed",
+    "暂存": "is-storage"
+  }[normalized];
+  return `<span class="blocked-status ${tone}" title="${escapeHtml(normalized)}" aria-label="${escapeHtml(normalized)}">${escapeHtml(normalized)}</span>`;
 }
 
 function getInstructionProgress(row) {
@@ -790,7 +808,7 @@ function renderRows() {
       <td title="${row.customer}">${row.customer}</td>
       <td title="${row.applicationNo}">${row.applicationNo}</td>
       <td title="${row.container}">${row.container}</td>
-      <td>${row.system}</td><td>${row.inbound}</td><td class="${row.blocked === "是" ? "blocked" : ""}">${row.blocked === "是" ? "拦截" : row.blocked}</td>
+      <td>${row.system}</td><td>${row.inbound}</td><td>${renderBlockedStatus(row.blocked)}</td>
       <td>${row.applicationType}</td><td class="release-type-col">${renderReleaseType(row)}</td><td>${row.shipmentId}</td><td>${row.referenceId}</td>
       <td>${isDestroyedView() ? row.dispatch : row.transfer}</td><td>${row.dispatch}</td><td title="${row.pallet}">${row.pallet}</td>
       ${(isApprovalView() || isTerminalRequestView())
@@ -818,7 +836,7 @@ function renderRows() {
       <td title="${row.container}">${row.container}</td>
       <td title="${row.system}">${row.system}</td>
       <td>${row.inbound}</td>
-      <td class="${row.blocked === "是" ? "blocked" : ""}">${row.blocked === "是" ? "拦截" : "否"}</td>
+      <td>${renderBlockedStatus(row.blocked)}</td>
       <td>${row.transfer}</td>
       <td title="${row.destination}">${row.destination}</td>
       <td title="${row.dispatch}">${row.dispatch}</td>
@@ -969,10 +987,10 @@ window.addEventListener("beforeunload", (event) => {
   event.returnValue = "";
 });
 
-document.querySelectorAll(".status-tab").forEach((tab) => {
+document.querySelectorAll(".status-tab[data-status]").forEach((tab) => {
   tab.addEventListener("click", () => {
     if (tab.dataset.status !== activeStatus && !confirmDiscardInstructionStatusDrafts()) return;
-    document.querySelectorAll(".status-tab").forEach((item) => item.classList.remove("active"));
+    document.querySelectorAll(".status-tab[data-status]").forEach((item) => item.classList.remove("active"));
     tab.classList.add("active");
     activeStatus = tab.dataset.status;
     selected.clear();
@@ -1144,46 +1162,77 @@ approvalReviewOverlay.addEventListener("click", (event) => {
 });
 
 function getCargoBoxRows(row) {
-  if (row.id === 1 && row.status === "暂存") {
-    return [
-      { boxNo: "FBA19DNZH02MU000319U0001", customerTracking: "YT2507100001_0710_2U0001", customerData: ["44 KG", "50*50*50 CM"], systemWeight: ["44 / 44 KG", "50*50*50 CM"], carrier: "美森正班13日达-卡派包税", transferNo: "1Z0VV966030992", warehouseReturnNo: "1Z0VV966030992", networkStatus: "已下单", status: "查看" },
-      { boxNo: "FBA19DNZH02MU000319U0002", customerTracking: "YT2507100001_0710_2U0002", customerData: ["44 KG", "50*50*50 CM"], systemWeight: ["44 / 44 KG", "50*50*50 CM"], carrier: "美森正班13日达-卡派包税", transferNo: "1321636632", warehouseReturnNo: "1321636632", networkStatus: "已下单", status: "查看" }
-    ];
-  }
-  const count = Math.max(1, Math.min(Number(row.unsent || row.boxes || 1), 8));
-  const perBoxWeight = Number(row.weight || count * 44) / count;
-  const fbaCode = `FBA${String(18 + row.id).padStart(2, "0")}DNZH02MU0003${String(row.id).padStart(2, "0")}`;
-  const waybillNo = `YT250710${String(row.id).padStart(4, "0")}_0710_${row.id}`;
+  const count = Math.max(1, Math.min(Number(row.unsent || row.boxes || 1), 10));
   return Array.from({ length: count }, (_, index) => {
-    const sequence = index + 1;
-    const weight = Number(perBoxWeight.toFixed(2));
-    const transferNo = `1Z0VV96603${String(row.id).padStart(2, "0")}${String(sequence).padStart(4, "0")}`;
+    const boxIndex = index + 1;
+    const key = `${getInstructionDetailKey(row)}::${boxIndex}`;
+    const systemBoxNo = row.system && row.system !== "/" ? `${row.system}-${String(boxIndex).padStart(4, "0")}` : `${row.container}-${String(boxIndex).padStart(4, "0")}`;
+    const lengthCm = 22 + (row.id % 3);
+    const widthCm = 23 + (boxIndex % 4);
+    const heightCm = 5 + (row.id % 4);
+    const customerWeight = Number((1.7 + (row.id % 4) * 0.2 + (boxIndex % 2) * 0.1).toFixed(1));
+    const materialWeight = Number(((lengthCm * widthCm * heightCm) / 6000).toFixed(1));
+    const actualWeight = Number(Math.max(0.1, customerWeight - 0.1).toFixed(1));
     return {
-      boxNo: `${fbaCode}U${String(sequence).padStart(4, "0")}`,
-      customerTracking: `${waybillNo}U${String(sequence).padStart(4, "0")}`,
-      customerData: [`${weight} KG`, "50*50*50 CM"],
-      systemWeight: [`${weight} / ${weight} KG`, "50*50*50 CM"],
-      carrier: row.dispatch || "-",
-      transferNo,
-      warehouseReturnNo: transferNo,
-      networkStatus: "已下单",
-      status: "查看"
+      key,
+      systemBoxNo,
+      customerData: `${customerWeight} KG / ${lengthCm}*${widthCm}*${heightCm} CM`,
+      pickingData: `材重 ${materialWeight} KG / 实重 ${actualWeight} KG`,
+      boxStatus: getCargoBoxStatus(row, index)
     };
   });
 }
 
-function renderCargoBoxRows(row) {
-  $("#cargoBoxBody").innerHTML = getCargoBoxRows(row).map((box) => `<tr>
-    <td class="cargo-check"><input type="checkbox" disabled aria-label="货箱 ${box.boxNo}" /></td>
-    <td class="box-code"><div>${box.boxNo}</div><div class="subline">${box.customerTracking}</div></td>
-    <td><div>${box.customerData[0]}</div><div class="subline">${box.customerData[1]}</div></td>
-    <td><div>${box.systemWeight[0]}</div><div class="subline">${box.systemWeight[1]}</div></td>
-    <td><div>${box.carrier}</div><div class="subline">${box.transferNo}</div></td>
-    <td class="muted">-</td><td class="return-no">${box.warehouseReturnNo}</td>
-    <td>${box.networkStatus}</td><td class="muted">${box.status}</td>
-  </tr>`).join("");
+function getCargoBoxStatus(row, index) {
+  if (row.status === "已出库") return "已出库";
+  if (["指令处理中", "待出库"].includes(row.status)) return "处理中";
+  return ["待处理", "处理中", "已出库"][index % 3];
 }
 
+function getCargoBoxStatusClass(status) {
+  return {
+    "待处理": "is-pending",
+    "处理中": "is-processing",
+    "已出库": "is-shipped"
+  }[status] || "is-pending";
+}
+
+function isCargoBoxSelectable(box) {
+  return box.boxStatus === "待处理";
+}
+
+function getSelectedCargoBoxes(row) {
+  if (!row.selectedCargoBoxes) row.selectedCargoBoxes = [];
+  return new Set(row.selectedCargoBoxes);
+}
+
+function setSelectedCargoBoxes(row, selectedBoxes) {
+  row.selectedCargoBoxes = [...selectedBoxes];
+}
+
+function renderCargoBoxRows(row) {
+  if (!row) return;
+  const selectedBoxes = getSelectedCargoBoxes(row);
+  const statusOrder = { "待处理": 0, "处理中": 1, "已出库": 2 };
+  const rows = getCargoBoxRows(row).sort((a, b) => (statusOrder[a.boxStatus] ?? 9) - (statusOrder[b.boxStatus] ?? 9));
+  rows.forEach((box) => {
+    if (!isCargoBoxSelectable(box)) selectedBoxes.delete(box.key);
+  });
+  setSelectedCargoBoxes(row, selectedBoxes);
+  $("#cargoBoxBody").innerHTML = rows.length ? rows.map((box) => `<tr data-cargo-key="${escapeHtml(box.key)}">
+    <td class="cargo-box-check-col"><input class="cargo-box-check" type="checkbox" data-cargo-key="${escapeHtml(box.key)}" ${selectedBoxes.has(box.key) ? "checked" : ""} ${isCargoBoxSelectable(box) ? "" : "disabled"} aria-label="选择货箱 ${escapeHtml(box.systemBoxNo)}" /></td>
+    <td class="cargo-box-code">${escapeHtml(box.systemBoxNo)}</td>
+    <td>${escapeHtml(box.customerData)}</td>
+    <td>${escapeHtml(box.pickingData)}</td>
+  </tr>`).join("") : `<tr class="cargo-box-empty"><td colspan="4">暂无货箱数据</td></tr>`;
+  const selectAll = $("#cargoBoxSelectAll");
+  if (selectAll) {
+    const selectableRows = rows.filter(isCargoBoxSelectable);
+    selectAll.checked = selectableRows.length > 0 && selectableRows.every((box) => selectedBoxes.has(box.key));
+    selectAll.indeterminate = selectableRows.some((box) => selectedBoxes.has(box.key)) && !selectAll.checked;
+    selectAll.disabled = selectableRows.length === 0;
+  }
+}
 function getActiveInstructionRows() {
   if (!activeReleaseRow) return [];
   return ensureInstructionDetailRows(activeReleaseRow);
@@ -1223,91 +1272,126 @@ function addReleaseAttachments(files) {
 function renderInstructionList() {
   const target = $("#instructionBody");
   const rows = getActiveInstructionRows();
-  const statusAdjustable = ["指令待处理", "指令处理中", "待出库"].includes(activeReleaseStatus);
-  const rowCodes = new Set(rows.map((row) => row.code));
-  selectedDetailInstructionCodes.forEach((code) => {
-    if (!rowCodes.has(code)) selectedDetailInstructionCodes.delete(code);
-  });
-  const selectedRows = rows.filter((row) => selectedDetailInstructionCodes.has(row.code));
-  const selectedPendingRows = statusAdjustable ? selectedRows.filter((row) => (row.status || "待处理") === "待处理") : [];
-  const selectAllControl = $("#instructionDetailSelectAll");
-  selectAllControl.disabled = rows.length === 0;
-  selectAllControl.checked = rows.length > 0 && rows.every((row) => selectedDetailInstructionCodes.has(row.code));
-  selectAllControl.indeterminate = !selectAllControl.checked && selectedRows.length > 0;
-  $("#instructionBatchComplete").hidden = !statusAdjustable;
-  $("#instructionBatchComplete").disabled = selectedPendingRows.length === 0;
   if (!rows.length) {
-    target.innerHTML = '<tr class="instruction-empty"><td colspan="13"><i>▤</i>暂无数据</td></tr>';
+    target.innerHTML = '<tr class="instruction-empty"><td colspan="17"><i>▤</i>暂无数据</td></tr>';
     return;
   }
-  target.innerHTML = rows.map((row, index) => {
-    const total = Number(row.price || 0) * Number(row.quantity || 1);
-    const status = row.status || "待处理";
-    const statusDisplay = statusAdjustable
-      ? `<select class="instruction-detail-status ${status === "已处理" ? "is-complete" : "is-pending"}" data-instruction-index="${index}" aria-label="调整${row.name}的指令状态"><option value="待处理" ${status === "待处理" ? "selected" : ""}>待处理</option><option value="已处理" ${status === "已处理" ? "selected" : ""}>已处理</option></select>`
-      : `<span class="instruction-detail-status-tag ${status === "已处理" ? "is-complete" : "is-pending"}">${status}</span>`;
+  target.innerHTML = rows.map((row) => {
+    const originalAmount = Number.isFinite(Number(row.originalAmount))
+      ? Number(row.originalAmount)
+      : Number(row.price || 0) * Number(row.quantity || 1);
+    const exchangeRate = Number(row.exchangeRate) || 1;
+    const cnyAmount = Number.isFinite(Number(row.cnyAmount))
+      ? Number(row.cnyAmount)
+      : originalAmount * exchangeRate;
+    const checked = selectedDetailInstructionCodes.has(row.code) ? " checked" : "";
+    const instructionRemark = row.remark || "";
+    const instructionImages = row.images || [];
+    const imageList = instructionImages.map((image, imageIndex) => {
+      const imageName = escapeHtml(image.name || `图片${imageIndex + 1}`);
+      const imageUrl = escapeHtml(image.url || "");
+      return `<span class="instruction-image-item"><a class="instruction-image-preview" href="${imageUrl}" data-image-name="${imageName}" title="查看 ${imageName}"><img src="${imageUrl}" alt="${imageName}" /></a><button class="instruction-image-remove" data-code="${escapeHtml(row.code)}" data-image-index="${imageIndex}" type="button" aria-label="删除${imageName}" title="删除图片">×</button></span>`;
+    }).join("");
+    const imageControl = `<div class="instruction-image-cell"><div class="instruction-image-list">${imageList || '<span class="instruction-image-empty">暂无图片</span>'}</div><div class="instruction-image-actions"><input class="instruction-image-input" data-code="${escapeHtml(row.code)}" type="file" accept="image/*" multiple hidden /><button class="instruction-image-upload" data-code="${escapeHtml(row.code)}" type="button"${instructionImages.length >= 9 ? " disabled" : ""}>上传图片</button><span>${instructionImages.length}/9</span></div></div>`;
+    const remarkControl = `<div class="instruction-remark-display"><span title="${escapeHtml(instructionRemark || "-")}">${escapeHtml(instructionRemark || "-")}</span><button class="instruction-remark-edit" data-code="${escapeHtml(row.code)}" type="button">${instructionRemark ? "编辑" : "添加"}</button></div>`;
     const operationControl = `<button class="instruction-edit" data-code="${row.code}" type="button">编辑</button><button class="instruction-delete" data-code="${row.code}" type="button">删除</button>`;
-    const instructionCheck = `<input class="instruction-row-status-check" type="checkbox" data-code="${row.code}" aria-label="选择${row.name}" ${selectedDetailInstructionCodes.has(row.code) ? "checked" : ""} />`;
     return `<tr>
-      <td class="instruction-check-col">${instructionCheck}</td><td>${row.name}</td><td>${row.type}</td><td>${row.unit}</td><td>${row.price}</td><td>${row.quantity || "1"}</td>
-      <td>${row.currency}</td><td>${Number(total.toFixed(2))}</td><td>${row.addedAt}</td><td>${row.addedBy}</td>
-      <td>${row.description}</td><td>${statusDisplay}</td><td>${operationControl}</td>
+      <td class="instruction-check-col"><input class="instruction-row-status-check" data-code="${escapeHtml(row.code)}" type="checkbox" aria-label="选择${escapeHtml(row.name)}"${checked} /></td>
+      <td>${escapeHtml(row.chargeDate || row.addedAt || "-")}</td><td>${escapeHtml(row.name || "-")}</td><td>${escapeHtml(row.type || "-")}</td><td>${escapeHtml(row.unit || "-")}</td>
+      <td>${escapeHtml(row.exchangeRate || "1")}</td><td>${escapeHtml(row.price || "0")}</td><td>${escapeHtml(row.quantity || "1")}</td><td>${escapeHtml(row.currency || "-")}</td>
+      <td>${originalAmount.toFixed(2)}</td><td>${cnyAmount.toFixed(2)}</td><td>${escapeHtml(row.addedAt || "-")}</td><td>${escapeHtml(row.addedBy || "-")}</td>
+      <td class="instruction-description">${escapeHtml(row.description || row.rawText || "-")}</td><td>${remarkControl}</td><td>${imageControl}</td><td class="instruction-actions">${operationControl}</td>
     </tr>`;
   }).join("");
 }
 
-function getFilteredInstructionCatalog() {
-  const keyword = $("#instructionSearchName").value.trim().toLowerCase();
-  const type = $("#instructionSearchType").value;
-  return instructionCatalog.filter((row) =>
-    (!keyword || `${row.code} ${row.name}`.toLowerCase().includes(keyword))
-    && (!type || row.type === type)
-  );
+function formatLocalDateTime() {
+  const now = new Date();
+  const pad = (value) => String(value).padStart(2, "0");
+  return `${now.getFullYear()}-${pad(now.getMonth() + 1)}-${pad(now.getDate())} ${pad(now.getHours())}:${pad(now.getMinutes())}:${pad(now.getSeconds())}`;
+}
+
+function createInstructionDraftRow() {
+  instructionDraftRowSequence += 1;
+  return {
+    id: `instruction-draft-${instructionDraftRowSequence}`,
+    chargeDate: formatLocalDateTime().slice(0, 16).replace(" ", "T"),
+    catalogCode: "",
+    feeName: "",
+    feeType: "操作费",
+    unit: "票",
+    price: "0",
+    quantity: "1",
+    currency: "人民币",
+    exchangeRate: "1",
+    description: ""
+  };
+}
+
+function getInstructionDraftRow(id) {
+  return instructionDraftRows.find((row) => row.id === id);
+}
+
+function getInstructionDraftOriginalAmount(row) {
+  const price = Number(row.price) || 0;
+  const quantity = Number(row.quantity) || 0;
+  return Number((price * quantity).toFixed(2));
+}
+
+function getInstructionDraftCnyAmount(row) {
+  const originalAmount = getInstructionDraftOriginalAmount(row);
+  const exchangeRate = Number(row.exchangeRate) || 0;
+  return Number((originalAmount * exchangeRate).toFixed(2));
+}
+
+function renderInstructionFeeSummary() {
+  const originalTotal = instructionDraftRows.reduce((total, row) => total + getInstructionDraftOriginalAmount(row), 0);
+  const cnyTotal = instructionDraftRows.reduce((total, row) => total + getInstructionDraftCnyAmount(row), 0);
+  $("#instructionFeeCount").textContent = `共 ${instructionDraftRows.length} 条`;
+  $("#instructionFeeOriginalTotal").textContent = originalTotal.toFixed(2);
+  $("#instructionFeeCnyTotal").textContent = cnyTotal.toFixed(2);
 }
 
 function renderInstructionPicker() {
-  const rows = getFilteredInstructionCatalog();
-  const displayRows = [...rows, ...Array(Math.max(0, 18 - rows.length)).fill(null)].slice(0, 18);
-  $("#instructionPickerBody").innerHTML = displayRows.map((row) => {
-    const alreadyAdded = row && instructionExistingCatalogCodes.has(row.code);
-    const draft = row ? (instructionDraftValues.get(row.code) || { unit: row.unit, price: row.price, quantity: "1" }) : null;
-    const disabled = alreadyAdded ? "disabled" : "";
-    return `<tr>
-    <td><input class="instruction-pick" type="checkbox" ${row ? `data-code="${row.code}"` : "disabled"} ${row && (instructionDraftCodes.has(row.code) || alreadyAdded) ? "checked" : ""} ${alreadyAdded ? 'disabled title="已添加"' : ""} /></td>
-    <td>${row?.code || ""}</td><td>${row?.name || ""}</td><td>${row?.type || ""}</td>
-    <td>${row ? `<select class="instruction-draft-unit" data-code="${row.code}" aria-label="${escapeHtml(row.name)}计费单位" ${disabled}><option value="票" ${draft.unit === "票" ? "selected" : ""}>票</option><option value="箱" ${draft.unit === "箱" ? "selected" : ""}>箱</option><option value="KG" ${draft.unit === "KG" ? "selected" : ""}>KG</option></select>` : ""}</td>
-    <td>${row ? `<input class="instruction-draft-price" data-code="${row.code}" type="number" min="0" step="any" value="${escapeHtml(draft.price)}" aria-label="${escapeHtml(row.name)}计费单价" ${disabled} />` : ""}</td>
-    <td>${row ? `<input class="instruction-draft-quantity" data-code="${row.code}" type="number" min="0" step="any" value="${escapeHtml(draft.quantity)}" aria-label="${escapeHtml(row.name)}计费数量" ${disabled} />` : ""}</td>
-    <td>${row?.currency || ""}</td><td>${row?.description || ""}</td>
-  </tr>`;
+  const target = $("#instructionPickerBody");
+  $("#instructionFeeCatalog").innerHTML = instructionCatalog.map((row) => `<option value="${escapeHtml(row.name)}"></option>`).join("");
+  renderInstructionFeeSummary();
+  if (!instructionDraftRows.length) {
+    target.innerHTML = '<tr class="instruction-fee-empty"><td colspan="12">暂无费用数据</td></tr>';
+    return;
+  }
+  target.innerHTML = instructionDraftRows.map((draft) => {
+    const originalAmount = getInstructionDraftOriginalAmount(draft);
+    const cnyAmount = getInstructionDraftCnyAmount(draft);
+    return `<tr data-instruction-draft-id="${escapeHtml(draft.id)}">
+      <td><input class="instruction-fee-field" data-instruction-field="chargeDate" type="datetime-local" value="${escapeHtml(draft.chargeDate)}" /></td>
+      <td><input class="instruction-fee-field instruction-fee-name" data-instruction-field="feeName" list="instructionFeeCatalog" placeholder="请选择或输入费用名称" value="${escapeHtml(draft.feeName)}" /></td>
+      <td><select class="instruction-fee-field" data-instruction-field="feeType"><option value="仓储费" ${draft.feeType === "仓储费" ? "selected" : ""}>仓储费</option><option value="操作费" ${draft.feeType === "操作费" ? "selected" : ""}>操作费</option></select></td>
+      <td><select class="instruction-fee-field" data-instruction-field="unit"><option value="票" ${draft.unit === "票" ? "selected" : ""}>票</option><option value="箱" ${draft.unit === "箱" ? "selected" : ""}>箱</option><option value="KG" ${draft.unit === "KG" ? "selected" : ""}>KG</option></select></td>
+      <td><input class="instruction-fee-field" data-instruction-field="exchangeRate" type="number" min="0" step="0.0001" value="${escapeHtml(draft.exchangeRate)}" /></td>
+      <td><input class="instruction-fee-field" data-instruction-field="price" type="number" min="0" step="0.01" value="${escapeHtml(draft.price)}" /></td>
+      <td><input class="instruction-fee-field" data-instruction-field="quantity" type="number" min="0" step="0.01" value="${escapeHtml(draft.quantity)}" /></td>
+      <td><select class="instruction-fee-field" data-instruction-field="currency"><option value="人民币" ${draft.currency === "人民币" ? "selected" : ""}>人民币</option><option value="USD" ${draft.currency === "USD" ? "selected" : ""}>USD</option></select></td>
+      <td><output class="instruction-fee-amount instruction-fee-original">${originalAmount.toFixed(2)}</output></td>
+      <td><output class="instruction-fee-amount instruction-fee-cny">${cnyAmount.toFixed(2)}</output></td>
+      <td><input class="instruction-fee-field" data-instruction-field="description" maxlength="100" value="${escapeHtml(draft.description)}" /></td>
+      <td><button class="instruction-fee-remove" type="button" aria-label="删除费用">删除</button></td>
+    </tr>`;
   }).join("");
-  const availableCodes = instructionCatalog.filter((row) => !instructionExistingCatalogCodes.has(row.code)).map((row) => row.code);
-  $("#instructionSelectAll").checked = availableCodes.length > 0 && availableCodes.every((code) => instructionDraftCodes.has(code));
-  $("#instructionSelectAll").disabled = availableCodes.length === 0;
-  $("#instructionSelectedCount").textContent = `已选中${instructionDraftCodes.size}条`;
 }
 
 function openInstructionPicker() {
-  const existing = getActiveInstructionRows();
-  instructionExistingCatalogCodes = new Set(existing.map((row) => row.catalogCode).filter(Boolean));
-  instructionDraftCodes = new Set();
-  instructionDraftValues.clear();
-  instructionCatalog.forEach((row) => {
-    const existingRow = existing.find((item) => item.catalogCode === row.code);
-    instructionDraftValues.set(row.code, {
-      unit: existingRow?.unit || row.unit,
-      price: existingRow?.price || row.price,
-      quantity: existingRow?.quantity || "1"
-    });
-  });
-  $("#instructionSearchName").value = "";
-  $("#instructionSearchType").value = "";
+  if (!activeReleaseRow) return;
+  instructionDraftRowSequence = 0;
+  instructionDraftRows = [createInstructionDraftRow()];
   $("#instructionOverlay").hidden = false;
   renderInstructionPicker();
+  requestAnimationFrame(() => document.querySelector(".instruction-fee-name")?.focus());
 }
 
 function closeInstructionPicker() {
   $("#instructionOverlay").hidden = true;
+  instructionDraftRows = [];
 }
 
 const releaseOverlay = $("#releaseOverlay");
@@ -1316,7 +1400,7 @@ let activeReleaseRow = null;
 let activeReleaseSourceRow = null;
 let activeReleaseReadOnly = false;
 let activeReleaseStatus = "暂存";
-let activeReleaseOrderType = "放货";
+let activeReleaseOrderType = "发货";
 const selectedDetailInstructionCodes = new Set();
 
 function normalizeReleaseRow(row) {
@@ -1329,7 +1413,7 @@ function normalizeReleaseRow(row) {
     container: row.container || "-",
     system: row.system || "/",
     inbound: row.inbound || "-",
-    blocked: row.blocked || "否",
+    blocked: blockedStatusOptions.includes(row.blocked) ? row.blocked : "暂存",
     transfer: row.transfer || "拆转",
     destination: row.destination || palletDestination || (row.applicationType === "其他地址" ? "FEDEX" : "ABE2"),
     dispatch: row.dispatch || "Truck-Amazon",
@@ -1385,7 +1469,7 @@ function updateReleaseApplicationFields() {
 function updateReleaseShippingState() {
   const shippingToggle = $("#releaseShippingToggle");
   const releaseFields = $("#releaseFields");
-  const compactOrderMode = activeReleaseOrderType !== "放货" || activeReleaseStatus === "审批拒绝";
+  const compactOrderMode = activeReleaseOrderType !== "发货" || activeReleaseStatus === "审批拒绝";
   const destroyOrderMode = activeReleaseOrderType === "销毁";
   shippingToggle.hidden = activeReleaseReadOnly;
   releaseFields.classList.toggle("shipping-disabled", compactOrderMode);
@@ -1420,8 +1504,7 @@ function setReleaseDrawerMode(readOnly, status) {
   $("#releaseConfirm").hidden = readOnly;
   $("#releaseCancel").textContent = readOnly ? "关闭" : "取消";
   $("#instructionAdd").hidden = false;
-  $("#instructionBatchComplete").hidden = !["指令待处理", "指令处理中", "待出库"].includes(status);
-  $("#cargoBoxSection").hidden = !readOnly && status === "暂存";
+  $("#cargoBoxSection").hidden = false;
   releaseForm.classList.toggle("release-readonly", readOnly);
 }
 
@@ -1431,7 +1514,7 @@ function openReleaseDrawer(sourceRow, options = {}) {
   const sourceStatus = options.status || activeStatus;
   activeReleaseRow = row;
   activeReleaseSourceRow = sourceRow;
-  activeReleaseOrderType = sourceStatus === "审批拒绝" ? "不放货" : getReleaseType(row);
+  activeReleaseOrderType = sourceStatus === "审批拒绝" ? "增值服务" : getReleaseType(row);
   selectedDetailInstructionCodes.clear();
   ensureInstructionDetailRows(sourceRow);
   releaseForm.reset();
@@ -1468,7 +1551,6 @@ function openReleaseDrawer(sourceRow, options = {}) {
   $("#releaseDate").value = (row.scheduledShippingTime || row.time || "").slice(0, 10);
   $("#releasePrivateDate").value = (row.scheduledShippingTime || "").slice(0, 10);
   $("#releaseRemark").value = row.customerRemark || "";
-  $("#releaseWarehouseRemark").value = row.warehouseRemark || "";
   $("#privateUploadName").textContent = "";
   updateReleaseTextCount("#releaseAddressDetail", "#releaseAddressCount");
   updateReleaseTextCount("#releaseOverseasRemark", "#releaseRemarkCount");
@@ -1476,6 +1558,7 @@ function openReleaseDrawer(sourceRow, options = {}) {
   $("#releaseTitle").textContent = readOnly ? "运单详情" : "下单";
   releaseOverlay.hidden = false;
   document.body.classList.add("release-open");
+  $("#releaseForm").insertBefore($("#cargoBoxSection"), $("#drawerAttachmentSection"));
   renderCargoBoxRows(row);
   renderReleaseAttachments();
   renderInstructionList();
@@ -1493,7 +1576,7 @@ function closeReleaseDrawer() {
   selectedDetailInstructionCodes.clear();
   activeReleaseReadOnly = false;
   activeReleaseStatus = "暂存";
-  activeReleaseOrderType = "放货";
+  activeReleaseOrderType = "发货";
   releaseForm.reset();
   $("#releaseAttachmentList").replaceChildren();
   $("#shipOutUploadName").textContent = "";
@@ -1518,93 +1601,116 @@ $("#releaseCancel").addEventListener("click", closeReleaseDrawer);
 releaseOverlay.addEventListener("click", (event) => {
   if (event.target === releaseOverlay) closeReleaseDrawer();
 });
+$("#cargoBoxBody").addEventListener("change", (event) => {
+  const checkbox = event.target.closest(".cargo-box-check");
+  if (!checkbox || !activeReleaseRow) return;
+  const selectedBoxes = getSelectedCargoBoxes(activeReleaseRow);
+  checkbox.checked ? selectedBoxes.add(checkbox.dataset.cargoKey) : selectedBoxes.delete(checkbox.dataset.cargoKey);
+  setSelectedCargoBoxes(activeReleaseRow, selectedBoxes);
+  renderCargoBoxRows(activeReleaseRow);
+});
+$("#cargoBoxSelectAll").addEventListener("change", (event) => {
+  if (!activeReleaseRow) return;
+  const selectedBoxes = event.target.checked
+    ? new Set(getCargoBoxRows(activeReleaseRow).filter(isCargoBoxSelectable).map((box) => box.key))
+    : new Set();
+  setSelectedCargoBoxes(activeReleaseRow, selectedBoxes);
+  renderCargoBoxRows(activeReleaseRow);
+});
 $("#instructionAdd").addEventListener("click", openInstructionPicker);
 $("#instructionClose").addEventListener("click", closeInstructionPicker);
 $("#instructionCancel").addEventListener("click", closeInstructionPicker);
-$("#instructionSearch").addEventListener("click", renderInstructionPicker);
-$("#instructionReset").addEventListener("click", () => {
-  $("#instructionSearchName").value = "";
-  $("#instructionSearchType").value = "";
+$("#instructionOverlay").addEventListener("click", (event) => {
+  if (event.target === $("#instructionOverlay")) closeInstructionPicker();
+});
+$("#instructionAddRow").addEventListener("click", () => {
+  const draft = createInstructionDraftRow();
+  instructionDraftRows.push(draft);
   renderInstructionPicker();
+  requestAnimationFrame(() => document.querySelector(`[data-instruction-draft-id="${draft.id}"] .instruction-fee-name`)?.focus());
 });
-$("#instructionSearchName").addEventListener("keydown", (event) => {
-  if (event.key === "Enter") renderInstructionPicker();
-});
-$("#instructionPickerBody").addEventListener("change", (event) => {
-  const draftUnit = event.target.closest(".instruction-draft-unit");
-  const draftPrice = event.target.closest(".instruction-draft-price");
-  const draftQuantity = event.target.closest(".instruction-draft-quantity");
-  const draftControl = draftUnit || draftPrice || draftQuantity;
-  if (draftControl?.dataset.code) {
-    const row = instructionCatalog.find((item) => item.code === draftControl.dataset.code);
-    if (!row) return;
-    const draft = instructionDraftValues.get(row.code) || { unit: row.unit, price: row.price, quantity: "1" };
-    if (draftUnit) draft.unit = draftUnit.value;
-    if (draftPrice) draft.price = draftPrice.value;
-    if (draftQuantity) draft.quantity = draftQuantity.value;
-    instructionDraftValues.set(row.code, draft);
-    return;
-  }
-  const checkbox = event.target.closest(".instruction-pick");
-  if (!checkbox || !checkbox.dataset.code) return;
-  checkbox.checked ? instructionDraftCodes.add(checkbox.dataset.code) : instructionDraftCodes.delete(checkbox.dataset.code);
+$("#instructionPickerBody").addEventListener("click", (event) => {
+  const removeButton = event.target.closest(".instruction-fee-remove");
+  if (!removeButton) return;
+  const draftId = removeButton.closest("[data-instruction-draft-id]")?.dataset.instructionDraftId;
+  instructionDraftRows = instructionDraftRows.filter((row) => row.id !== draftId);
   renderInstructionPicker();
 });
 $("#instructionPickerBody").addEventListener("input", (event) => {
-  const control = event.target.closest(".instruction-draft-price, .instruction-draft-quantity");
-  if (!control?.dataset.code) return;
-  const row = instructionCatalog.find((item) => item.code === control.dataset.code);
-  if (!row) return;
-  const draft = instructionDraftValues.get(row.code) || { unit: row.unit, price: row.price, quantity: "1" };
-  if (control.classList.contains("instruction-draft-price")) draft.price = control.value;
-  if (control.classList.contains("instruction-draft-quantity")) draft.quantity = control.value;
-  instructionDraftValues.set(row.code, draft);
+  const control = event.target.closest(".instruction-fee-field");
+  const draftId = control?.closest("[data-instruction-draft-id]")?.dataset.instructionDraftId;
+  const draft = getInstructionDraftRow(draftId);
+  if (!draft) return;
+  draft[control.dataset.instructionField] = control.value;
+  if (["price", "quantity", "exchangeRate"].includes(control.dataset.instructionField)) {
+    const row = control.closest("tr");
+    const originalOutput = row?.querySelector(".instruction-fee-original");
+    const cnyOutput = row?.querySelector(".instruction-fee-cny");
+    if (originalOutput) originalOutput.textContent = getInstructionDraftOriginalAmount(draft).toFixed(2);
+    if (cnyOutput) cnyOutput.textContent = getInstructionDraftCnyAmount(draft).toFixed(2);
+    renderInstructionFeeSummary();
+  }
 });
-$("#instructionPickerBody").addEventListener("focusout", (event) => {
-  const control = event.target.closest(".instruction-draft-price, .instruction-draft-quantity");
-  if (!control?.dataset.code || control.value.trim()) return;
-  const row = instructionCatalog.find((item) => item.code === control.dataset.code);
-  if (!row) return;
-  const draft = instructionDraftValues.get(row.code) || { unit: row.unit, price: row.price, quantity: "1" };
-  if (control.classList.contains("instruction-draft-price")) draft.price = row.price;
-  if (control.classList.contains("instruction-draft-quantity")) draft.quantity = "1";
-  control.value = control.classList.contains("instruction-draft-price") ? draft.price : draft.quantity;
-  instructionDraftValues.set(row.code, draft);
-});
-$("#instructionSelectAll").addEventListener("change", (event) => {
-  instructionDraftCodes = event.target.checked
-    ? new Set(instructionCatalog.filter((row) => !instructionExistingCatalogCodes.has(row.code)).map((row) => row.code))
-    : new Set();
+$("#instructionPickerBody").addEventListener("change", (event) => {
+  const control = event.target.closest(".instruction-fee-field");
+  const draftId = control?.closest("[data-instruction-draft-id]")?.dataset.instructionDraftId;
+  const draft = getInstructionDraftRow(draftId);
+  if (!draft) return;
+  const field = control.dataset.instructionField;
+  draft[field] = control.value;
+  if (field !== "feeName") return;
+  const catalog = instructionCatalog.find((row) => row.name === draft.feeName || row.code === draft.feeName);
+  if (!catalog) return;
+  draft.catalogCode = catalog.code;
+  draft.feeName = catalog.name;
+  draft.feeType = catalog.type;
+  draft.unit = catalog.unit;
+  draft.price = catalog.price;
+  draft.currency = catalog.currency;
   renderInstructionPicker();
 });
 $("#instructionConfirm").addEventListener("click", () => {
   if (!activeReleaseRow) return;
-  if (!instructionDraftCodes.size) {
-    window.alert("请先选择需要新增的指令");
-    return;
-  }
   const existingRows = getActiveInstructionRows();
   const detailKey = getInstructionDetailKey(activeReleaseRow);
   const createdAt = Date.now();
-  const addedRows = instructionCatalog
-    .filter((row) => instructionDraftCodes.has(row.code))
-    .map((row, index) => {
-      const draft = instructionDraftValues.get(row.code) || { unit: row.unit, price: row.price, quantity: "1" };
-      return {
-        ...row,
-        catalogCode: row.code,
-        code: `${detailKey}-NEW-${createdAt}-${index + 1}`,
-        unit: draft.unit || row.unit,
-        price: String(draft.price).trim() || row.price,
-        quantity: String(draft.quantity).trim() || "1",
-        addedAt: "2026-07-25 14:00:00",
-        addedBy: "天朗（付豪）",
-        remark: "",
-        images: [],
-        status: "待处理"
-      };
-    });
-  const rows = [...existingRows, ...addedRows];
+  const addedAt = formatLocalDateTime();
+  for (const draft of instructionDraftRows) {
+    const price = Number(draft.price);
+    const quantity = Number(draft.quantity);
+    const rate = Number(draft.exchangeRate);
+    if (!draft.chargeDate || !draft.feeName.trim() || !Number.isFinite(price) || price < 0 || !Number.isFinite(quantity) || quantity < 0 || !Number.isFinite(rate) || rate <= 0) {
+      window.alert("请完善费用名称、计费时间、单价、数量和汇率");
+      return;
+    }
+  }
+  const newRows = instructionDraftRows.map((draft, index) => {
+    const catalog = instructionCatalog.find((row) => row.code === draft.catalogCode || row.name === draft.feeName) || {};
+    const price = Number(draft.price) || 0;
+    const quantity = Number(draft.quantity) || 0;
+    const originalAmount = getInstructionDraftOriginalAmount(draft);
+    return {
+      ...catalog,
+      catalogCode: catalog.code || "CUSTOM",
+      code: `${detailKey}-NEW-${createdAt}-${index + 1}`,
+      name: draft.feeName.trim(),
+      type: draft.feeType || catalog.type || "操作费",
+      unit: draft.unit || catalog.unit,
+      price: String(draft.price).trim() || "0",
+      quantity: String(quantity),
+      currency: draft.currency || catalog.currency,
+      chargeDate: draft.chargeDate.replace("T", " "),
+      addedAt,
+      addedBy: "天朗（付豪）",
+      description: draft.description.trim() || catalog.description || "",
+      remark: "",
+      exchangeRate: draft.exchangeRate,
+      originalAmount,
+      cnyAmount: Number((originalAmount * Number(draft.exchangeRate)).toFixed(2)),
+      status: "待处理"
+    };
+  });
+  const rows = [...existingRows, ...newRows];
   instructionRowsByInventory.set(detailKey, rows);
   syncInstructionDetails(detailKey, rows);
   closeInstructionPicker();
@@ -1615,12 +1721,23 @@ $("#instructionConfirm").addEventListener("click", () => {
 $("#instructionBody").addEventListener("click", (event) => {
   const uploadButton = event.target.closest(".instruction-image-upload");
   const removeImageButton = event.target.closest(".instruction-image-remove");
+  const previewImage = event.target.closest(".instruction-image-preview");
   const remarkButton = event.target.closest(".instruction-remark-edit");
   const editButton = event.target.closest(".instruction-edit");
   const deleteButton = event.target.closest(".instruction-delete");
   if (uploadButton) {
     const input = event.target.closest("td")?.querySelector(`.instruction-image-input[data-code="${CSS.escape(uploadButton.dataset.code)}"]`);
     input?.click();
+    return;
+  }
+  if (previewImage) {
+    event.preventDefault();
+    const image = previewImage.querySelector("img");
+    if (image?.src) {
+      $("#instructionImagePreview").src = image.src;
+      $("#instructionImagePreview").alt = previewImage.dataset.imageName || image.alt || "图片预览";
+      $("#instructionImagePreviewOverlay").hidden = false;
+    }
     return;
   }
   if (removeImageButton) {
@@ -1637,7 +1754,7 @@ $("#instructionBody").addEventListener("click", (event) => {
     const row = getActiveInstructionRows().find((item) => item.code === remarkButton.dataset.code);
     if (!row) return;
     editingRemarkInstructionCode = row.code;
-    $("#instructionRemarkTitle").textContent = row.remark ? "修改备注" : "备注";
+    $("#instructionRemarkTitle").textContent = row.remark ? "修改指令备注" : "指令备注";
     $("#instructionRemarkText").value = row.remark || "";
     $("#instructionRemarkOverlay").hidden = false;
     requestAnimationFrame(() => $("#instructionRemarkText").focus());
@@ -1701,7 +1818,7 @@ $("#instructionBody").addEventListener("change", (event) => {
   renderRows();
 });
 
-$("#instructionDetailSelectAll").addEventListener("change", (event) => {
+$("#instructionDetailSelectAll")?.addEventListener("change", (event) => {
   getActiveInstructionRows().forEach((row) => {
     event.target.checked ? selectedDetailInstructionCodes.add(row.code) : selectedDetailInstructionCodes.delete(row.code);
   });
@@ -1768,7 +1885,17 @@ $("#instructionDownloadImages")?.addEventListener("click", () => {
   });
 });
 
-$("#instructionBatchComplete").addEventListener("click", () => {
+function closeInstructionImagePreview() {
+  $("#instructionImagePreviewOverlay").hidden = true;
+  $("#instructionImagePreview").removeAttribute("src");
+}
+
+$("#instructionImagePreviewClose")?.addEventListener("click", closeInstructionImagePreview);
+$("#instructionImagePreviewOverlay")?.addEventListener("click", (event) => {
+  if (event.target === $("#instructionImagePreviewOverlay")) closeInstructionImagePreview();
+});
+
+$("#instructionBatchComplete")?.addEventListener("click", () => {
   if (!activeReleaseRow || !["指令待处理", "指令处理中", "待出库"].includes(activeReleaseStatus) || !selectedDetailInstructionCodes.size) return;
   const rows = getActiveInstructionRows();
   const detailKey = getInstructionDetailKey(activeReleaseRow);
@@ -1835,6 +1962,8 @@ document.addEventListener("keydown", (event) => {
   } else if (!$("#instructionDeleteOverlay").hidden) {
     $("#instructionDeleteOverlay").hidden = true;
     deletingInstructionCode = "";
+  } else if (!$("#instructionImagePreviewOverlay").hidden) {
+    closeInstructionImagePreview();
   } else if (!$("#instructionBatchRemarkOverlay").hidden) {
     $("#instructionBatchRemarkOverlay").hidden = true;
   } else if (!$("#instructionRemarkOverlay").hidden) {
@@ -1844,6 +1973,14 @@ document.addEventListener("keydown", (event) => {
     closeInstructionPicker();
   } else if (!releaseOverlay.hidden) {
     closeReleaseDrawer();
+  } else if (!$("#interceptAttachmentDeleteOverlay").hidden) {
+    closeInterceptAttachmentDelete();
+  } else if (!$("#interceptAttachmentOverlay").hidden) {
+    closeInterceptAttachmentModal();
+  } else if (!$("#interceptFeeOverlay").hidden) {
+    closeInterceptFeeModal();
+  } else if (!$("#interceptDetailOverlay").hidden) {
+    closeInterceptDetail();
   }
 });
 $("#uploadButton").addEventListener("click", () => $("#releaseFile").click());
@@ -1864,7 +2001,7 @@ document.querySelectorAll('input[name="releaseOrderType"]').forEach((control) =>
   control.addEventListener("change", (event) => {
     activeReleaseOrderType = event.target.value;
     updateReleaseApplicationFields();
-    if (activeReleaseOrderType === "放货") {
+    if (activeReleaseOrderType === "发货") {
       requestAnimationFrame(() => (isMarketplaceRelease() ? $("#releaseWarehouseCode") : isPrivateAddressRelease() ? $("#releasePrivateDispatch") : $("#releaseDestination")).focus());
     }
   });
@@ -1892,12 +2029,12 @@ releaseForm.addEventListener("submit", (event) => {
   }
   if (!releaseForm.reportValidity() || !activeReleaseRow) return;
   activeReleaseRow.releaseType = activeReleaseOrderType;
-  activeReleaseRow.shippingEnabled = activeReleaseOrderType === "放货";
+  activeReleaseRow.shippingEnabled = activeReleaseOrderType === "发货";
   if (activeReleaseSourceRow) {
     activeReleaseSourceRow.releaseType = activeReleaseOrderType;
-    activeReleaseSourceRow.shippingEnabled = activeReleaseOrderType === "放货";
+    activeReleaseSourceRow.shippingEnabled = activeReleaseOrderType === "发货";
   }
-  if (activeReleaseOrderType !== "放货") {
+  if (activeReleaseOrderType !== "发货") {
     const boxesControl = $("#releaseShipOutBoxes");
     const boxes = Number(boxesControl.value);
     if (boxes > activeReleaseRow.unsent) {
@@ -1930,7 +2067,6 @@ releaseForm.addEventListener("submit", (event) => {
   }
   boxesControl.setCustomValidity("");
   activeReleaseRow.customerRemark = $("#releaseRemark").value.trim();
-  activeReleaseRow.warehouseRemark = $("#releaseWarehouseRemark").value.trim();
   closeReleaseDrawer();
 });
 $("#releaseBoxes").addEventListener("input", () => $("#releaseBoxes").setCustomValidity(""));
@@ -1961,5 +2097,2024 @@ window.addEventListener("resize", () => {
   clearTimeout(watermarkTimer);
   watermarkTimer = setTimeout(buildWatermarks, 120);
 });
+
+const interceptStatusOrder = ["待处理", "已确认", "拦截中", "拦截成功", "拦截失败", "取消/驳回"];
+const interceptStatusLabel = {
+  待处理: "待审批",
+  已确认: "已确认",
+  拦截中: "拦截中",
+  已完成: "拦截成功",
+  拦截成功: "拦截成功",
+  拦截失败: "拦截失败",
+  已取消: "取消/驳回",
+  已驳回: "取消/驳回",
+  "取消/驳回": "取消/驳回"
+};
+const interceptStatusClass = {
+  待处理: "is-pending",
+  已确认: "is-confirmed",
+  拦截中: "is-processing",
+  已完成: "is-completed",
+  拦截成功: "is-completed",
+  拦截失败: "is-failed",
+  已取消: "is-canceled",
+  已驳回: "is-canceled",
+  "取消/驳回": "is-canceled"
+};
+const interceptTasks = [
+  {
+    id: 1, no: "202608040001", waybill: "2", container: "WEMA1131231", system: "/", customer: "TTTX", source: "美仓拦截", warehouse: "美仓1号仓",
+    cargoStatus: "未拆柜", inventoryStatus: "待拆柜", outboundStatus: "未出库", boxes: 11,
+    status: "待处理", reconciliationStatus: "待核销", reason: "客户调整运输计划，申请暂缓出库", attachment: "拦截申请-20260804-01.pdf", customerRemark: "请优先保留整票货物，待客户确认后再处理", remark: "等待客户确认新运输计划",
+    applicant: "客服-张敏", appliedAt: "2026-08-04 09:18:22", handler: "", handleAt: "", failReason: "", actualBoxes: "", storageNo: "", resultRemark: "",
+    logs: [{ time: "2026-08-04 09:18:22", user: "客服-张敏", action: "提交申请", change: "- → 待处理", note: "客户申请拦截" }]
+  },
+  {
+    id: 2, no: "202608040002", waybill: "US0601", container: "MSCU7654321", system: "MSCU7654321-260701", customer: "ABC-US", source: "天图拦截", warehouse: "美仓1号仓",
+    cargoStatus: "已拆柜", inventoryStatus: "已入库", outboundStatus: "未出库", boxes: 4,
+    status: "已确认", reconciliationStatus: "已核销", reason: "订单信息异常，客户要求暂缓处理", attachment: "-", customerRemark: "订单信息核实中，请勿安排出库", remark: "请仓库优先确认货物位置",
+    applicant: "客服-刘洋", appliedAt: "2026-08-04 10:06:15", handler: "仓库-李明", handleAt: "2026-08-04 10:18:40", failReason: "", actualBoxes: "", storageNo: "", resultRemark: "",
+    logs: [
+      { time: "2026-08-04 10:06:15", user: "客服-刘洋", action: "提交申请", change: "- → 待处理", note: "订单信息待客户复核" },
+      { time: "2026-08-04 10:18:40", user: "仓库-李明", action: "确认拦截", change: "待处理 → 已确认", note: "拦截申请已确认，等待开始拦截" }
+    ]
+  },
+  {
+    id: 3, no: "202608030015", waybill: "88", container: "8889990", system: "8889990-250623", customer: "23", source: "美仓拦截", warehouse: "美仓1号仓",
+    cargoStatus: "已拆柜", inventoryStatus: "已入库", outboundStatus: "未出库", boxes: 5,
+    status: "拦截中", reconciliationStatus: "部分核销", reason: "客户申请暂停出库", attachment: "客户邮件截图.png", customerRemark: "客户要求暂停发货，等待后续通知", remark: "仓库正在核对货物位置",
+    applicant: "客服-张敏", appliedAt: "2026-08-03 15:20:31", handler: "仓库-李明", handleAt: "2026-08-03 15:34:06", failReason: "", actualBoxes: "", storageNo: "", resultRemark: "",
+    logs: [
+      { time: "2026-08-03 15:20:31", user: "客服-张敏", action: "提交申请", change: "- → 待处理", note: "客户调整出库计划" },
+      { time: "2026-08-03 15:28:12", user: "仓库-李明", action: "确认拦截", change: "待处理 → 已确认", note: "货物已入库，创建仓库拦截任务" },
+      { time: "2026-08-03 15:34:06", user: "仓库-李明", action: "开始拦截", change: "已确认 → 拦截中", note: "仓库开始定位并处理货物" }
+    ]
+  },
+  {
+    id: 4, no: "202608020009", waybill: "111", container: "CCCA1414141", system: "CCCA1414141-240411", customer: "TTTX", source: "天图拦截", warehouse: "美仓1号仓",
+    cargoStatus: "暂存中", inventoryStatus: "暂存", outboundStatus: "未出库", boxes: 2,
+    status: "已完成", reconciliationStatus: "已核销", reason: "客户要求货物转入暂存", attachment: "拦截申请单.pdf", customerRemark: "请转入暂存，后续由客户重新下单", remark: "后续等待客户重新下单",
+    applicant: "客服-周悦", appliedAt: "2026-08-02 11:03:44", handler: "仓库-王强", handleAt: "2026-08-02 13:46:20", failReason: "", actualBoxes: "2", storageNo: "STG202608020001", resultRemark: "货物已转入 A02-03 暂存库位",
+    logs: [
+      { time: "2026-08-02 11:03:44", user: "客服-周悦", action: "提交申请", change: "- → 待处理", note: "客户申请进入暂存" },
+      { time: "2026-08-02 11:14:18", user: "仓库-王强", action: "确认拦截", change: "待处理 → 已确认", note: "货物已入库" },
+      { time: "2026-08-02 11:20:06", user: "仓库-王强", action: "开始拦截", change: "已确认 → 拦截中", note: "仓库开始处理货物" },
+      { time: "2026-08-02 13:46:20", user: "仓库-王强", action: "拦截成功", change: "拦截中 → 已完成", note: "实际拦截 2 箱，已生成暂存单 STG202608020001" }
+    ]
+  },
+  {
+    id: 5, no: "202608010004", waybill: "72", container: "TLLU2026072", system: "TLLU2026072-260715", customer: "23", source: "美仓拦截", warehouse: "美仓1号仓",
+    cargoStatus: "已拆柜", inventoryStatus: "已入库", outboundStatus: "未出库", boxes: 3,
+    status: "取消/驳回", terminationType: "驳回", interceptType: "拆柜前拦截", reconciliationStatus: "已核销", reason: "客户临时要求取消发货", attachment: "-", customerRemark: "如已出库请同步实际状态", remark: "", applicant: "客服-刘洋", appliedAt: "2026-08-01 16:32:09", handler: "系统", handleAt: "2026-08-01 16:32:10", failReason: "拆柜前未能及时完成拦截，货物已拆柜", terminationReason: "拆柜前未能及时完成拦截，货物已拆柜", actualBoxes: "", storageNo: "", resultRemark: "",
+    logs: [
+      { time: "2026-08-01 16:32:09", user: "客服-刘洋", action: "提交申请", change: "- → 待处理", note: "客户要求取消发货" },
+      { time: "2026-08-01 16:32:10", user: "系统", action: "驳回", change: "待处理 → 取消/驳回", note: "货物已完成出库，无法执行拦截" }
+    ]
+  },
+  {
+    id: 6, no: "202607310018", waybill: "2", container: "AAAA0000000", system: "AAAA0000000-241109", customer: "TTTX", source: "天图拦截", warehouse: "美仓1号仓",
+    cargoStatus: "已拆柜", inventoryStatus: "已入库", outboundStatus: "未出库", boxes: 4,
+    status: "取消/驳回", terminationType: "取消", reconciliationStatus: "已核销", reason: "客户申请暂停发货", attachment: "-", customerRemark: "客户已撤回本次拦截申请", remark: "客户已自行调整订单", cancelReason: "客户主动取消申请", terminationReason: "客户主动取消申请", applicant: "客服-周悦", appliedAt: "2026-07-31 09:11:48", handler: "客服-周悦", handleAt: "2026-07-31 09:32:24", failReason: "", actualBoxes: "", storageNo: "", resultRemark: "客户主动取消申请",
+    logs: [
+      { time: "2026-07-31 09:11:48", user: "客服-周悦", action: "提交申请", change: "- → 待处理", note: "客户申请暂停发货" },
+      { time: "2026-07-31 09:32:24", user: "客服-周悦", action: "取消申请", change: "待处理 → 取消/驳回", note: "客户主动取消" }
+    ]
+  },
+  {
+    id: 7, no: "202607300012", waybill: "US0730", container: "OOLU7216038", system: "OOLU7216038-260730", customer: "ABC-US", source: "美仓拦截", warehouse: "美仓1号仓",
+    cargoStatus: "暂存中", inventoryStatus: "暂存", outboundStatus: "未出库", boxes: 6,
+    status: "已完成", completionResult: "拦截完成", reconciliationStatus: "已核销", reason: "客户变更派送计划，申请转入暂存", attachment: "拦截确认单-0730.pdf", customerRemark: "已确认货物转入暂存区", remark: "现场复核完成，货物数量一致",
+    applicant: "客服-张敏", appliedAt: "2026-07-30 09:26:18", handler: "仓库-李明", handleAt: "2026-07-30 11:42:36", failReason: "", actualBoxes: "6", storageNo: "STG202607300007", resultRemark: "6 箱货物已转入 A03-02 暂存库位", archived: false,
+    logs: [
+      { time: "2026-07-30 09:26:18", user: "客服-张敏", action: "提交申请", change: "- → 待处理", note: "客户申请变更派送计划" },
+      { time: "2026-07-30 09:38:42", user: "仓库-李明", action: "确认拦截", change: "待处理 → 已确认", note: "已确认拦截申请" },
+      { time: "2026-07-30 09:45:20", user: "仓库-李明", action: "开始拦截", change: "已确认 → 拦截中", note: "已定位货物并开始处理" },
+      { time: "2026-07-30 11:42:36", user: "仓库-李明", action: "处理完成", change: "拦截中 → 已完成", note: "实际处理 6 箱，货物已转入暂存库位" }
+    ]
+  },
+  {
+    id: 8, no: "202607290021", waybill: "BBA9461", container: "BPAI9461644", system: "BPAI9461644-240330", customer: "TTTX", source: "天图拦截", warehouse: "美仓1号仓",
+    cargoStatus: "暂存中", inventoryStatus: "暂存", outboundStatus: "未出库", boxes: 3,
+    status: "已完成", completionResult: "拦截完成", reconciliationStatus: "部分核销", reason: "客户要求暂停出库并核对箱唛", attachment: "客户邮件-0729.png", customerRemark: "箱唛已复核，可继续暂存", remark: "已补拍箱唛照片并回传",
+    applicant: "客服-刘洋", appliedAt: "2026-07-29 14:08:51", handler: "仓库-王强", handleAt: "2026-07-29 16:25:09", failReason: "", actualBoxes: "3", storageNo: "STG202607290008", resultRemark: "3 箱箱唛核验完成，已转入 B01-05 暂存库位", archived: true, archivedAt: "2026-07-30 09:12:44",
+    logs: [
+      { time: "2026-07-29 14:08:51", user: "客服-刘洋", action: "提交申请", change: "- → 待处理", note: "客户要求核对箱唛" },
+      { time: "2026-07-29 14:20:16", user: "仓库-王强", action: "确认拦截", change: "待处理 → 已确认", note: "已确认拦截申请" },
+      { time: "2026-07-29 14:26:30", user: "仓库-王强", action: "开始拦截", change: "已确认 → 拦截中", note: "开始核验现场货物" },
+      { time: "2026-07-29 16:25:09", user: "仓库-王强", action: "处理完成", change: "拦截中 → 已完成", note: "箱唛核验完成，3 箱已转入暂存" },
+      { time: "2026-07-30 09:12:44", user: "仓库-主管", action: "归档", change: "已完成 → 已完成", note: "处理记录已归档" }
+    ]
+  },
+  {
+    id: 9, no: "202607280006", waybill: "US0728", container: "FCIU8844221", system: "FCIU8844221-260728", customer: "ABC-US", source: "美仓拦截", warehouse: "美仓1号仓",
+    cargoStatus: "已拆柜", inventoryStatus: "已入库", outboundStatus: "部分出库", boxes: 8,
+    status: "拦截失败", terminationType: "拦截失败", reconciliationStatus: "部分核销", reason: "客户要求暂停出库并转运", attachment: "拦截申请-0728.pdf", customerRemark: "请核实剩余货物状态", remark: "现场未找到全部货物", applicant: "客服-刘洋", appliedAt: "2026-07-28 10:12:21", handler: "仓库-王强", handleAt: "2026-07-28 12:08:42", failReason: "部分货物已出库，剩余货物无法定位", terminationReason: "部分货物已出库，剩余货物无法定位", actualBoxes: "", storageNo: "", resultRemark: "",
+    logs: [
+      { time: "2026-07-28 10:12:21", user: "客服-刘洋", action: "提交申请", change: "- → 待审批", note: "客户申请暂停出库" },
+      { time: "2026-07-28 10:24:08", user: "仓库-王强", action: "确认拦截", change: "待审批 → 已确认", note: "申请已确认" },
+      { time: "2026-07-28 10:31:17", user: "仓库-王强", action: "开始拦截", change: "已确认 → 拦截中", note: "开始定位货物" },
+      { time: "2026-07-28 12:08:42", user: "仓库-王强", action: "拦截失败", change: "拦截中 → 拦截失败", note: "部分货物已出库，剩余货物无法定位" }
+    ]
+  }
+];
+
+const interceptLatestTrackingDefaults = {
+  1: "2026-08-04 08:30 已到达洛杉矶港，等待清关",
+  2: "2026-08-03 15:00 已入库美仓1号仓",
+  3: "2026-08-03 12:00 货物在库，处理中",
+  4: "2026-08-02 14:00 已转入暂存库位 A02-03",
+  5: "2026-08-01 16:00 货物已完成出库，已送达",
+  6: "2026-07-31 09:00 已取消，货物正常出库",
+  7: "2026-07-30 11:42 已转入暂存库位 A03-02",
+  8: "2026-07-29 16:25 已转入暂存库位 B01-05"
+};
+
+const interceptLegacyStatusMap = {
+  处理中: "拦截中",
+  拦截成功: "已完成",
+  拦截失败: "拦截失败",
+  已取消: "取消/驳回",
+  已驳回: "取消/驳回"
+};
+
+interceptTasks.forEach((task) => {
+  const legacyStatus = task.status;
+  task.status = interceptLegacyStatusMap[legacyStatus] || legacyStatus;
+  if (task.status === "取消/驳回") {
+    if (legacyStatus === "已取消") task.terminationType ||= "取消";
+    else if (legacyStatus === "已驳回") task.terminationType ||= "驳回";
+    else task.terminationType ||= task.failReason ? "驳回" : "取消";
+    task.terminationReason ||= task.failReason || task.cancelReason || task.resultRemark || "-";
+  }
+  if (task.status === "拦截失败") task.terminationType ||= "拦截失败";
+  task.latestTracking ||= interceptLatestTrackingDefaults[task.id] || "-";
+  task.interceptType ||= task.cargoStatus === "未拆柜" ? "拆柜前拦截" : "拆柜后拦截";
+});
+
+function getInterceptDisplayStatus(task) {
+  if (!task) return "";
+  if (task.status === "待处理") return "待处理";
+  if (task.status === "已完成" || task.status === "拦截成功") return "拦截成功";
+  if (task.status === "拦截失败") return "拦截失败";
+  if (["已取消", "已驳回", "取消/驳回"].includes(task.status)) return "取消/驳回";
+  return task.status;
+}
+
+function interceptStatusMatches(task, status) {
+  if (status === "已完成") return ["拦截成功", "拦截失败"].includes(getInterceptDisplayStatus(task));
+  return status === "全部" || getInterceptDisplayStatus(task) === status;
+}
+
+function getInterceptForecastStatus(task) {
+  if (task.forecastStatus) return task.forecastStatus;
+  return {
+    "待处理": "待预报",
+    "已确认": "预报中",
+    "拦截中": "预报中",
+    "已完成": "预报成功",
+    "拦截成功": "预报成功",
+    "拦截失败": "预报失败",
+    "已驳回": "预报失败",
+    "已取消": "已取消",
+    "取消/驳回": task.terminationType === "取消" ? "已取消" : task.terminationType === "拦截失败" ? "预报失败" : "预报失败"
+  }[task.status] || "待预报";
+}
+
+function getInterceptType(task) {
+  return task.interceptType || (task.cargoStatus === "未拆柜" ? "拆柜前拦截" : "拆柜后拦截");
+}
+
+function getInterceptForecastStatusClass(status) {
+  return {
+    "待预报": "is-pending",
+    "预报中": "is-processing",
+    "预报成功": "is-success",
+    "预报失败": "is-failed",
+    "已取消": "is-canceled"
+  }[status] || "is-pending";
+}
+
+let interceptActiveTab = "全部";
+let interceptVisibleRows = [];
+let selectedInterceptIds = new Set();
+let activeInterceptId = null;
+let interceptDetailMode = "view";
+let interceptDetailTab = "cargo";
+let interceptFeeDraftRows = [];
+let interceptFeeDraftSequence = 0;
+let interceptFeeDraftFocusId = null;
+let editingInterceptFeeRemarkId = null;
+let interceptAttachmentRowsByTask = new Map();
+let interceptAttachmentEditingId = null;
+let interceptAttachmentDeletingId = null;
+let interceptAttachmentFile = null;
+let interceptAttachmentForm = {
+  fileName: "",
+  fileSize: "",
+  type: "其他",
+  customerVisible: "可见"
+};
+let interceptToastTimer = null;
+let interceptFeedbackMode = "";
+let interceptCancelContext = { mode: "single", taskId: null };
+let interceptRemarkContext = null;
+let interceptRemarkField = "remark";
+
+const interceptPage = $("#interceptPage");
+const inventoryPage = $("#inventoryPage");
+const interceptTableBody = $("#interceptTableBody");
+const interceptFilters = {
+  no: $("#interceptNoFilter"),
+  waybill: $("#interceptWaybillFilter"),
+  container: $("#interceptContainerFilter"),
+  system: $("#interceptSystemFilter"),
+  customer: $("#interceptCustomerFilter"),
+  source: $("#interceptSourceFilter"),
+  type: $("#interceptTypeFilter"),
+  cargoStatus: $("#interceptCargoStatusFilter"),
+  status: $("#interceptStatusFilter"),
+  forecastStatus: $("#interceptForecastStatusFilter"),
+  reconciliationStatus: $("#interceptReconciliationStatusFilter"),
+  dateFrom: $("#interceptDateFrom"),
+  dateTo: $("#interceptDateTo")
+};
+
+function getInterceptTask(id = activeInterceptId) {
+  return interceptTasks.find((task) => task.id === Number(id));
+}
+
+function showInterceptToast(message = "请勾选运单") {
+  const toast = $("#interceptToast");
+  if (!toast) return;
+  toast.textContent = message;
+  toast.hidden = false;
+  clearTimeout(interceptToastTimer);
+  interceptToastTimer = setTimeout(() => {
+    toast.hidden = true;
+  }, 2200);
+}
+
+function getInterceptStatusTag(status) {
+  return `<span class="intercept-status ${interceptStatusClass[status] || "is-pending"}">${escapeHtml(interceptStatusLabel[status] || status)}</span>`;
+}
+
+function getInterceptResultTag(task) {
+  const status = getInterceptDisplayStatus(task);
+  if (["拦截成功", "拦截失败", "取消/驳回"].includes(status)) return getInterceptStatusTag(status);
+  return '<span class="intercept-result-empty">-</span>';
+}
+
+function getInterceptForecastStatusTag(task) {
+  const status = getInterceptForecastStatus(task);
+  return `<span class="intercept-forecast-status ${getInterceptForecastStatusClass(status)}">${escapeHtml(status)}</span>`;
+}
+
+function getInterceptCargoTag(status) {
+  const extraClass = status === "已出库" ? " is-outbound" : status === "暂存中" ? " is-storage" : "";
+  return `<span class="intercept-cargo-status${extraClass}">${escapeHtml(status)}</span>`;
+}
+
+const interceptAttachmentDownloadCache = new Map();
+
+function getInterceptAttachmentItems(task) {
+  if (!task) return [];
+  if (Array.isArray(task.attachments) && task.attachments.length) {
+    return task.attachments.map((item, index) => {
+      if (!item) return null;
+      if (typeof item === "string") {
+        const name = item.trim();
+        return name ? { name, url: getInterceptAttachmentUrl(task, name) } : null;
+      }
+      const name = String(item.name || item.filename || `附件${index + 1}`).trim();
+      if (!name) return null;
+      const url = String(item.url || "").trim() || getInterceptAttachmentUrl(task, name);
+      return { name, url };
+    }).filter(Boolean);
+  }
+  const raw = String(task.attachment || "").trim();
+  if (!raw || raw === "-") return [];
+  return [{ name: raw, url: getInterceptAttachmentUrl(task, raw) }];
+}
+
+const interceptAttachmentTypeOptions = ["POD", "ISA", "报关资料", "底单", "其他", "其它", "税金单", "递延资料", "提单"];
+
+function getInterceptAttachmentRows(task) {
+  if (!task) return [];
+  if (interceptAttachmentRowsByTask.has(task.id)) return interceptAttachmentRowsByTask.get(task.id);
+  const rows = getInterceptAttachmentItems(task).map((item, index) => ({
+    id: `INTERCEPT-ATT-${task.id}-${index}-${item.name}`,
+    name: item.name,
+    type: "其他",
+    customerVisible: "可见",
+    fileSize: "-",
+    uploadedBy: task.handler || task.applicant || "系统",
+    uploadedAt: task.appliedAt || "-",
+    url: item.url,
+    file: null
+  }));
+  interceptAttachmentRowsByTask.set(task.id, rows);
+  return rows;
+}
+
+function getInterceptAttachmentUrl(task, name) {
+  const key = `${task.id || task.no}::${name}`;
+  if (!interceptAttachmentDownloadCache.has(key)) {
+    const blob = new Blob([
+      `拦截单号: ${task.no}\n`,
+      `拦截原因: ${task.reason || "-"}\n`,
+      `附件名称: ${name}\n`
+    ], { type: "text/plain;charset=utf-8" });
+    interceptAttachmentDownloadCache.set(key, URL.createObjectURL(blob));
+  }
+  return interceptAttachmentDownloadCache.get(key);
+}
+
+function renderInterceptAttachments(task) {
+  const items = getInterceptAttachmentItems(task);
+  if (!items.length) return "-";
+  return `<div class="intercept-attachment-links">${items.map((item) => `<a class="intercept-attachment-link" href="${escapeHtml(item.url)}" download="${escapeHtml(item.name)}" title="${escapeHtml(item.name)}">${escapeHtml(item.name)}</a>`).join("")}</div>`;
+}
+
+function getInterceptCargoBoxSource(task) {
+  const boxes = Math.max(1, Number(task.actualBoxes || task.boxes || 1));
+  return {
+    ...task,
+    boxes,
+    unsent: boxes,
+    status: task.cargoStatus === "已出库" ? "已出库" : "待出库"
+  };
+}
+
+function renderInterceptCargoBoxes(task) {
+  const source = getInterceptCargoBoxSource(task);
+  const rows = getCargoBoxRows(source).sort((a, b) => (a.systemBoxNo || "").localeCompare(b.systemBoxNo || ""));
+  $("#interceptCargoBoxBody").innerHTML = rows.map((box) => `<tr>
+    <td class="cargo-box-code">${escapeHtml(box.systemBoxNo)}</td>
+    <td>${escapeHtml(box.customerData)}</td>
+    <td>${escapeHtml(box.pickingData)}</td>
+  </tr>`).join("");
+}
+
+function renderInterceptLog(task) {
+  $("#interceptLogTitle").textContent = "查看日志";
+  $("#interceptLogBody").innerHTML = task.logs.map((log) => {
+    const [before = "-", after = "-"] = String(log.change || "- → -").split("→").map((item) => item.trim());
+    return `<tr>
+      <td title="${escapeHtml(log.note || log.action)}">${escapeHtml(log.action)}</td>
+      <td title="${escapeHtml(before)}">${escapeHtml(before)}</td>
+      <td title="${escapeHtml(after)}">${escapeHtml(after)}</td>
+      <td>${escapeHtml(log.user)}</td>
+      <td>${escapeHtml(log.time)}</td>
+    </tr>`;
+  }).join("");
+}
+
+function getInterceptInstructionRows(task) {
+  if (Array.isArray(task?.fees)) {
+    return task.fees.map((fee) => ({
+      ...fee,
+      name: fee.name || "费用",
+      price: fee.price ?? fee.unitPrice,
+      quantity: fee.quantity || 1,
+      currency: fee.currency || "人民币",
+      description: fee.description || fee.remark || "",
+      remark: fee.remark || fee.description || "",
+      images: Array.isArray(fee.images) ? fee.images : []
+    }));
+  }
+  const sourceRow = instructionWorkflowRows.flat().find((row) => (
+    String(row.container || "") === String(task.container || "")
+    && String(row.inbound || "") === String(task.waybill || "")
+  ));
+  const sourceRows = sourceRow ? ensureInstructionDetailRows(sourceRow) : [];
+  if (sourceRows.length) return sourceRows;
+  const fallback = instructionCatalog.find((row) => row.name.startsWith("拦截-")) || instructionCatalog[0];
+  return fallback ? [{ ...fallback, quantity: "1" }] : [];
+}
+
+function formatInterceptInstructionFeeAmount(value) {
+  return Number(Number(value || 0).toFixed(2)).toString();
+}
+
+function formatInterceptInstructionFeeCurrency(currency) {
+  const raw = String(currency || "人民币").trim();
+  const normalized = raw.toUpperCase();
+  if (raw === "人民币" || normalized === "RMB" || normalized === "CNY") return "CNY";
+  if (raw === "美元" || normalized === "USD") return "USD";
+  return normalized || "CNY";
+}
+
+function formatInterceptInstructionFee(row) {
+  const quantity = Number(row.quantity || 1) || 1;
+  const price = Number(row.price ?? row.unitPrice ?? 0) || 0;
+  const total = Number(row.cnyAmount ?? price * quantity);
+  return `${formatInterceptInstructionFeeAmount(total)} ${formatInterceptInstructionFeeCurrency(row.currency)} ${row.name || "费用"} (${formatInterceptInstructionFeeAmount(price)}/${row.unit || "票"})`;
+}
+
+function renderInterceptInstructionFees(rows) {
+  if (!rows.length) return "-";
+  return rows.map((row) => {
+    const text = formatInterceptInstructionFee(row);
+    return `<div title="${escapeHtml(text)}">${escapeHtml(text)}</div>`;
+  }).join("");
+}
+
+function getInterceptReconciliationStatus(task, rows = getInterceptInstructionRows(task)) {
+  if (["待核销", "部分核销", "已核销"].includes(task.reconciliationStatus)) return task.reconciliationStatus;
+  if (!rows.length) return "已核销";
+  return rows.length > 1 ? "部分核销" : "待核销";
+}
+
+function hasUnreconciledInterceptFees(task) {
+  return ["待核销", "部分核销"].includes(getInterceptReconciliationStatus(task));
+}
+
+function confirmInterceptWithFeeWarning(tasks) {
+  const warning = "所选运单包含未核销或部分核销的操作指令。是否仍要拦截？";
+  if (!tasks.some(hasUnreconciledInterceptFees)) return true;
+  showInterceptToast(warning);
+  return window.confirm(warning);
+}
+
+function renderInterceptReconciliationStatus(task, rows) {
+  const status = getInterceptReconciliationStatus(task, rows);
+  return `<span class="intercept-reconciliation-status is-${status}">${status}</span>`;
+}
+
+function parseInterceptFeeNumber(value) {
+  return Number(String(value ?? "0").replace(/[^\d.-]/g, "")) || 0;
+}
+
+function formatInterceptFeeAmount(value) {
+  return parseInterceptFeeNumber(value).toFixed(2);
+}
+
+function getInterceptFeeOriginalAmount(fee) {
+  return parseInterceptFeeNumber(fee.unitPrice) * (parseInterceptFeeNumber(fee.quantity) || 1);
+}
+
+function getInterceptFeeRmbAmount(fee) {
+  return getInterceptFeeOriginalAmount(fee) * (parseInterceptFeeNumber(fee.exchangeRate) || 1);
+}
+
+function getInterceptFeeRows(task) {
+  if (Array.isArray(task.fees)) return task.fees;
+  const instructionRows = getInterceptInstructionRows(task);
+  task.fees = instructionRows.map((row, index) => ({
+    id: `${task.id}-fee-${index + 1}`,
+    billingTime: row.addedAt || task.appliedAt || formatLocalDateTime(),
+    name: row.name || "",
+    type: row.type || "操作费",
+    unit: row.unit || "票",
+    exchangeRate: row.currency === "人民币" ? 1 : 7.1,
+    unitPrice: parseInterceptFeeNumber(row.price),
+    price: parseInterceptFeeNumber(row.price),
+    quantity: parseInterceptFeeNumber(row.quantity) || 1,
+    currency: row.currency || "人民币",
+    addedAt: row.addedAt || task.appliedAt || formatLocalDateTime(),
+    addedBy: row.addedBy || "系统",
+    description: row.description || row.remark || "",
+    remark: row.remark || row.description || "",
+    images: Array.isArray(row.images) ? row.images : []
+  }));
+  return task.fees;
+}
+
+function renderInterceptFee(task) {
+  const rows = getInterceptFeeRows(task);
+  const originalTotal = rows.reduce((sum, fee) => sum + getInterceptFeeOriginalAmount(fee), 0);
+  const rmbTotal = rows.reduce((sum, fee) => sum + getInterceptFeeRmbAmount(fee), 0);
+  const body = rows.length ? rows.map((fee) => `<tr>
+    <td>${escapeHtml(fee.billingTime || fee.addedAt || "-")}</td>
+    <td>${escapeHtml(fee.name || "-")}</td>
+    <td>${escapeHtml(fee.type || "其他")}</td>
+    <td>${escapeHtml(fee.unit || "票")}</td>
+    <td>${parseInterceptFeeNumber(fee.exchangeRate || 1).toFixed(3)}</td>
+    <td>${formatInterceptFeeAmount(fee.unitPrice)}</td>
+    <td>${parseInterceptFeeNumber(fee.quantity).toFixed(2).replace(/\.00$/, "")}</td>
+    <td>${escapeHtml(fee.currency || "人民币")}</td>
+    <td class="intercept-fee-amount">${formatInterceptFeeAmount(getInterceptFeeOriginalAmount(fee))}</td>
+    <td class="intercept-fee-amount">${formatInterceptFeeAmount(getInterceptFeeRmbAmount(fee))}</td>
+    <td><div class="instruction-remark-display"><span title="${escapeHtml(fee.description || fee.remark || "-")}">${escapeHtml(fee.description || fee.remark || "-")}</span><button class="instruction-remark-edit" data-intercept-fee-remark="${escapeHtml(fee.id)}" type="button">${(fee.description || fee.remark) ? "编辑" : "添加"}</button></div></td>
+    <td>${escapeHtml(fee.addedAt || "-")}</td>
+    <td>${escapeHtml(fee.addedBy || "系统")}</td>
+    <td><button class="intercept-action" data-intercept-fee-action="edit" data-intercept-fee-id="${escapeHtml(fee.id)}" type="button">编辑</button><button class="intercept-action" data-intercept-fee-action="image" data-intercept-fee-id="${escapeHtml(fee.id)}" type="button">图片</button><button class="intercept-action danger" data-intercept-fee-action="delete" data-intercept-fee-id="${escapeHtml(fee.id)}" type="button">删除</button></td>
+  </tr>`).join("") : '<tr><td colspan="14" class="intercept-fee-empty">暂无费用记录</td></tr>';
+  $("#interceptFeeContent").innerHTML = `<div class="intercept-fee-detail-toolbar">
+    <div><h3 class="intercept-fee-detail-title">操作指令</h3><div class="intercept-fee-detail-summary"><span>共 <strong>${rows.length}</strong> 条</span><span>原币合计 <strong>${formatInterceptFeeAmount(originalTotal)}</strong></span><span>人民币合计 <strong>${formatInterceptFeeAmount(rmbTotal)}</strong></span></div></div>
+    <button class="btn primary" data-intercept-fee-action="add" type="button">新增</button>
+  </div><div class="intercept-fee-main-table-wrap"><table class="intercept-fee-table intercept-fee-main-table"><thead><tr><th>计费时间</th><th>费用名称</th><th>费用类型</th><th>*计费单位</th><th>*汇率</th><th>*单价</th><th>*数量</th><th>*币种</th><th>原币应收金额</th><th>人民币应收金额</th><th>费用备注</th><th>添加时间</th><th>添加人</th><th>操作</th></tr></thead><tbody>${body}</tbody></table></div>`;
+}
+
+function createInterceptFeeDraft(fee) {
+  return {
+    id: fee.id,
+    billingTime: fee.billingTime || fee.addedAt || formatLocalDateTime(),
+    name: fee.name || "",
+    type: fee.type || "操作费",
+    unit: fee.unit || "票",
+    exchangeRate: String(fee.exchangeRate ?? 1),
+    unitPrice: String(fee.unitPrice ?? fee.price ?? 0),
+    price: String(fee.price ?? fee.unitPrice ?? 0),
+    quantity: String(fee.quantity ?? 1),
+    currency: fee.currency || "人民币",
+    description: fee.description || fee.remark || "",
+    remark: fee.remark || fee.description || "",
+    images: Array.isArray(fee.images) ? fee.images : []
+  };
+}
+
+function createEmptyInterceptFeeDraft() {
+  interceptFeeDraftSequence += 1;
+  return {
+    id: `new-fee-${Date.now()}-${interceptFeeDraftSequence}`,
+    billingTime: formatLocalDateTime(),
+    name: "",
+    type: "操作费",
+    unit: "票",
+    exchangeRate: "1",
+    unitPrice: "0",
+    price: "0",
+    quantity: "1",
+    currency: "人民币",
+    description: "",
+    remark: "",
+    images: []
+  };
+}
+
+function getInterceptFeeDraft(id) {
+  return interceptFeeDraftRows.find((row) => String(row.id) === String(id));
+}
+
+function getInterceptFeeDraftOriginalAmount(row) {
+  return parseInterceptFeeNumber(row.price ?? row.unitPrice) * (parseInterceptFeeNumber(row.quantity) || 1);
+}
+
+function getInterceptFeeDraftRmbAmount(row) {
+  return getInterceptFeeDraftOriginalAmount(row) * (parseInterceptFeeNumber(row.exchangeRate) || 1);
+}
+
+function renderInterceptFeeDraftSummary() {
+  const originalTotal = interceptFeeDraftRows.reduce((sum, row) => sum + getInterceptFeeDraftOriginalAmount(row), 0);
+  const rmbTotal = interceptFeeDraftRows.reduce((sum, row) => sum + getInterceptFeeDraftRmbAmount(row), 0);
+  $("#interceptFeeCount").textContent = String(interceptFeeDraftRows.length);
+  $("#interceptFeeOriginalTotal").textContent = formatInterceptFeeAmount(originalTotal);
+  $("#interceptFeeRmbTotal").textContent = formatInterceptFeeAmount(rmbTotal);
+}
+
+function openInterceptFeeRemark(rowId) {
+  const task = getInterceptTask();
+  if (!task) return;
+  const row = getInterceptFeeRows(task).find((fee) => String(fee.id) === String(rowId));
+  if (!row) return;
+  editingInterceptFeeRemarkId = row.id;
+  $("#interceptRemarkTitle").textContent = (row.description || row.remark) ? "修改备注" : "备注";
+  $("#interceptRemarkContext").textContent = `拦截单号：${task.no}`;
+  $("#interceptRemarkLabel").textContent = "备注内容";
+  $("#interceptRemarkText").placeholder = "请输入费用备注";
+  $("#interceptRemarkText").value = row.description || row.remark || "";
+  $("#interceptRemarkOverlay").hidden = false;
+  requestAnimationFrame(() => $("#interceptRemarkText").focus());
+}
+
+function openInterceptFeeImages(rowId) {
+  const task = getInterceptTask();
+  if (!task) return;
+  const row = getInterceptFeeRows(task).find((fee) => String(fee.id) === String(rowId));
+  if (!row) return;
+  const images = Array.isArray(row.images) ? row.images : [];
+  if (!images.length) {
+    window.alert("当前操作指令暂无图片");
+    return;
+  }
+  const image = images[0];
+  $("#instructionImagePreview").src = image.url;
+  $("#instructionImagePreview").alt = image.name || "图片预览";
+  $("#instructionImagePreviewOverlay").hidden = false;
+}
+
+function submitInterceptFeeRemark(event) {
+  event.preventDefault();
+  if (!editingInterceptFeeRemarkId) return;
+  const task = getInterceptTask();
+  if (!task) return;
+  const row = getInterceptFeeRows(task).find((fee) => String(fee.id) === String(editingInterceptFeeRemarkId));
+  if (!row) return;
+  const remark = $("#interceptRemarkText").value.trim();
+  const previousRemark = row.description || row.remark || "";
+  row.description = remark;
+  row.remark = remark;
+  addInterceptLog(task, "修改操作指令备注", task.status, `"${previousRemark || "-"}" → "${remark || "-"}"`);
+  $("#interceptRemarkOverlay").hidden = true;
+  editingInterceptFeeRemarkId = null;
+  refreshInterceptUI();
+}
+function renderInterceptFeeDraftRows() {
+  $("#interceptFeeCatalog").innerHTML = instructionCatalog.map((row) => `<option value="${escapeHtml(row.name)}">${escapeHtml(row.code)}</option>`).join("");
+  renderInterceptFeeDraftSummary();
+  const body = $("#interceptFeeDraftBody");
+  if (!interceptFeeDraftRows.length) {
+    body.innerHTML = '<tr><td colspan="12" class="intercept-fee-empty">暂无数据</td></tr>';
+    return;
+  }
+  body.innerHTML = interceptFeeDraftRows.map((row) => {
+    const originalAmount = getInterceptFeeDraftOriginalAmount(row);
+    const rmbAmount = getInterceptFeeDraftRmbAmount(row);
+    const focused = String(row.id) === String(interceptFeeDraftFocusId) ? " is-focused" : "";
+    return `<tr class="${focused}" data-intercept-fee-draft-id="${escapeHtml(row.id)}">
+      <td><input class="intercept-fee-form-field" data-intercept-fee-field="billingTime" value="${escapeHtml(row.billingTime)}" aria-label="计费时间" /></td>
+      <td><input class="intercept-fee-form-field intercept-fee-name" data-intercept-fee-field="name" list="interceptFeeCatalog" value="${escapeHtml(row.name)}" placeholder="请选择或输入费用名称" aria-label="费用名称" /></td>
+      <td><input class="intercept-fee-form-field" data-intercept-fee-field="type" value="${escapeHtml(row.type)}" aria-label="费用类型" /></td>
+      <td><select class="intercept-fee-form-field" data-intercept-fee-field="unit" aria-label="计费单位"><option value="票" ${row.unit === "票" ? "selected" : ""}>票</option><option value="箱" ${row.unit === "箱" ? "selected" : ""}>箱</option><option value="KG" ${row.unit === "KG" ? "selected" : ""}>KG</option><option value="CBM" ${row.unit === "CBM" ? "selected" : ""}>CBM</option></select></td>
+      <td><input type="number" min="0" step="any" class="intercept-fee-form-field" data-intercept-fee-field="exchangeRate" value="${escapeHtml(row.exchangeRate)}" aria-label="汇率" /></td>
+      <td><input type="number" min="0" step="any" class="intercept-fee-form-field" data-intercept-fee-field="unitPrice" value="${escapeHtml(row.unitPrice)}" aria-label="单价" /></td>
+      <td><input type="number" min="0" step="any" class="intercept-fee-form-field" data-intercept-fee-field="quantity" value="${escapeHtml(row.quantity)}" aria-label="数量" /></td>
+      <td><select class="intercept-fee-form-field" data-intercept-fee-field="currency" aria-label="币种"><option value="人民币" ${row.currency === "人民币" ? "selected" : ""}>人民币</option><option value="USD" ${row.currency === "USD" ? "selected" : ""}>USD</option></select></td>
+      <td class="intercept-fee-amount intercept-fee-draft-original">${formatInterceptFeeAmount(originalAmount)}</td>
+      <td class="intercept-fee-amount intercept-fee-draft-rmb">${formatInterceptFeeAmount(rmbAmount)}</td>
+      <td><input class="intercept-fee-form-field" data-intercept-fee-field="description" value="${escapeHtml(row.description || row.remark || "")}" aria-label="费用备注" /></td>
+      <td><button class="intercept-fee-delete" data-intercept-fee-draft-remove="${escapeHtml(row.id)}" type="button" aria-label="删除费用" title="删除费用明细">删除</button></td>
+    </tr>`;
+  }).join("");
+}
+
+function openInterceptFeeModal(focusId = null) {
+  const task = getInterceptTask();
+  if (!task) return;
+  interceptFeeDraftRows = getInterceptFeeRows(task).map(createInterceptFeeDraft);
+  interceptFeeDraftFocusId = focusId;
+  $("#interceptFeeOverlay").hidden = false;
+  renderInterceptFeeDraftRows();
+}
+
+function closeInterceptFeeModal() {
+  $("#interceptFeeOverlay").hidden = true;
+  interceptFeeDraftRows = [];
+  interceptFeeDraftFocusId = null;
+}
+
+function saveInterceptFeeDraftRows(event) {
+  event.preventDefault();
+  const task = getInterceptTask();
+  if (!task) return;
+  const confirmedAt = formatLocalDateTime();
+  const existingRows = getInterceptFeeRows(task);
+  task.fees = interceptFeeDraftRows.map((row, index) => {
+    const existing = existingRows.find((fee) => String(fee.id) === String(row.id));
+    const originalAmount = getInterceptFeeDraftOriginalAmount(row);
+    const exchangeRate = parseInterceptFeeNumber(row.exchangeRate) || 1;
+    const price = parseInterceptFeeNumber(row.price ?? row.unitPrice);
+    const description = (row.description ?? row.remark ?? "").trim();
+    return {
+      id: row.id,
+      billingTime: row.billingTime.trim() || existing?.billingTime || existing?.addedAt || confirmedAt,
+      name: row.name.trim() || `费用${index + 1}`,
+      type: row.type.trim() || "其他",
+      unit: row.unit.trim() || "票",
+      exchangeRate,
+      unitPrice: price,
+      price,
+      quantity: parseInterceptFeeNumber(row.quantity) || 1,
+      currency: row.currency,
+      total: originalAmount * exchangeRate,
+      addedAt: existing?.addedAt || confirmedAt,
+      addedBy: existing?.addedBy || "仓库-李明",
+      description,
+      remark: description,
+      images: Array.isArray(existing?.images) ? existing.images : []
+    };
+  });
+  closeInterceptFeeModal();
+  refreshInterceptUI();
+}
+
+function renderInterceptOtherInfo(task) {
+  const rows = getInterceptAttachmentRows(task);
+  $("#interceptAttachmentType").innerHTML = interceptAttachmentTypeOptions.map((type) => `<option value="${escapeHtml(type)}">${escapeHtml(type)}</option>`).join("");
+  $("#interceptAttachmentBody").innerHTML = rows.length ? rows.map((row) => `<tr data-intercept-attachment-id="${escapeHtml(row.id)}">
+    <td title="${escapeHtml(row.name)}">${escapeHtml(row.name)}</td>
+    <td>${escapeHtml(row.type)}</td>
+    <td>${escapeHtml(row.customerVisible)}</td>
+    <td>${escapeHtml(row.fileSize || "-")}</td>
+    <td>${escapeHtml(row.uploadedBy || "-")}</td>
+    <td class="intercept-attachment-time">${escapeHtml(row.uploadedAt || "-")}</td>
+    <td><button class="intercept-action" data-intercept-attachment-action="edit" type="button">编辑</button><button class="intercept-action" data-intercept-attachment-action="download" type="button">下载</button><button class="intercept-action danger" data-intercept-attachment-action="delete" type="button">删除</button></td>
+  </tr>`).join("") : '<tr><td colspan="7" class="intercept-attachment-empty"><span class="intercept-attachment-empty-icon" aria-hidden="true">▧</span>暂无附件</td></tr>';
+}
+
+function resetInterceptAttachmentForm() {
+  interceptAttachmentForm = { fileName: "", fileSize: "", type: "其他", customerVisible: "可见" };
+  interceptAttachmentFile = null;
+}
+
+function renderInterceptAttachmentForm() {
+  $("#interceptAttachmentTitle").textContent = interceptAttachmentEditingId ? "编辑附件" : "上传附件";
+  $("#interceptAttachmentType").value = interceptAttachmentForm.type;
+  $("#interceptAttachmentFileName").textContent = interceptAttachmentForm.fileName;
+  $("#interceptAttachmentFileSize").textContent = interceptAttachmentForm.fileSize || "-";
+  $("#interceptAttachmentFileRow").hidden = !interceptAttachmentForm.fileName;
+  document.querySelectorAll('input[name="interceptAttachmentCustomerVisible"]').forEach((control) => {
+    control.checked = control.value === interceptAttachmentForm.customerVisible;
+  });
+}
+
+function openInterceptAttachmentModal(rowId = null) {
+  const task = getInterceptTask();
+  if (!task) return;
+  const row = rowId ? getInterceptAttachmentRows(task).find((item) => String(item.id) === String(rowId)) : null;
+  interceptAttachmentEditingId = row?.id || null;
+  interceptAttachmentForm = row
+    ? { fileName: row.name, fileSize: row.fileSize || "", type: row.type, customerVisible: row.customerVisible }
+    : { fileName: "", fileSize: "", type: "其他", customerVisible: "可见" };
+  interceptAttachmentFile = null;
+  $("#interceptAttachmentFileInput").value = "";
+  $("#interceptAttachmentOverlay").hidden = false;
+  renderInterceptAttachmentForm();
+}
+
+function closeInterceptAttachmentModal() {
+  $("#interceptAttachmentOverlay").hidden = true;
+  interceptAttachmentEditingId = null;
+  resetInterceptAttachmentForm();
+  $("#interceptAttachmentFileInput").value = "";
+}
+
+function openInterceptAttachmentDelete(rowId) {
+  const task = getInterceptTask();
+  const row = task && getInterceptAttachmentRows(task).find((item) => String(item.id) === String(rowId));
+  if (!row) return;
+  interceptAttachmentDeletingId = row.id;
+  $("#interceptAttachmentDeleteText").textContent = `确定删除附件“${row.name}”吗？`;
+  $("#interceptAttachmentDeleteOverlay").hidden = false;
+}
+
+function closeInterceptAttachmentDelete() {
+  $("#interceptAttachmentDeleteOverlay").hidden = true;
+  interceptAttachmentDeletingId = null;
+}
+
+function downloadInterceptAttachment(task, row) {
+  if (!task || !row) return;
+  const url = row.file ? URL.createObjectURL(row.file) : row.url || getInterceptAttachmentUrl(task, row.name);
+  const link = document.createElement("a");
+  link.href = url;
+  link.download = row.name;
+  document.body.appendChild(link);
+  link.click();
+  link.remove();
+  if (row.file) URL.revokeObjectURL(url);
+}
+
+function saveInterceptAttachment() {
+  const task = getInterceptTask();
+  const fileName = interceptAttachmentForm.fileName.trim();
+  if (!task) return;
+  if (!fileName) {
+    window.alert("请先选择附件文件");
+    return;
+  }
+  const existingRows = getInterceptAttachmentRows(task);
+  const nextRows = interceptAttachmentEditingId
+    ? existingRows.map((row) => String(row.id) === String(interceptAttachmentEditingId)
+      ? { ...row, name: fileName, type: interceptAttachmentForm.type, customerVisible: interceptAttachmentForm.customerVisible, fileSize: interceptAttachmentForm.fileSize || row.fileSize, file: interceptAttachmentFile || row.file, url: interceptAttachmentFile ? "" : getInterceptAttachmentUrl(task, fileName) }
+      : row)
+    : [...existingRows, {
+        id: `INTERCEPT-ATT-${task.id}-${Date.now()}`,
+        name: fileName,
+        type: interceptAttachmentForm.type,
+        customerVisible: interceptAttachmentForm.customerVisible,
+        fileSize: interceptAttachmentForm.fileSize || "-",
+        uploadedBy: "仓库-李明",
+        uploadedAt: formatLocalDateTime(),
+        file: interceptAttachmentFile,
+        url: interceptAttachmentFile ? "" : getInterceptAttachmentUrl(task, fileName)
+      }];
+  interceptAttachmentRowsByTask.set(task.id, nextRows);
+  task.attachments = nextRows.map((row) => row.name);
+  task.attachment = nextRows[0]?.name || "-";
+  closeInterceptAttachmentModal();
+  refreshInterceptUI();
+}
+
+function confirmDeleteInterceptAttachment() {
+  const task = getInterceptTask();
+  if (!task || !interceptAttachmentDeletingId) return;
+  const nextRows = getInterceptAttachmentRows(task).filter((row) => String(row.id) !== String(interceptAttachmentDeletingId));
+  interceptAttachmentRowsByTask.set(task.id, nextRows);
+  task.attachments = nextRows.map((row) => row.name);
+  task.attachment = nextRows[0]?.name || "-";
+  closeInterceptAttachmentDelete();
+  refreshInterceptUI();
+}
+
+function renderInterceptDetailTabs() {
+  document.querySelectorAll("[data-intercept-detail-tab]").forEach((tab) => {
+    const active = tab.dataset.interceptDetailTab === interceptDetailTab;
+    tab.classList.toggle("active", active);
+    tab.setAttribute("aria-selected", String(active));
+  });
+  document.querySelectorAll("[data-intercept-detail-panel]").forEach((panel) => {
+    const active = panel.dataset.interceptDetailPanel === interceptDetailTab;
+    panel.hidden = !active;
+  });
+}
+
+function formatInterceptDate(value) {
+  return String(value || "").slice(0, 10);
+}
+
+function renderInterceptStatusTabs() {
+  document.querySelectorAll("[data-intercept-status]").forEach((tab) => {
+    const status = tab.dataset.interceptStatus;
+    const count = status === "全部" ? interceptTasks.length : interceptTasks.filter((task) => interceptStatusMatches(task, status)).length;
+    tab.textContent = `${status === "待处理" ? "待审批" : status}(${count})`;
+    tab.classList.toggle("active", status === interceptActiveTab);
+  });
+}
+
+function getFilteredInterceptTasks() {
+  const no = interceptFilters.no.value.trim().toLowerCase();
+  const waybill = interceptFilters.waybill.value.trim().toLowerCase();
+  const container = interceptFilters.container.value.trim().toLowerCase();
+  const system = interceptFilters.system.value.trim().toLowerCase();
+  const from = interceptFilters.dateFrom.value;
+  const to = interceptFilters.dateTo.value;
+  return interceptTasks.filter((task) => (
+    interceptStatusMatches(task, interceptActiveTab)
+    && (!no || task.no.toLowerCase().includes(no))
+    && (!waybill || task.waybill.toLowerCase().includes(waybill))
+    && (!container || (task.container || "").toLowerCase().includes(container))
+    && (!system || (task.system || "").toLowerCase().includes(system))
+    && (!interceptFilters.customer.value || task.customer === interceptFilters.customer.value)
+    && (!interceptFilters.source.value || task.source === interceptFilters.source.value)
+    && (!interceptFilters.type.value || getInterceptType(task) === interceptFilters.type.value)
+    && (!interceptFilters.cargoStatus.value || task.cargoStatus === interceptFilters.cargoStatus.value)
+    && (!interceptFilters.status.value || interceptStatusMatches(task, interceptFilters.status.value))
+    && (!interceptFilters.forecastStatus.value || getInterceptForecastStatus(task) === interceptFilters.forecastStatus.value)
+    && (!interceptFilters.reconciliationStatus.value || getInterceptReconciliationStatus(task) === interceptFilters.reconciliationStatus.value)
+    && (!from || formatInterceptDate(task.appliedAt) >= from)
+    && (!to || formatInterceptDate(task.appliedAt) <= to)
+  ));
+}
+
+function getVisibleSelectableInterceptTasks() {
+  return interceptVisibleRows;
+}
+
+function getVisiblePendingInterceptTasks() {
+  return interceptVisibleRows.filter((task) => task.status === "待处理");
+}
+
+function getInterceptStatusReasonColumn() {
+  const status = interceptActiveTab !== "全部" ? interceptActiveTab : interceptFilters.status.value;
+  if (status === "取消/驳回") return { label: "终止原因", field: "terminationReason" };
+  return null;
+}
+
+function getInterceptTerminationType(task) {
+  if (getInterceptDisplayStatus(task) !== "取消/驳回") return "-";
+  if (task.terminationType === "取消" || task.status === "已取消") return "取消";
+  if (task.terminationType === "驳回" || task.status === "已驳回" || task.failReason) return "驳回";
+  return "取消";
+}
+
+function getSelectedPendingInterceptTasks() {
+  return [...selectedInterceptIds]
+    .map((id) => getInterceptTask(id))
+    .filter((task) => task?.status === "待处理");
+}
+
+function getSelectedConfirmedInterceptTasks() {
+  return [...selectedInterceptIds]
+    .map((id) => getInterceptTask(id))
+    .filter((task) => task?.status === "已确认");
+}
+
+function getSelectedCancelableInterceptTasks() {
+  return [...selectedInterceptIds]
+    .map((id) => getInterceptTask(id))
+    .filter((task) => ["待处理", "已确认"].includes(task?.status));
+}
+
+function pruneInterceptSelection() {
+  const visibleSelectableIds = new Set(getVisibleSelectableInterceptTasks().map((task) => task.id));
+  selectedInterceptIds = new Set([...selectedInterceptIds].filter((id) => visibleSelectableIds.has(id)));
+}
+
+function updateInterceptBatchControls() {
+  const isPendingView = interceptActiveTab === "待处理";
+  const isConfirmedView = interceptActiveTab === "已确认";
+  const isInterceptingView = interceptActiveTab === "拦截中";
+  const isCompletedView = interceptActiveTab === "已完成";
+  const selectableRows = getVisibleSelectableInterceptTasks();
+  const selectedCount = selectableRows.filter((task) => selectedInterceptIds.has(task.id)).length;
+  const selectAll = $("#interceptSelectAll");
+  const cancelButton = $("#interceptBatchCancelButton");
+  const confirmButton = $("#interceptBatchConfirmButton");
+  const successButton = $("#interceptBatchSuccessButton");
+  const failureButton = $("#interceptBatchFailureButton");
+  const completeButton = $("#interceptBatchCompleteButton");
+  const archiveButton = $("#interceptBatchArchiveButton");
+  const noteButton = $("#interceptBatchNoteButton");
+  const exportButton = $("#interceptBatchExportButton");
+
+  cancelButton.hidden = !isPendingView && !isConfirmedView;
+  cancelButton.textContent = isConfirmedView ? "驳回" : "取消拦截";
+  confirmButton.hidden = !isPendingView && !isConfirmedView;
+  confirmButton.textContent = isConfirmedView ? "开始拦截" : "确认拦截";
+  successButton.hidden = !isInterceptingView;
+  failureButton.hidden = !isInterceptingView;
+  completeButton.hidden = !isInterceptingView;
+  archiveButton.hidden = !isCompletedView;
+  noteButton.hidden = isCompletedView;
+  exportButton.hidden = false;
+
+  [cancelButton, confirmButton, completeButton, successButton, failureButton, archiveButton, noteButton, exportButton].forEach((button) => {
+    button.disabled = false;
+  });
+
+  selectAll.disabled = selectableRows.length === 0;
+  selectAll.setAttribute("aria-label", isCompletedView ? "全选已完成拦截单" : isInterceptingView ? "全选拦截中任务" : isConfirmedView ? "全选已确认拦截单" : "全选待审批拦截单");
+  selectAll.checked = selectableRows.length > 0 && selectedCount === selectableRows.length;
+  selectAll.indeterminate = selectedCount > 0 && selectedCount < selectableRows.length;
+}
+
+function renderInterceptRows() {
+  renderInterceptStatusTabs();
+  interceptVisibleRows = getFilteredInterceptTasks();
+  pruneInterceptSelection();
+  const statusReasonColumn = getInterceptStatusReasonColumn();
+  const statusReasonHeader = $("#interceptStatusReasonHeader");
+  if (statusReasonHeader) {
+    statusReasonHeader.hidden = !statusReasonColumn;
+    statusReasonHeader.textContent = statusReasonColumn?.label || "";
+  }
+  $("#interceptListSummary").textContent = `共 ${interceptVisibleRows.length} 条拦截任务`;
+  const listHint = $("#interceptListHint");
+  if (listHint) listHint.textContent = interceptActiveTab === "已完成"
+    ? "已完成任务可在「拦截结果」列查看拦截成功、拦截失败，支持查看结果、日志和导出"
+    : "拦截成功后将自动生成暂存单";
+  if (!interceptVisibleRows.length) {
+    interceptTableBody.innerHTML = `<tr class="intercept-empty"><td colspan="${statusReasonColumn ? 22 : 21}">暂无匹配的拦截任务</td></tr>`;
+  } else {
+    interceptTableBody.innerHTML = interceptVisibleRows.map((task) => {
+      const instructionRows = getInterceptInstructionRows(task);
+      const primaryAction = (["待处理", "已确认", "拦截中"].includes(task.status)) ? '<button class="intercept-action" data-intercept-action="handle" type="button">处理</button>' : "";
+      const completeAction = task.status === "拦截中" ? '<button class="intercept-action" data-intercept-action="complete" type="button">完成</button>' : "";
+      const retryAction = ["取消/驳回", "拦截失败"].includes(task.status) && task.failReason && getInterceptType(task) === "拆柜前拦截"
+        ? '<button class="intercept-action" data-intercept-action="retry-after-unpack" type="button">发起拆柜后拦截</button>'
+        : "";
+      const completedActions = ["已完成", "拦截成功", "拦截失败"].includes(getInterceptDisplayStatus(task))
+        ? `<button class="intercept-action" data-intercept-action="result" type="button">查看结果</button>${task.archived ? '<span class="intercept-archived-mark">已归档</span>' : ""}`
+        : "";
+      const checked = selectedInterceptIds.has(task.id) ? " checked" : "";
+      const disabled = "";
+      const boxCount = escapeHtml(task.actualBoxes || task.boxes || "-");
+      const terminationType = getInterceptTerminationType(task);
+      const statusReasonValue = task[statusReasonColumn?.field];
+      const statusReasonCell = statusReasonColumn
+        ? `<td class="intercept-status-reason-cell" title="${escapeHtml(statusReasonValue || "-")}">${escapeHtml(statusReasonValue || "-")}</td>`
+        : "";
+      const rowClass = getInterceptDisplayStatus(task) === "拦截失败" ? ' class="intercept-row-failed"' : "";
+      return `<tr data-intercept-id="${task.id}"${rowClass}>
+        <td class="intercept-check"><input class="intercept-row-check" type="checkbox" data-intercept-id="${task.id}" aria-label="选择${escapeHtml(task.no)}"${checked}${disabled} /></td>
+        <td>${escapeHtml(task.customer)}</td><td>${escapeHtml(getInterceptType(task))}</td><td title="${escapeHtml(task.no)}">${escapeHtml(task.no)}</td><td title="${escapeHtml(task.waybill)}">${escapeHtml(task.waybill)}</td><td title="${escapeHtml(task.container || "-")}">${escapeHtml(task.container || "-")}</td>
+        <td>${getInterceptForecastStatusTag(task)}</td><td title="${escapeHtml(task.reason)}">${escapeHtml(task.reason)}</td><td>${getInterceptResultTag(task)}</td><td>${escapeHtml(terminationType)}</td>${statusReasonCell}<td>${boxCount}</td><td class="intercept-instruction-fee-cell">${renderInterceptInstructionFees(instructionRows)}</td><td>${renderInterceptReconciliationStatus(task, instructionRows)}</td><td title="${escapeHtml(task.customerRemark || "-")}">${escapeHtml(task.customerRemark || "-")}</td><td title="${escapeHtml(task.remark || "-")}">${escapeHtml(task.remark || "-")}</td><td>${escapeHtml(task.source || "-")}</td>
+        <td>${escapeHtml(task.applicant)}</td><td>${escapeHtml(task.appliedAt)}</td><td>${escapeHtml(task.handler || "-")}</td><td>${escapeHtml(task.handleAt || "-")}</td>
+        <td><button class="intercept-action" data-intercept-action="detail" type="button">详情</button>${primaryAction}${completeAction}${completedActions}${retryAction}<button class="intercept-action" data-intercept-action="log" type="button">日志</button></td>
+      </tr>`;
+    }).join("");
+  }
+  updateInterceptBatchControls();
+  $("#interceptTableFooter").innerHTML = `<span>共 ${interceptVisibleRows.length} 条</span><button type="button">‹</button><button class="active" type="button">1</button><button type="button">›</button><select><option>50 条/页</option></select>`;
+}
+
+function addInterceptLog(task, action, previousStatus, note, user = "仓库-李明") {
+  const now = formatLocalDateTime();
+  task.logs.push({
+    time: now,
+    user,
+    action,
+    change: `${interceptStatusLabel[previousStatus] || previousStatus || "-"} → ${getInterceptDisplayStatus(task) || task.status}`,
+    note
+  });
+  task.handler = user;
+  task.handleAt = now;
+}
+
+function renderInterceptDetail(task, mode = "view") {
+  $("#interceptDetailTitle").textContent = `拦截详情 · ${task.no}`;
+  $("#interceptDetailSubTitle").innerHTML = `${getInterceptStatusTag(getInterceptDisplayStatus(task))} <span>${escapeHtml(task.waybill)}</span>`;
+
+  const displayStatus = getInterceptDisplayStatus(task);
+  const finalStepLabel = displayStatus === "取消/驳回" ? "取消/驳回" : displayStatus === "拦截失败" ? "拦截失败" : "拦截成功";
+  const stepLabels = ["提交申请", "已确认", "拦截中", finalStepLabel];
+  const currentStep = displayStatus === "待处理" ? 0 : displayStatus === "已确认" ? 1 : displayStatus === "拦截中" ? 2 : 3;
+  $("#interceptFlow").innerHTML = stepLabels.map((label, index) => {
+    const isComplete = index < currentStep || (currentStep === 3 && index === 3 && ["拦截成功", "拦截失败", "取消/驳回"].includes(displayStatus));
+    const isActive = index === currentStep;
+    return `<div class="intercept-flow-step${isComplete ? " is-complete" : ""}${isActive ? " is-active" : ""}"><i>${isComplete ? "✓" : index + 1}</i><span>${label}</span></div>`;
+  }).join("");
+
+  const field = (label, value) => `<div><dt>${label}</dt><dd>${value}</dd></div>`;
+  $("#interceptBasicInfo").innerHTML = [
+    field("客户名称", escapeHtml(task.customer)),
+    field("拦截来源", escapeHtml(task.source || "-")),
+    field("拦截类型", escapeHtml(getInterceptType(task))),
+    field("拦截单号", escapeHtml(task.no)),
+    field("入仓号", escapeHtml(task.waybill)),
+    field("柜号", escapeHtml(task.container || "-")),
+    field("拦截原因", escapeHtml(task.reason)),
+    field("拦截箱数", `${escapeHtml(task.actualBoxes || task.boxes || "-")} 箱`),
+    field("货物状态", getInterceptCargoTag(task.cargoStatus)),
+    field("所在仓库", escapeHtml(task.warehouse)),
+    field("出库状态", escapeHtml(task.outboundStatus)),
+    field("申请人", escapeHtml(task.applicant)),
+    field("申请时间", escapeHtml(task.appliedAt)),
+    ["拦截成功", "拦截失败"].includes(displayStatus) ? field(displayStatus === "拦截失败" ? "失败原因" : "完成结果", escapeHtml(task.failReason || task.resultRemark || "-")) : "",
+    displayStatus === "拦截成功" ? field("归档状态", task.archived ? `已归档${task.archivedAt ? `（${escapeHtml(task.archivedAt)}）` : ""}` : "未归档") : "",
+    displayStatus === "取消/驳回" ? field("终止类型", escapeHtml(getInterceptTerminationType(task))) : "",
+    displayStatus === "取消/驳回" ? field("终止原因", escapeHtml(task.terminationReason || task.failReason || task.cancelReason || task.resultRemark || "-")) : "",
+    field("客户备注", `${escapeHtml(task.customerRemark || "-")}<button class="intercept-action" data-detail-action="editCustomerRemark" type="button" title="编辑客户备注" style="margin-left:6px">✎</button>`),
+    field("备注", `${escapeHtml(task.remark || "-")}<button class="intercept-action" data-detail-action="editRemark" type="button" title="编辑备注" style="margin-left:6px">✎</button>`)
+  ].join("");
+  renderInterceptCargoBoxes(task);
+  renderInterceptFee(task);
+  renderInterceptOtherInfo(task);
+  renderInterceptDetailTabs();
+
+  const retryAction = (displayStatus === "拦截失败" || (displayStatus === "取消/驳回" && getInterceptTerminationType(task) === "驳回")) && task.failReason && getInterceptType(task) === "拆柜前拦截"
+    ? '<button class="btn primary" data-detail-action="retry-after-unpack" type="button">发起拆柜后拦截</button>'
+    : "";
+  const actions = mode === "process"
+    ? task.status === "待处理"
+      ? '<button class="btn" data-detail-action="cancel" type="button">取消申请</button><button class="btn primary" data-detail-action="confirm" type="button">确认拦截</button>'
+      : task.status === "已确认"
+        ? '<button class="btn" data-detail-action="cancel" type="button">驳回</button><button class="btn primary" data-detail-action="start" type="button">开始拦截</button>'
+        : task.status === "拦截中"
+          ? '<button class="btn" data-detail-action="failure" type="button">拦截失败</button><button class="btn" data-detail-action="complete" type="button">处理完成</button><button class="btn primary" data-detail-action="success" type="button">拦截成功</button>'
+          : ""
+    : retryAction;
+  const completedAction = displayStatus === "拦截成功" && task.storageNo
+    ? '<button class="btn primary" data-detail-action="storage" type="button">查看暂存详情</button>'
+    : "";
+  $("#interceptDetailActions").innerHTML = `<button class="btn" data-detail-action="close" type="button">关闭</button>${actions}${completedAction}${mode === "process" ? retryAction : ""}`;
+}
+
+function openInterceptDetail(id, mode = "view") {
+  const task = getInterceptTask(id);
+  if (!task) return;
+  activeInterceptId = task.id;
+  interceptDetailMode = mode;
+  interceptDetailTab = "cargo";
+  renderInterceptDetail(task, mode);
+  $("#interceptDetailOverlay").hidden = false;
+}
+
+function openInterceptLog(id) {
+  const task = getInterceptTask(id);
+  if (!task) return;
+  activeInterceptId = task.id;
+  renderInterceptLog(task);
+  $("#interceptLogOverlay").hidden = false;
+}
+
+function closeInterceptLog() {
+  $("#interceptLogOverlay").hidden = true;
+  activeInterceptId = null;
+}
+
+function closeInterceptDetail() {
+  if (!$("#interceptAttachmentDeleteOverlay").hidden) closeInterceptAttachmentDelete();
+  if (!$("#interceptAttachmentOverlay").hidden) closeInterceptAttachmentModal();
+  if (!$("#interceptFeeOverlay").hidden) closeInterceptFeeModal();
+  $("#interceptDetailOverlay").hidden = true;
+  activeInterceptId = null;
+  interceptDetailMode = "view";
+}
+
+function refreshInterceptUI() {
+  renderInterceptRows();
+  const task = getInterceptTask();
+  if (task && !$("#interceptDetailOverlay").hidden) renderInterceptDetail(task, interceptDetailMode);
+}
+
+function applyInterceptConfirm(task) {
+  if (!task || task.status !== "待处理") return false;
+  const previousStatus = task.status;
+  if (task.cargoStatus === "已出库") {
+    task.status = "取消/驳回";
+    task.terminationType = "驳回";
+    task.failReason = "货物已完成出库";
+    task.terminationReason = task.failReason;
+    task.resultRemark = "系统校验货物已完成出库，无法执行拦截";
+    addInterceptLog(task, "驳回", previousStatus, task.resultRemark, "系统");
+    return true;
+  }
+  task.status = "已确认";
+  addInterceptLog(task, "确认拦截", previousStatus, task.cargoStatus === "未拆柜" ? "货物未拆柜，已确认预报拦截申请" : "货物已入库，已确认仓库拦截申请");
+  return true;
+}
+
+function applyInterceptStart(task) {
+  if (!task || task.status !== "已确认") return false;
+  const previousStatus = task.status;
+  task.status = "拦截中";
+  addInterceptLog(task, "开始拦截", previousStatus, "仓库已开始执行拦截任务");
+  return true;
+}
+
+function applyInterceptCancel(task, reason = "") {
+  if (!task || !["待处理", "已确认"].includes(task.status)) return false;
+  const previousStatus = task.status;
+  task.status = "取消/驳回";
+  task.terminationType = previousStatus === "已确认" ? "驳回" : "取消";
+  task.cancelReason = reason;
+  task.terminationReason = reason;
+  task.resultRemark = reason || "取消拦截申请";
+  task.remark = task.remark ? `${task.remark}；取消原因：${reason}` : `取消原因：${reason}`;
+  addInterceptLog(task, previousStatus === "已确认" ? "驳回" : "取消申请", previousStatus, reason || "取消/驳回拦截申请", "客服-张敏");
+  return true;
+}
+
+function createAfterUnpackInterceptTask(task) {
+  if (!task || !["取消/驳回", "拦截失败"].includes(task.status) || !task.failReason || getInterceptType(task) !== "拆柜前拦截") return false;
+  const existingRetry = interceptTasks.find((candidate) => (
+    candidate.retryOf === task.no && ["待处理", "已确认", "拦截中"].includes(candidate.status)
+  ));
+  if (existingRetry) {
+    showInterceptToast(`该拦截单已有拆柜后拦截任务：${existingRetry.no}`);
+    return false;
+  }
+  if (!window.confirm("原拆柜前拦截未成功，确认在货物拆柜后重新发起拦截吗？")) return false;
+  const nextId = interceptTasks.reduce((max, candidate) => Math.max(max, Number(candidate.id) || 0), 0) + 1;
+  const retryCount = interceptTasks.filter((candidate) => candidate.retryOf === task.no).length;
+  const now = formatLocalDateTime();
+  const nextTask = {
+    ...task,
+    id: nextId,
+    no: `${task.no}-${String(retryCount + 1).padStart(2, "0")}`,
+    interceptType: "拆柜后拦截",
+    retryOf: task.no,
+    status: "待处理",
+    cargoStatus: "已拆柜",
+    inventoryStatus: "已入库",
+    outboundStatus: "未出库",
+    latestTracking: "已由拆柜前拦截失败任务重新发起",
+    actualBoxes: task.actualBoxes || String(task.boxes || 1),
+    storageNo: "",
+    resultRemark: "",
+    handler: "",
+    handleAt: "",
+    failReason: "",
+    cancelReason: "",
+    fees: [],
+    reconciliationStatus: "已核销",
+    logs: [{
+      time: now,
+      user: "客服-张敏",
+      action: "重新发起拆柜后拦截",
+      change: "- → 待处理",
+      note: `由拆柜前拦截失败任务 ${task.no} 重新发起，操作指令需重新录入`
+    }]
+  };
+  interceptTasks.push(nextTask);
+  task.logs.push({
+    time: now,
+    user: "客服-张敏",
+    action: "发起拆柜后拦截",
+    change: "取消/驳回 → -",
+    note: `已创建新任务 ${nextTask.no}，新任务进入待处理，操作指令需重新录入`
+  });
+  refreshInterceptFilterOptions();
+  selectedInterceptIds.clear();
+  interceptActiveTab = "待处理";
+  showInterceptToast("已发起拆柜后拦截，任务已进入待处理");
+  refreshInterceptUI();
+  return true;
+}
+
+function confirmInterceptTask() {
+  const task = getInterceptTask();
+  if (!task || task.status !== "待处理") return;
+  if (!confirmInterceptWithFeeWarning([task])) return;
+  if (task.cargoStatus === "已出库") {
+    applyInterceptConfirm(task);
+    window.alert("货物已出库，无法执行拦截");
+    refreshInterceptUI();
+    return;
+  }
+  const prompt = task.cargoStatus === "未拆柜" ? "当前货物未拆柜，确认执行拦截？" : "当前货物已入库，确认执行拦截？";
+  if (!window.confirm(prompt)) return;
+  applyInterceptConfirm(task);
+  refreshInterceptUI();
+}
+
+function startInterceptTask() {
+  const task = getInterceptTask();
+  if (!task || task.status !== "已确认") return;
+  if (!window.confirm("确认开始执行该拦截任务吗？")) return;
+  applyInterceptStart(task);
+  refreshInterceptUI();
+}
+
+function cancelInterceptTask() {
+  const task = getInterceptTask();
+  if (!task || !["待处理", "已确认"].includes(task.status)) return;
+  interceptCancelContext = { mode: "single", taskId: task.id };
+  $("#interceptCancelReasonTitle").textContent = task.status === "已确认" ? "驳回拦截" : "取消拦截";
+  $("#interceptCancelReasonText").value = "";
+  $("#interceptCancelReasonOverlay").hidden = false;
+  $("#interceptCancelReasonText").focus();
+}
+
+function confirmSelectedInterceptTasks() {
+  const tasks = getSelectedPendingInterceptTasks();
+  if (!tasks.length) {
+    showInterceptToast();
+    return;
+  }
+  if (!confirmInterceptWithFeeWarning(tasks)) return;
+  const outboundCount = tasks.filter((task) => task.cargoStatus === "已出库").length;
+  const message = outboundCount
+    ? `确认选中的 ${tasks.length} 条拦截申请吗？其中 ${outboundCount} 条货物已出库，将自动归入取消/驳回。`
+    : `确认选中的 ${tasks.length} 条拦截申请吗？`;
+  if (!window.confirm(message)) return;
+  tasks.forEach(applyInterceptConfirm);
+  selectedInterceptIds.clear();
+  refreshInterceptUI();
+}
+
+function startSelectedInterceptTasks() {
+  const tasks = getSelectedConfirmedInterceptTasks();
+  if (!tasks.length) {
+    showInterceptToast("请勾选已确认任务");
+    return;
+  }
+  if (!window.confirm(`确认开始处理选中的 ${tasks.length} 条拦截任务吗？`)) return;
+  tasks.forEach(applyInterceptStart);
+  selectedInterceptIds.clear();
+  interceptActiveTab = "拦截中";
+  refreshInterceptUI();
+}
+
+function cancelSelectedInterceptTasks() {
+  const tasks = getSelectedCancelableInterceptTasks();
+  if (!tasks.length) {
+    showInterceptToast();
+    return;
+  }
+  interceptCancelContext = { mode: "batch", taskIds: tasks.map((t) => t.id) };
+  $("#interceptCancelReasonTitle").textContent = interceptActiveTab === "已确认" ? `批量驳回（${tasks.length}条）` : `批量取消拦截（${tasks.length}条）`;
+  $("#interceptCancelReasonText").value = "";
+  $("#interceptCancelReasonOverlay").hidden = false;
+  $("#interceptCancelReasonText").focus();
+}
+
+function exportInterceptTasks() {
+  const tasks = getVisibleSelectableInterceptTasks().filter((task) => selectedInterceptIds.has(task.id));
+  if (!tasks.length) {
+    showInterceptToast();
+    return;
+  }
+  const statusReasonColumn = getInterceptStatusReasonColumn();
+  const headers = ["客户名称", "拦截类型", "拦截单号", "入仓号", "柜号", "预报单状态", "拦截原因", "拦截结果", "终止类型", "拦截箱数", "操作指令", "核销状态", "客户备注", "备注", "拦截来源", "申请人", "申请时间", "处理人", "处理时间"];
+  if (statusReasonColumn) headers.splice(9, 0, statusReasonColumn.label);
+  const rows = tasks.map((task) => {
+    const result = getInterceptDisplayStatus(task);
+    return [
+      task.customer, getInterceptType(task), task.no, task.waybill, task.container || "",
+      getInterceptForecastStatus(task), task.reason, ["拦截成功", "拦截失败", "取消/驳回"].includes(result) ? result : "", getInterceptTerminationType(task), task.actualBoxes || task.boxes || "", getInterceptInstructionRows(task).map(formatInterceptInstructionFee).join("；"), getInterceptReconciliationStatus(task), task.customerRemark || "", task.remark || "", task.source || "",
+      task.applicant, task.appliedAt, task.handler || "", task.handleAt || ""
+    ];
+  });
+  if (statusReasonColumn) rows.forEach((row, index) => {
+    const task = tasks[index];
+    const value = task[statusReasonColumn.field];
+    row.splice(9, 0, value || "");
+  });
+  const csvContent = [headers, ...rows].map((row) => row.map((cell) => `"${String(cell).replace(/"/g, '""')}"`).join(",")).join("\n");
+  const blob = new Blob(["﻿" + csvContent], { type: "text/csv;charset=utf-8" });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = `拦截管理_${interceptActiveTab}_${formatLocalDateTime().slice(0, 10)}.csv`;
+  a.click();
+  URL.revokeObjectURL(url);
+}
+
+function archiveSelectedCompletedTasks() {
+  const tasks = getVisibleSelectableInterceptTasks()
+    .filter((task) => selectedInterceptIds.has(task.id) && task.status === "已完成" && !task.archived);
+  if (!tasks.length) {
+    showInterceptToast(selectedInterceptIds.size ? "所选任务均已归档" : "请勾选已完成任务");
+    return;
+  }
+  if (!window.confirm(`确认归档选中的 ${tasks.length} 条已完成任务吗？归档后仍可查看详情和日志。`)) return;
+  const now = formatLocalDateTime();
+  tasks.forEach((task) => {
+    task.archived = true;
+    task.archivedAt = now;
+    task.logs.push({
+      time: now,
+      user: "仓库-主管",
+      action: "归档",
+      change: "已完成 → 已完成",
+      note: "处理记录已归档"
+    });
+  });
+  selectedInterceptIds.clear();
+  refreshInterceptUI();
+  showInterceptToast(`已归档 ${tasks.length} 条任务`);
+}
+
+function batchRemarkInterceptTasks() {
+  const tasks = getVisibleSelectableInterceptTasks().filter((task) => selectedInterceptIds.has(task.id));
+  if (!tasks.length) {
+    showInterceptToast();
+    return;
+  }
+  $("#interceptBatchNoteOverlay").hidden = false;
+  $("#interceptBatchNoteText").value = "";
+  $("#interceptBatchNoteText").focus();
+}
+
+function submitInterceptBatchNote(event) {
+  event.preventDefault();
+  const note = $("#interceptBatchNoteText").value.trim();
+  if (!note) {
+    window.alert("请输入备注内容");
+    return;
+  }
+  const tasks = getVisibleSelectableInterceptTasks().filter((task) => selectedInterceptIds.has(task.id));
+  tasks.forEach((task) => {
+    const previousRemark = task.remark || "";
+    task.remark = previousRemark ? `${previousRemark}；${note}` : note;
+    addInterceptLog(task, "备注", task.status, note);
+  });
+  $("#interceptBatchNoteOverlay").hidden = true;
+  selectedInterceptIds.clear();
+  refreshInterceptUI();
+}
+
+function closeInterceptBatchNote() {
+  $("#interceptBatchNoteOverlay").hidden = true;
+}
+
+function submitInterceptCancelReason(event) {
+  event.preventDefault();
+  const reason = $("#interceptCancelReasonText").value.trim();
+  if (!reason) {
+    window.alert("请输入取消原因");
+    return;
+  }
+  if (interceptCancelContext.mode === "single") {
+    const task = getInterceptTask(interceptCancelContext.taskId);
+    if (task) applyInterceptCancel(task, reason);
+  } else {
+    const tasks = (interceptCancelContext.taskIds || []).map((id) => getInterceptTask(id)).filter(Boolean);
+    tasks.forEach((task) => applyInterceptCancel(task, reason));
+    selectedInterceptIds.clear();
+  }
+  $("#interceptCancelReasonOverlay").hidden = true;
+  interceptCancelContext = { mode: "single", taskId: null };
+  refreshInterceptUI();
+}
+
+function closeInterceptCancelReason() {
+  $("#interceptCancelReasonOverlay").hidden = true;
+  interceptCancelContext = { mode: "single", taskId: null };
+}
+
+function openInterceptRemark(taskId, field = "remark") {
+  const task = getInterceptTask(taskId);
+  if (!task) return;
+  interceptRemarkContext = task.id;
+  interceptRemarkField = field;
+  const isCustomerRemark = field === "customerRemark";
+  $("#interceptRemarkTitle").textContent = isCustomerRemark ? "编辑客户备注" : "编辑备注";
+  $("#interceptRemarkContext").textContent = `拦截单号：${task.no}`;
+  $("#interceptRemarkLabel").textContent = isCustomerRemark ? "客户备注" : "备注内容";
+  $("#interceptRemarkText").placeholder = isCustomerRemark ? "请输入客户备注" : "请输入备注内容";
+  $("#interceptRemarkText").value = task[field] || "";
+  $("#interceptRemarkOverlay").hidden = false;
+  $("#interceptRemarkText").focus();
+}
+
+function submitInterceptRemark(event) {
+  event.preventDefault();
+  if (!interceptRemarkContext) return;
+  const task = getInterceptTask(interceptRemarkContext);
+  if (!task) return;
+  const remark = $("#interceptRemarkText").value.trim();
+  const field = interceptRemarkField;
+  const previousRemark = task[field] || "";
+  task[field] = remark;
+  addInterceptLog(task, field === "customerRemark" ? "修改客户备注" : "修改备注", task.status, `"${previousRemark || "-"}" → "${remark || "-"}"`);
+  $("#interceptRemarkOverlay").hidden = true;
+  interceptRemarkContext = null;
+  interceptRemarkField = "remark";
+  refreshInterceptUI();
+}
+
+function closeInterceptRemark() {
+  $("#interceptRemarkOverlay").hidden = true;
+  interceptRemarkContext = null;
+  interceptRemarkField = "remark";
+}
+
+function getSelectedInterceptingTasks() {
+  return [...selectedInterceptIds]
+    .map((id) => getInterceptTask(id))
+    .filter((task) => task?.status === "拦截中");
+}
+
+function completeInterceptTasks(tasks) {
+  const actionableTasks = tasks.filter((task) => task?.status === "拦截中");
+  if (!actionableTasks.length) {
+    showInterceptToast("请选择处理中的任务");
+    return;
+  }
+  if (!window.confirm(`确认将 ${actionableTasks.length} 条任务标记为已完成吗？`)) return;
+  actionableTasks.forEach((task) => {
+    const previousStatus = task.status;
+    task.status = "已完成";
+    task.completionResult = "处理完成";
+    task.actualBoxes = String(task.actualBoxes || task.boxes || "");
+    task.storageNo ||= `STG${formatLocalDateTime().slice(0, 10).replaceAll("-", "")}${String(task.id).padStart(4, "0")}`;
+    task.cargoStatus = "暂存中";
+    task.inventoryStatus = "暂存";
+    task.outboundStatus = "未出库";
+    task.resultRemark = `已完成 ${task.actualBoxes || task.boxes} 箱货物处理并转入暂存`;
+    task.archived = false;
+    addInterceptLog(task, "处理完成", previousStatus, task.resultRemark);
+    createStorageFromIntercept(task);
+  });
+  selectedInterceptIds.clear();
+  interceptActiveTab = "已完成";
+  closeInterceptDetail();
+  refreshInterceptUI();
+  showInterceptToast(`已完成 ${actionableTasks.length} 条任务`);
+}
+
+function completeSelectedInterceptTasks() {
+  completeInterceptTasks(getSelectedInterceptingTasks());
+}
+
+function batchInterceptSuccess() {
+  const tasks = getSelectedInterceptingTasks();
+  if (!tasks.length) {
+    showInterceptToast();
+    return;
+  }
+  $("#interceptBatchSuccessTitle").textContent = "拦截成功";
+  $("#interceptBatchSuccessSummary").textContent = `已选择 ${tasks.length} 条处理中的记录，确认后将自动生成暂存单。`;
+  $("#interceptBatchSuccessNote").value = "";
+  $("#interceptBatchSuccessOverlay").hidden = false;
+  $("#interceptBatchSuccessNote").focus();
+}
+
+function batchInterceptFailure() {
+  const tasks = getSelectedInterceptingTasks();
+  if (!tasks.length) {
+    showInterceptToast();
+    return;
+  }
+  $("#interceptBatchFailureTitle").textContent = "拦截失败";
+  $("#interceptBatchFailureSummary").textContent = `已选择 ${tasks.length} 条处理中的记录，请填写失败原因。`;
+  $("#interceptBatchFailureReason").value = "";
+  $("#interceptBatchFailureOverlay").hidden = false;
+  $("#interceptBatchFailureReason").focus();
+}
+
+function submitInterceptBatchSuccess(event) {
+  event.preventDefault();
+  const tasks = getSelectedInterceptingTasks();
+  if (!tasks.length) return;
+  const note = $("#interceptBatchSuccessNote").value.trim();
+  const user = "仓库-李明";
+  tasks.forEach((task) => {
+    const previousStatus = task.status;
+    const actualBoxes = Number(task.actualBoxes || task.boxes);
+    task.status = "已完成";
+    task.cargoStatus = "暂存中";
+    task.inventoryStatus = "暂存";
+    task.outboundStatus = "未出库";
+    task.actualBoxes = String(actualBoxes);
+    task.storageNo = `STG${formatLocalDateTime().slice(0, 10).replaceAll("-", "")}${String(task.id).padStart(4, "0")}`;
+    task.resultRemark = note || "已完成货物拦截并转入暂存";
+    task.handler = user;
+    task.handleAt = formatLocalDateTime();
+    task.logs.push({
+      time: formatLocalDateTime(),
+      user,
+      action: "拦截成功",
+      change: `${previousStatus} → 已完成`,
+      note: `实际拦截 ${actualBoxes} 箱，已生成暂存单 ${task.storageNo}${note ? `；${note}` : ""}`
+    });
+    createStorageFromIntercept(task);
+  });
+  $("#interceptBatchSuccessOverlay").hidden = true;
+  selectedInterceptIds.clear();
+  interceptActiveTab = "已完成";
+  refreshInterceptUI();
+}
+
+function submitInterceptBatchFailure(event) {
+  event.preventDefault();
+  const tasks = getSelectedInterceptingTasks();
+  if (!tasks.length) return;
+  const failReason = $("#interceptBatchFailureReason").value.trim();
+  if (!failReason) {
+    window.alert("请填写失败原因");
+    return;
+  }
+  const user = "仓库-李明";
+  tasks.forEach((task) => {
+    const previousStatus = task.status;
+    task.status = "拦截失败";
+    task.terminationType = "拦截失败";
+    task.failReason = failReason;
+    task.terminationReason = failReason;
+    task.resultRemark = "";
+    task.handler = user;
+    task.handleAt = formatLocalDateTime();
+    task.logs.push({
+      time: formatLocalDateTime(),
+      user,
+      action: "拦截失败",
+      change: `${interceptStatusLabel[previousStatus] || previousStatus} → 拦截失败`,
+      note: failReason
+    });
+  });
+  $("#interceptBatchFailureOverlay").hidden = true;
+  selectedInterceptIds.clear();
+  interceptActiveTab = "已完成";
+  refreshInterceptUI();
+}
+
+function closeInterceptBatchSuccess() {
+  $("#interceptBatchSuccessOverlay").hidden = true;
+}
+
+function closeInterceptBatchFailure() {
+  $("#interceptBatchFailureOverlay").hidden = true;
+}
+
+function openInterceptFeedback(mode) {
+  const task = getInterceptTask();
+  if (!task || task.status !== "拦截中") return;
+  interceptFeedbackMode = mode;
+  const isSuccess = mode === "success";
+  $("#interceptFeedbackTitle").textContent = isSuccess ? "确认拦截成功" : "确认拦截失败";
+  $("#interceptFeedbackFields").innerHTML = isSuccess
+    ? `<p>请确认实际拦截的货物数量。提交后系统将自动生成暂存单。</p><label><span class="required">实际拦截箱数</span><input id="interceptActualBoxes" type="number" min="1" max="${task.boxes}" value="${task.boxes}" required /></label><label><span>备注</span><textarea id="interceptFeedbackNote" maxlength="200" placeholder="请输入处理备注"></textarea></label>`
+    : '<p>请填写无法完成拦截的原因，系统将保留处理记录。</p><label><span class="required">失败原因</span><textarea id="interceptFailReason" maxlength="200" required placeholder="例如：已出库、找不到货物、客户取消"></textarea></label>';
+  $("#interceptFeedbackOverlay").hidden = false;
+}
+
+function createStorageFromIntercept(task) {
+  if (!task.storageNo || inventoryRows.some((row) => row.pallet === task.storageNo)) return;
+  const nextId = inventoryRows.reduce((max, row) => Math.max(max, row.id), 0) + 1;
+  inventoryRows.unshift({
+    id: nextId,
+    customer: task.customer,
+    container: task.container || task.waybill,
+    system: task.system || task.container || task.waybill,
+    inbound: task.waybill,
+    blocked: "暂存",
+    transfer: "-",
+    destination: "暂存库",
+    dispatch: "-",
+    pallet: task.storageNo,
+    time: task.handleAt || formatLocalDateTime(),
+    weight: 0,
+    volume: 0,
+    boxes: Number(task.actualBoxes || task.boxes),
+    pending: 0,
+    unsent: Number(task.actualBoxes || task.boxes),
+    sent: 0,
+    status: "暂存"
+  });
+}
+
+function submitInterceptFeedback(event) {
+  event.preventDefault();
+  const task = getInterceptTask();
+  if (!task || task.status !== "拦截中") return;
+  const note = $("#interceptFeedbackNote")?.value.trim() || "";
+  const previousStatus = task.status;
+  if (interceptFeedbackMode === "success") {
+    const actualBoxes = Number($("#interceptActualBoxes").value);
+    if (!actualBoxes || actualBoxes < 1 || actualBoxes > task.boxes) {
+      window.alert(`实际拦截箱数需在 1 到 ${task.boxes} 之间`);
+      return;
+    }
+    task.status = "已完成";
+    task.cargoStatus = "暂存中";
+    task.inventoryStatus = "暂存";
+    task.outboundStatus = "未出库";
+    task.actualBoxes = String(actualBoxes);
+    task.storageNo = `STG${formatLocalDateTime().slice(0, 10).replaceAll("-", "")}${String(task.id).padStart(4, "0")}`;
+    task.resultRemark = note || "已完成货物拦截并转入暂存";
+    addInterceptLog(task, "拦截成功", previousStatus, `实际拦截 ${actualBoxes} 箱，已生成暂存单 ${task.storageNo}${note ? `；${note}` : ""}`);
+    createStorageFromIntercept(task);
+  } else {
+    const failReason = $("#interceptFailReason").value.trim();
+    if (!failReason) {
+      window.alert("请填写失败原因");
+      return;
+    }
+    task.status = "拦截失败";
+    task.terminationType = "拦截失败";
+    task.failReason = failReason;
+    task.terminationReason = failReason;
+    task.resultRemark = "";
+    addInterceptLog(task, "拦截失败", previousStatus, failReason);
+  }
+  $("#interceptFeedbackOverlay").hidden = true;
+  interceptActiveTab = "已完成";
+  refreshInterceptUI();
+}
+
+function showStagingInventory(status = activeStatus) {
+  interceptPage.hidden = true;
+  inventoryPage.hidden = false;
+  $("#navInterceptManagement").classList.remove("active");
+  $("#navStagingInventory").classList.add("active");
+  $("#currentPageName").textContent = "暂存库存";
+  document.title = "暂存库存 - 美仓海外仓系统";
+  activeStatus = status;
+  document.querySelectorAll(".status-tab").forEach((tab) => {
+    if (tab.dataset.status) tab.classList.toggle("active", tab.dataset.status === activeStatus);
+  });
+  selected.clear();
+  $("#filterCard").classList.toggle("approval-filter", isRequestTableView());
+  $("#filterCard").classList.remove("approval-expanded", "collapsed");
+  $("#collapseButton").innerHTML = isRequestTableView() ? "<span>⌄</span> 展开" : "<span>⌃</span> 收起";
+  applyFilters();
+}
+
+function showInterceptManagement() {
+  if (!confirmDiscardInstructionStatusDrafts()) return;
+  inventoryPage.hidden = true;
+  interceptPage.hidden = false;
+  $("#navStagingInventory").classList.remove("active");
+  $("#navInterceptManagement").classList.add("active");
+  $("#currentPageName").textContent = "拦截管理";
+  document.title = "拦截管理 - 美仓海外仓系统";
+  renderInterceptRows();
+}
+
+function refreshInterceptFilterOptions() {
+  const customer = interceptFilters.customer.value;
+  interceptFilters.customer.innerHTML = '<option value="">全部客户</option>';
+  addOptions(interceptFilters.customer, interceptTasks.map((task) => task.customer));
+  interceptFilters.customer.value = customer;
+}
+
+function initInterceptManagement() {
+  interceptTasks.filter((task) => task.status === "已完成").forEach(createStorageFromIntercept);
+  refreshInterceptFilterOptions();
+  renderInterceptRows();
+  $("#navInterceptManagement").addEventListener("click", showInterceptManagement);
+  $("#navStagingInventory").addEventListener("click", () => showStagingInventory(activeStatus));
+  $("#interceptSearchButton").addEventListener("click", renderInterceptRows);
+  $("#interceptBatchCancelButton").addEventListener("click", cancelSelectedInterceptTasks);
+  $("#interceptBatchConfirmButton").addEventListener("click", () => {
+    if (interceptActiveTab === "已确认") startSelectedInterceptTasks();
+    else confirmSelectedInterceptTasks();
+  });
+  $("#interceptBatchSuccessButton").addEventListener("click", batchInterceptSuccess);
+  $("#interceptBatchFailureButton").addEventListener("click", batchInterceptFailure);
+  $("#interceptBatchCompleteButton").addEventListener("click", completeSelectedInterceptTasks);
+  $("#interceptBatchArchiveButton").addEventListener("click", archiveSelectedCompletedTasks);
+  $("#interceptBatchNoteButton").addEventListener("click", batchRemarkInterceptTasks);
+  $("#interceptBatchExportButton").addEventListener("click", exportInterceptTasks);
+  $("#interceptSelectAll").addEventListener("change", (event) => {
+    getVisibleSelectableInterceptTasks().forEach((task) => {
+      if (event.currentTarget.checked) selectedInterceptIds.add(task.id);
+      else selectedInterceptIds.delete(task.id);
+    });
+    renderInterceptRows();
+  });
+  $("#interceptResetButton").addEventListener("click", () => {
+    Object.values(interceptFilters).forEach((control) => { control.value = ""; });
+    selectedInterceptIds.clear();
+    interceptActiveTab = "全部";
+    renderInterceptRows();
+  });
+  Object.values(interceptFilters).forEach((control) => control.addEventListener("keydown", (event) => {
+    if (event.key === "Enter") renderInterceptRows();
+  }));
+  document.querySelectorAll("[data-intercept-status]").forEach((tab) => tab.addEventListener("click", () => {
+    selectedInterceptIds.clear();
+    interceptActiveTab = tab.dataset.interceptStatus;
+    renderInterceptRows();
+  }));
+  interceptTableBody.addEventListener("change", (event) => {
+    const checkbox = event.target.closest(".intercept-row-check");
+    if (!checkbox) return;
+    const id = Number(checkbox.dataset.interceptId);
+    if (checkbox.checked) selectedInterceptIds.add(id);
+    else selectedInterceptIds.delete(id);
+    updateInterceptBatchControls();
+  });
+  interceptTableBody.addEventListener("click", (event) => {
+    const button = event.target.closest("[data-intercept-action]");
+    if (!button) return;
+    const row = button.closest("[data-intercept-id]");
+    const task = getInterceptTask(row?.dataset.interceptId);
+    if (!task) return;
+    const action = button.dataset.interceptAction;
+    if (action === "storage") {
+      createStorageFromIntercept(task);
+      showStagingInventory("暂存");
+      return;
+    }
+    if (action === "log") {
+      openInterceptLog(task.id);
+      return;
+    }
+    if (action === "handle") {
+      openInterceptDetail(task.id, "process");
+      return;
+    }
+    if (action === "result") {
+      openInterceptDetail(task.id, "result");
+      return;
+    }
+    if (action === "complete") {
+      completeInterceptTasks([task]);
+      return;
+    }
+    if (action === "retry-after-unpack") {
+      createAfterUnpackInterceptTask(task);
+      return;
+    }
+    openInterceptDetail(task.id);
+  });
+  $("#interceptDetailClose").addEventListener("click", closeInterceptDetail);
+  $("#interceptDetailTabs").addEventListener("click", (event) => {
+    const tab = event.target.closest("[data-intercept-detail-tab]");
+    if (!tab) return;
+    interceptDetailTab = tab.dataset.interceptDetailTab;
+    const task = getInterceptTask();
+    if (task) renderInterceptDetail(task, interceptDetailMode);
+  });
+  $("#interceptAttachmentUploadButton").addEventListener("click", () => openInterceptAttachmentModal());
+  $("#interceptAttachmentBody").addEventListener("click", (event) => {
+    const button = event.target.closest("[data-intercept-attachment-action]");
+    const row = button?.closest("[data-intercept-attachment-id]");
+    const task = getInterceptTask();
+    if (!button || !row || !task) return;
+    const attachment = getInterceptAttachmentRows(task).find((item) => String(item.id) === String(row.dataset.interceptAttachmentId));
+    if (!attachment) return;
+    const action = button.dataset.interceptAttachmentAction;
+    if (action === "edit") openInterceptAttachmentModal(attachment.id);
+    if (action === "download") downloadInterceptAttachment(task, attachment);
+    if (action === "delete") openInterceptAttachmentDelete(attachment.id);
+  });
+  $("#interceptAttachmentClose").addEventListener("click", closeInterceptAttachmentModal);
+  $("#interceptAttachmentCancel").addEventListener("click", closeInterceptAttachmentModal);
+  $("#interceptAttachmentOverlay").addEventListener("click", (event) => {
+    if (event.target === $("#interceptAttachmentOverlay")) closeInterceptAttachmentModal();
+  });
+  $("#interceptAttachmentFileInput").addEventListener("change", (event) => {
+    const file = event.currentTarget.files?.[0];
+    if (!file) return;
+    const sizeInMb = file.size / 1024 / 1024;
+    interceptAttachmentFile = file;
+    interceptAttachmentForm.fileName = file.name;
+    interceptAttachmentForm.fileSize = sizeInMb >= 1 ? `${sizeInMb.toFixed(1)}MB` : `${Math.max(1, Math.round(file.size / 1024))}KB`;
+    renderInterceptAttachmentForm();
+  });
+  $("#interceptAttachmentFileRemove").addEventListener("click", () => {
+    interceptAttachmentForm.fileName = "";
+    interceptAttachmentForm.fileSize = "";
+    interceptAttachmentFile = null;
+    $("#interceptAttachmentFileInput").value = "";
+    renderInterceptAttachmentForm();
+  });
+  $("#interceptAttachmentType").addEventListener("change", (event) => {
+    interceptAttachmentForm.type = event.currentTarget.value;
+  });
+  document.querySelectorAll('input[name="interceptAttachmentCustomerVisible"]').forEach((control) => control.addEventListener("change", (event) => {
+    interceptAttachmentForm.customerVisible = event.currentTarget.value;
+  }));
+  $("#interceptAttachmentConfirm").addEventListener("click", saveInterceptAttachment);
+  $("#interceptAttachmentDeleteClose").addEventListener("click", closeInterceptAttachmentDelete);
+  $("#interceptAttachmentDeleteCancel").addEventListener("click", closeInterceptAttachmentDelete);
+  $("#interceptAttachmentDeleteConfirm").addEventListener("click", confirmDeleteInterceptAttachment);
+  $("#interceptAttachmentDeleteOverlay").addEventListener("click", (event) => {
+    if (event.target === $("#interceptAttachmentDeleteOverlay")) closeInterceptAttachmentDelete();
+  });
+  $("#interceptFeeContent").addEventListener("click", (event) => {
+    const button = event.target.closest("[data-intercept-fee-action]");
+    if (!button) return;
+    const task = getInterceptTask();
+    if (!task) return;
+    const action = button.dataset.interceptFeeAction;
+    const feeId = button.dataset.interceptFeeId;
+    if (button.dataset.interceptFeeRemark) { openInterceptFeeRemark(button.dataset.interceptFeeRemark); return; }
+  if (uploadButton) {
+    const row = getInterceptFeeRows(task).find((fee) => String(fee.id) === String(uploadButton.dataset.interceptFeeId));
+    if (!row) return;
+    const input = document.createElement("input");
+    input.type = "file";
+    input.accept = "image/*";
+    input.multiple = true;
+    input.addEventListener("change", () => {
+      const files = [...(input.files || [])].filter((file) => file.type.startsWith("image/"));
+      if (!files.length) return;
+      row.images ||= [];
+      const remaining = Math.max(0, 9 - row.images.length);
+      files.slice(0, remaining).forEach((file) => row.images.push({ name: file.name, url: URL.createObjectURL(file) }));
+      renderInterceptFee(task);
+      refreshInterceptUI();
+    });
+    input.click();
+    return;
+  }
+  if (previewImage) {
+    event.preventDefault();
+    const image = previewImage.querySelector("img");
+    if (image?.src) {
+      $("#instructionImagePreview").src = image.src;
+      $("#instructionImagePreview").alt = previewImage.dataset.imageName || image.alt || "图片预览";
+      $("#instructionImagePreviewOverlay").hidden = false;
+    }
+    return;
+  }    if (action === "add") {
+      openInterceptFeeModal();
+      return;
+    }
+    if (action === "image") { openInterceptFeeImages(feeId); return; }
+    if (action === "edit") {
+      openInterceptFeeModal(feeId);
+      return;
+    }
+    const feeName = getInterceptFeeRows(task).find((fee) => String(fee.id) === String(feeId))?.name || "明细";
+    if (action === "delete" && window.confirm(`确定删除费用“${feeName}”吗？`)) {
+      task.fees = getInterceptFeeRows(task).filter((fee) => String(fee.id) !== String(feeId));
+      renderInterceptFee(task);
+      refreshInterceptUI();
+    }
+  });
+  $("#interceptFeeClose").addEventListener("click", closeInterceptFeeModal);
+  $("#interceptFeeCancel").addEventListener("click", closeInterceptFeeModal);
+  $("#interceptFeeOverlay").addEventListener("click", (event) => {
+    if (event.target === $("#interceptFeeOverlay")) closeInterceptFeeModal();
+  });
+  $("#interceptFeeAddRow").addEventListener("click", () => {
+    const row = createEmptyInterceptFeeDraft();
+    interceptFeeDraftRows.push(row);
+    interceptFeeDraftFocusId = row.id;
+    renderInterceptFeeDraftRows();
+    requestAnimationFrame(() => document.querySelector(`[data-intercept-fee-draft-id="${row.id}"] .intercept-fee-name`)?.focus());
+  });
+  $("#interceptFeeDraftBody").addEventListener("click", (event) => {
+    const button = event.target.closest("[data-intercept-fee-draft-remove]");
+    if (!button) return;
+    interceptFeeDraftRows = interceptFeeDraftRows.filter((row) => String(row.id) !== String(button.dataset.interceptFeeDraftRemove));
+    renderInterceptFeeDraftRows();
+  });
+  $("#interceptFeeDraftBody").addEventListener("input", (event) => {
+    const control = event.target.closest(".intercept-fee-form-field");
+    const draftId = control?.closest("[data-intercept-fee-draft-id]")?.dataset.interceptFeeDraftId;
+    const row = getInterceptFeeDraft(draftId);
+    if (!row) return;
+    const field = control.dataset.interceptFeeField;
+    row[field] = control.value;
+    if (field === "unitPrice") row.price = control.value;
+    if (["unitPrice", "price", "quantity", "exchangeRate"].includes(field)) {
+      const draftRow = control.closest("tr");
+      const originalCell = draftRow?.querySelector(".intercept-fee-draft-original");
+      const rmbCell = draftRow?.querySelector(".intercept-fee-draft-rmb");
+      if (originalCell) originalCell.textContent = formatInterceptFeeAmount(getInterceptFeeDraftOriginalAmount(row));
+      if (rmbCell) rmbCell.textContent = formatInterceptFeeAmount(getInterceptFeeDraftRmbAmount(row));
+      renderInterceptFeeDraftSummary();
+    }
+  });
+  $("#interceptFeeDraftBody").addEventListener("change", (event) => {
+    const control = event.target.closest(".intercept-fee-form-field");
+    const draftId = control?.closest("[data-intercept-fee-draft-id]")?.dataset.interceptFeeDraftId;
+    const row = getInterceptFeeDraft(draftId);
+    if (!row) return;
+    const field = control.dataset.interceptFeeField;
+    row[field] = control.value;
+    if (field === "currency") {
+      row.exchangeRate = row.currency === "人民币" ? "1" : (row.exchangeRate === "1" ? "7.1" : row.exchangeRate);
+      renderInterceptFeeDraftRows();
+      return;
+    }
+    if (field === "name") {
+      const catalog = instructionCatalog.find((item) => item.name === row.name);
+      if (!catalog) return;
+      row.type = catalog.type;
+      row.unit = catalog.unit;
+      row.unitPrice = catalog.price;
+      row.price = catalog.price;
+      row.currency = catalog.currency;
+      row.exchangeRate = catalog.currency === "人民币" ? "1" : (row.exchangeRate === "1" ? "7.1" : row.exchangeRate);
+      row.description = catalog.description || row.description || "";
+      renderInterceptFeeDraftRows();
+    }
+  });
+  $("#interceptFeeForm").addEventListener("submit", saveInterceptFeeDraftRows);
+  $("#interceptDetailOverlay").addEventListener("click", (event) => {
+    if (event.target === $("#interceptDetailOverlay")) closeInterceptDetail();
+  });
+  $("#interceptDetailActions").addEventListener("click", (event) => {
+    const button = event.target.closest("[data-detail-action]");
+    if (!button) return;
+    const action = button.dataset.detailAction;
+    const task = getInterceptTask();
+    if (action === "close") closeInterceptDetail();
+    if (action === "handle" && task) openInterceptDetail(task.id, "process");
+    if (action === "confirm") confirmInterceptTask();
+    if (action === "start") startInterceptTask();
+    if (action === "complete" && task) completeInterceptTasks([task]);
+    if (action === "retry-after-unpack" && task) createAfterUnpackInterceptTask(task);
+    if (action === "cancel") cancelInterceptTask();
+    if (action === "success" || action === "failure") openInterceptFeedback(action);
+    if (action === "storage") {
+      const task = getInterceptTask();
+      if (task) createStorageFromIntercept(task);
+      closeInterceptDetail();
+      showStagingInventory("暂存");
+    }
+    if (action === "editRemark" || action === "editCustomerRemark") {
+      const task = getInterceptTask();
+      if (task) openInterceptRemark(task.id, action === "editCustomerRemark" ? "customerRemark" : "remark");
+    }
+  });
+  $("#interceptDetailOverlay").addEventListener("click", (event) => {
+    const button = event.target.closest("[data-detail-action]");
+    if (!button || !["editRemark", "editCustomerRemark"].includes(button.dataset.detailAction)) return;
+    const task = getInterceptTask();
+    if (task) openInterceptRemark(task.id, button.dataset.detailAction === "editCustomerRemark" ? "customerRemark" : "remark");
+  });
+  $("#interceptLogClose").addEventListener("click", closeInterceptLog);
+  $("#interceptLogOverlay").addEventListener("click", (event) => {
+    if (event.target === $("#interceptLogOverlay")) closeInterceptLog();
+  });
+  $("#interceptFeedbackClose").addEventListener("click", () => { $("#interceptFeedbackOverlay").hidden = true; });
+  $("#interceptFeedbackCancel").addEventListener("click", () => { $("#interceptFeedbackOverlay").hidden = true; });
+  $("#interceptFeedbackOverlay").addEventListener("click", (event) => {
+    if (event.target === $("#interceptFeedbackOverlay")) $("#interceptFeedbackOverlay").hidden = true;
+  });
+  $("#interceptFeedbackForm").addEventListener("submit", submitInterceptFeedback);
+  $("#interceptBatchNoteClose").addEventListener("click", closeInterceptBatchNote);
+  $("#interceptBatchNoteCancel").addEventListener("click", closeInterceptBatchNote);
+  $("#interceptBatchNoteOverlay").addEventListener("click", (event) => {
+    if (event.target === $("#interceptBatchNoteOverlay")) closeInterceptBatchNote();
+  });
+  $("#interceptBatchNoteForm").addEventListener("submit", submitInterceptBatchNote);
+  $("#interceptCancelReasonClose").addEventListener("click", closeInterceptCancelReason);
+  $("#interceptCancelReasonCancel").addEventListener("click", closeInterceptCancelReason);
+  $("#interceptCancelReasonOverlay").addEventListener("click", (event) => {
+    if (event.target === $("#interceptCancelReasonOverlay")) closeInterceptCancelReason();
+  });
+  $("#interceptCancelReasonForm").addEventListener("submit", submitInterceptCancelReason);
+  $("#interceptRemarkClose").addEventListener("click", closeInterceptRemark);
+  $("#interceptRemarkCancelBtn").addEventListener("click", closeInterceptRemark);
+  $("#interceptRemarkOverlay").addEventListener("click", (event) => {
+    if (event.target === $("#interceptRemarkOverlay")) closeInterceptRemark();
+  });
+  $("#interceptRemarkForm").addEventListener("submit", (event) => {
+    if (editingInterceptFeeRemarkId) {
+      submitInterceptFeeRemark(event);
+      return;
+    }
+    submitInterceptRemark(event);
+  });
+  $("#interceptBatchSuccessClose").addEventListener("click", closeInterceptBatchSuccess);
+  $("#interceptBatchSuccessCancel").addEventListener("click", closeInterceptBatchSuccess);
+  $("#interceptBatchSuccessOverlay").addEventListener("click", (event) => {
+    if (event.target === $("#interceptBatchSuccessOverlay")) closeInterceptBatchSuccess();
+  });
+  $("#interceptBatchSuccessForm").addEventListener("submit", submitInterceptBatchSuccess);
+  $("#interceptBatchFailureClose").addEventListener("click", closeInterceptBatchFailure);
+  $("#interceptBatchFailureCancel").addEventListener("click", closeInterceptBatchFailure);
+  $("#interceptBatchFailureOverlay").addEventListener("click", (event) => {
+    if (event.target === $("#interceptBatchFailureOverlay")) closeInterceptBatchFailure();
+  });
+  $("#interceptBatchFailureForm").addEventListener("submit", submitInterceptBatchFailure);
+  document.addEventListener("keydown", (event) => {
+    if (event.key !== "Escape") return;
+    if (!$("#interceptRemarkOverlay").hidden) closeInterceptRemark();
+    else if (!$("#interceptCancelReasonOverlay").hidden) closeInterceptCancelReason();
+    else if (!$("#interceptBatchSuccessOverlay").hidden) closeInterceptBatchSuccess();
+    else if (!$("#interceptBatchFailureOverlay").hidden) closeInterceptBatchFailure();
+    else if (!$("#interceptBatchNoteOverlay").hidden) closeInterceptBatchNote();
+    else if (!$("#interceptFeedbackOverlay").hidden) $("#interceptFeedbackOverlay").hidden = true;
+    else if (!$("#interceptLogOverlay").hidden) closeInterceptLog();
+    else if (!$("#interceptDetailOverlay").hidden) closeInterceptDetail();
+  });
+}
+
+initInterceptManagement();
 renderRows();
 buildWatermarks();
